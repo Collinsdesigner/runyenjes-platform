@@ -122,7 +122,7 @@ router.post('/chat', requireAuth, async (req, res) => {
       return res.status(502).json({ error: 'The AI assistant is temporarily unavailable.' });
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     const reply = data.choices?.[0]?.message?.content ?? 'Sorry, I could not generate a response.';
 
     await prisma.aIMessage.create({
