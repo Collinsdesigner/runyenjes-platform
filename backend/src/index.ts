@@ -39,6 +39,7 @@ app.use('/uploads', uploadsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/ai', aiRoutes);
 
+console.log("GROQ KEY FOUND:", !!process.env.GROQ_API_KEY);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`✔ Server running at http://localhost:${PORT}`);
