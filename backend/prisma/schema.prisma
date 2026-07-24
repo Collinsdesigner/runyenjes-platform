@@ -1,0 +1,337 @@
+// Runyenjes Technical & Vocational College — Database Schema
+// This file is the single source of truth for every table in the system.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// IDENTITY & SETTINGS
+// ─────────────────────────────────────────────
+
+// One row only. Holds the institution's name/branding so it can be
+// changed from a settings screen later without touching any code.
+model SiteSettings {
+  id              Int      @id @default(1)
+  institutionName String   @default("Runyenjes Technical & Vocational College")
+  shortName       String   @default("Runyenjes")
+  tagline         String   @default("Empowering Through Skills and Technology")
+  logoUrl         String?
+  primaryColor    String   @default("#0B7A2B")
+  secondaryColor  String   @default("#5C0F00")
+  address         String   @default("P.O. Box 239-60103, Runyenjes")
+  phone           String   @default("0797210054")
+  email           String   @default("runyenjestti@gmail.com")
+  website         String   @default("www.runyenjestechnical.ac.ke")
+  updatedAt       DateTime @default(now()) @updatedAt
+}
+
+enum Role {
+  FOUNDER
+  ADMIN
+  REGISTRAR
+  TEACHER
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+model User {
+  id              String     @id @default(uuid())
+  name            String
+  email           String     @unique
+  passwordHash    String?
+  admissionNumber String?    @unique
+  phone           String?
+  avatarUrl       String?
+  role            Role
+  status          UserStatus @default(ACTIVE)
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+
+  groupMemberships GroupMember[]
+  messages         Message[]
+  posts            Post[]
+  comments         Comment[]
+  materials        Material[]
+  auditLogs        AuditLog[]      @relation("ActorLogs")
+  reviewedApps     Application[]   @relation("ReviewedBy")
+  verifiedPayments Payment[]       @relation("VerifiedBy")
+  continuationCheckIns ContinuationCheckIn[]
+  likes            PostLike[]
+  aiConversations  AIConversation[]
+
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// ACADEMIC STRUCTURE
+// ─────────────────────────────────────────────
+
+model Department {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  users     User[]
+  programs  Program[]
+  groups    Group[]
+  createdAt DateTime   @default(now())
+}
+
+model Program {
+  id                String   @id @default(uuid())
+  departmentId      String
+  department        Department @relation(fields: [departmentId], references: [id])
+  name              String
+  level             String?
+  entryRequirements String?
+  examBody          String?
+  isShortCourse     Boolean  @default(false)
+
+  units        Unit[]
+  fees         ProgramFee[]
+  applications Application[]
+  groups       Group[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([departmentId, name, level])
+}
+
+model ProgramFee {
+  id            String   @id @default(uuid())
+  programId     String
+  program       Program  @relation(fields: [programId], references: [id])
+  amount        Decimal
+  effectiveFrom DateTime @default(now())
+  setBy         String?
+}
+
+model Unit {
+  id        String     @id @default(uuid())
+  programId String
+  program   Program    @relation(fields: [programId], references: [id])
+  name      String
+  materials Material[]
+  createdAt DateTime   @default(now())
+}
+
+model Material {
+  id         String   @id @default(uuid())
+  unitId     String
+  unit       Unit     @relation(fields: [unitId], references: [id])
+  uploadedBy String
+  uploader   User     @relation(fields: [uploadedBy], references: [id])
+  fileUrl    String
+  type       String
+  version    Int      @default(1)
+  createdAt  DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// GROUPS & CHAT
+// ─────────────────────────────────────────────
+
+enum GroupType {
+  CLASS
+  DEPARTMENT
+  SCHOOL
+  TEACHERS
+  ADMINS
+}
+
+model Group {
+  id           String      @id @default(uuid())
+  type         GroupType
+  name         String
+  programId    String?     @unique
+  program      Program?    @relation(fields: [programId], references: [id])
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  members  GroupMember[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+}
+
+model GroupMember {
+  id          String   @id @default(uuid())
+  groupId     String
+  group       Group    @relation(fields: [groupId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  roleInGroup String   @default("member")
+  joinedAt    DateTime @default(now())
+
+  @@unique([groupId, userId])
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  groupId       String
+  group         Group    @relation(fields: [groupId], references: [id])
+  senderId      String
+  sender        User     @relation(fields: [senderId], references: [id])
+  content       String
+  attachmentUrl String?
+  createdAt     DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// HOME FEED (public)
+// ─────────────────────────────────────────────
+
+model Post {
+  id               String     @id @default(uuid())
+  authorId         String?
+  author           User?      @relation(fields: [authorId], references: [id])
+  authorNamePublic String?
+  content          String
+  mediaUrl         String?
+  comments         Comment[]
+  likes            PostLike[]
+  createdAt        DateTime   @default(now())
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id               String   @id @default(uuid())
+  postId           String
+  post             Post     @relation(fields: [postId], references: [id])
+  authorId         String?
+  author           User?    @relation(fields: [authorId], references: [id])
+  authorNamePublic String?
+  content          String
+  createdAt        DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// ADMISSIONS PORTAL
+// ─────────────────────────────────────────────
+
+enum ApplicationStatus {
+  SUBMITTED
+  ADMITTED
+  REJECTED
+  WAITLISTED
+  REPORTED
+}
+
+model Application {
+  id            String            @id @default(uuid())
+  applicantName String
+  email         String
+  phone         String
+  idNumber      String
+  programId     String
+  program       Program           @relation(fields: [programId], references: [id])
+  intake        String
+  status        ApplicationStatus @default(SUBMITTED)
+  documents     Json?
+  reviewedById  String?
+  reviewedBy    User?             @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  payments      Payment[]
+  createdAt     DateTime          @default(now())
+}
+
+model Payment {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  amount        Decimal
+  method        String
+  reference     String?
+  status        String      @default("pending")
+  verifiedById  String?
+  verifiedBy    User?       @relation("VerifiedBy", fields: [verifiedById], references: [id])
+  createdAt     DateTime    @default(now())
+}
+
+// ─────────────────────────────────────────────
+// TERM CONTINUATION (re-admission each term)
+// ─────────────────────────────────────────────
+
+model Term {
+  id        String                @id @default(uuid())
+  name      String                @unique // e.g. "Term 2 2026"
+  startDate DateTime
+  endDate   DateTime?
+  isActive  Boolean               @default(false)
+  checkIns  ContinuationCheckIn[]
+  createdAt DateTime              @default(now())
+}
+
+model ContinuationCheckIn {
+  id          String    @id @default(uuid())
+  termId      String
+  term        Term      @relation(fields: [termId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  status      String    @default("PENDING") // PENDING | CONFIRMED | DEFERRED
+  confirmedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([termId, userId])
+}
+
+// One row. Counts anonymous (not-logged-in) visits to the public Home feed —
+// no identity or IP stored, just a number.
+model VisitCounter {
+  id    Int @id @default(1)
+  count Int @default(0)
+}
+
+// ─────────────────────────────────────────────
+// AI ASSISTANT (chat history)
+// ─────────────────────────────────────────────
+
+model AIConversation {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  title     String      @default("New chat")
+  messages  AIMessage[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now()) @updatedAt
+}
+
+model AIMessage {
+  id             String         @id @default(uuid())
+  conversationId String
+  conversation   AIConversation @relation(fields: [conversationId], references: [id])
+  role           String // 'user' | 'assistant'
+  content        String
+  createdAt      DateTime       @default(now())
+}
+
+// ─────────────────────────────────────────────
+// AUDIT
+// ─────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  actor     User     @relation("ActorLogs", fields: [actorId], references: [id])
+  action    String
+  target    String?
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Default brand colors — overridden at runtime from Admin Settings
+   via JS (document.documentElement.style.setProperty), so every
+   existing Tailwind class using these stays in sync automatically. */
+:root {
+  --color-primary: #0B7A2B;
+  --color-secondary: #5C0F00;
+}
