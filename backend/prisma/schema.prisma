@@ -197,6 +197,7 @@ model Post {
   authorNamePublic String?
   content          String
   mediaUrl         String?
+  mediaPublicId    String?
   comments         Comment[]
   likes            PostLike[]
   createdAt        DateTime   @default(now())

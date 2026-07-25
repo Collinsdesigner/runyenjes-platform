@@ -24,9 +24,12 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image was uploaded' });
     }
 
-    const url = await uploadImage(req.file, 'posts');
+    const image = await uploadImage(req.file, 'posts');
 
-    res.status(201).json({ url });
+    res.status(201).json({
+      url: image.secureUrl,
+      publicId: image.publicId,
+    });
   } catch (error) {
     console.error('Upload failed:', error);
     res.status(500).json({ error: 'Image upload failed' });

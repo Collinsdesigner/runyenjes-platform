@@ -8,15 +8,29 @@ cloudinary.config({
   secure: true,
 });
 
+export interface UploadedImage {
+  secureUrl: string;
+  publicId: string;
+}
+
 export async function uploadImage(
   file: Express.Multer.File,
   folder: string
-): Promise<string> {
+): Promise<UploadedImage> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: 'image',
+        transformation: [
+          {
+            width: 1200,
+            height: 1200,
+            crop: 'limit',
+            quality: 'auto',
+            fetch_format: 'auto',
+          },
+        ],
       },
       (error, result) => {
         if (error) {
@@ -27,11 +41,20 @@ export async function uploadImage(
           return reject(new Error('Cloudinary upload failed.'));
         }
 
-        resolve(result.secure_url);
+        resolve({
+          secureUrl: result.secure_url,
+          publicId: result.public_id,
+        });
       }
     );
 
     streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+}
+
+export async function deleteImage(publicId: string): Promise<void> {
+  await cloudinary.uploader.destroy(publicId, {
+    resource_type: 'image',
   });
 }
 

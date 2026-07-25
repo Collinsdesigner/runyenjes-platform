@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { optionalAuth, requireAuth } from '../middleware/auth';
+import { deleteImage } from '../services/media.service';
 
 const router = Router();
 
@@ -42,7 +43,7 @@ router.get('/', optionalAuth, async (req, res) => {
 
 // ---------- Create a post (logged-in members only — students, teachers, admins) ----------
 router.post('/', requireAuth, async (req, res) => {
-  const { content, mediaUrl } = req.body;
+const { content, mediaUrl, mediaPublicId } = req.body;
   if (!content || !content.trim()) {
     return res.status(400).json({ error: 'Post content cannot be empty' });
   }
@@ -52,6 +53,7 @@ router.post('/', requireAuth, async (req, res) => {
       authorId: req.user!.userId,
       content: content.trim(),
       mediaUrl: mediaUrl || null,
+      mediaPublicId: mediaPublicId || null,
     },
     include: { author: { select: { name: true, role: true, avatarUrl: true } } },
   });
@@ -141,10 +143,17 @@ router.delete('/:postId', requireAuth, async (req, res) => {
     return res.status(403).json({ error: 'You can only delete your own posts' });
   }
 
-  await prisma.comment.deleteMany({ where: { postId } });
-  await prisma.postLike.deleteMany({ where: { postId } });
-  await prisma.post.delete({ where: { id: postId } });
+if (post.mediaPublicId) {
+  try {
+    await deleteImage(post.mediaPublicId);
+  } catch (error) {
+    console.error('Failed to delete image from Cloudinary:', error);
+  }
+}
 
+await prisma.comment.deleteMany({ where: { postId } });
+await prisma.postLike.deleteMany({ where: { postId } });
+await prisma.post.delete({ where: { id: postId } });
   res.status(204).send();
 });
 
