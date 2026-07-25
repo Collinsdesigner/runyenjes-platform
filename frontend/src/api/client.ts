@@ -6,7 +6,15 @@ interface RequestOptions {
   token?: string | null;
 }
 
-export async function uploadImage(file: File, token: string | null): Promise<string> {
+export interface UploadedImage {
+  url: string;
+  publicId: string;
+}
+
+export async function uploadImage(
+  file: File,
+  token: string | null
+): Promise<UploadedImage> {
   const formData = new FormData();
   formData.append('image', file);
 
@@ -20,13 +28,25 @@ export async function uploadImage(file: File, token: string | null): Promise<str
   });
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Image upload failed');
-  return data.url;
+
+  if (!res.ok) {
+    throw new Error(data.error || 'Image upload failed');
+  }
+
+  return {
+    url: data.url,
+    publicId: data.publicId,
+  };
 }
 
 export async function api(path: string, options: RequestOptions = {}) {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (options.token) headers['Authorization'] = `Bearer ${options.token}`;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (options.token) {
+    headers['Authorization'] = `Bearer ${options.token}`;
+  }
 
   const res = await fetch(`${API_URL}${path}`, {
     method: options.method || 'GET',

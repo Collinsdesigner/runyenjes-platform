@@ -39,7 +39,8 @@ export default function Profile() {
     setSuccess(null);
     setUploading(true);
     try {
-      const url = await uploadImage(file, token);
+      const image = await uploadImage(file, token);
+      const url = image.url;
       await api('/profile/avatar', { method: 'PATCH', body: { avatarUrl: url }, token });
       updateAvatar(url);
       setSuccess('Profile picture updated.');

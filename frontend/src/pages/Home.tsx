@@ -82,6 +82,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [newPost, setNewPost] = useState('');
   const [newMediaUrl, setNewMediaUrl] = useState('');
+  const [newMediaPublicId, setNewMediaPublicId] = useState('');  
   const [uploadingImage, setUploadingImage] = useState(false);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,8 +112,9 @@ export default function Home() {
     setError(null);
     setUploadingImage(true);
     try {
-      const url = await uploadImage(file, token);
-      setNewMediaUrl(url);
+    const image = await uploadImage(file, token);
+    setNewMediaUrl(image.url);
+    setNewMediaPublicId(image.publicId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Image upload failed');
     } finally {
@@ -127,11 +129,16 @@ export default function Home() {
     try {
       await api('/posts', {
         method: 'POST',
-        body: { content: newPost, mediaUrl: newMediaUrl || undefined },
+     body: {
+     content: newPost,
+     mediaUrl: newMediaUrl || undefined,
+     mediaPublicId: newMediaPublicId || undefined,
+   },
         token,
       });
       setNewPost('');
       setNewMediaUrl('');
+      setNewMediaPublicId('');
       await loadPosts();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create post');
@@ -296,7 +303,10 @@ export default function Home() {
                 <img src={newMediaUrl} alt="Preview" className="w-full max-h-64 object-contain bg-gray-100 rounded-lg" />
                 <button
                   type="button"
-                  onClick={() => setNewMediaUrl('')}
+              onClick={() => {
+                setNewMediaUrl('');
+              setNewMediaPublicId('');
+            }}
                   className="absolute top-2 right-2 bg-black/60 text-white text-xs w-6 h-6 rounded-full"
                 >
                   ✕

@@ -83,7 +83,8 @@ export default function GroupChat() {
     setError(null);
     setUploadingImage(true);
     try {
-      const url = await uploadImage(file, token);
+      const image = await uploadImage(file, token);
+      const url = image.url;
       setAttachmentUrl(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Image upload failed');
