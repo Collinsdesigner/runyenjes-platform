@@ -108,27 +108,65 @@ router.delete('/:postId/comments/:commentId', requireAuth, async (req, res) => {
   res.status(204).send();
 });
 
-// ---------- Toggle like on a post (logged-in members only) ----------
-router.post('/:postId/like', requireAuth, async (req, res) => {
+
+// ---------- Toggle like on a post (members + visitors) ----------
+router.post('/:postId/like', async (req, res) => {
   const { postId } = req.params;
-
-  const post = await prisma.post.findUnique({ where: { id: postId } });
-  if (!post) return res.status(404).json({ error: 'Post not found' });
-
-  const existing = await prisma.postLike.findUnique({
-    where: { postId_userId: { postId, userId: req.user!.userId } },
+  const { guestId, guestName } = req.body;
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
   });
 
-  if (existing) {
-    await prisma.postLike.delete({ where: { id: existing.id } });
-    const likeCount = await prisma.postLike.count({ where: { postId } });
-    return res.json({ liked: false, likeCount });
+  if (!post) {
+    return res.status(404).json({ error: 'Post not found' });
   }
 
-  await prisma.postLike.create({ data: { postId, userId: req.user!.userId } });
-  const likeCount = await prisma.postLike.count({ where: { postId } });
-  res.json({ liked: true, likeCount });
+  const userId = req.user?.userId ?? null;
+
+if (!userId && !guestId) {
+    return res.status(400).json({
+      error: 'Please provide your name before liking',
+    });
+  }
+
+const existing = await prisma.postLike.findFirst({
+  where: userId
+    ? { postId, userId }
+    : { postId, guestId },
 });
+  if (existing) {
+    await prisma.postLike.delete({
+      where: { id: existing.id },
+    });
+
+    const likeCount = await prisma.postLike.count({
+      where: { postId },
+    });
+
+    return res.json({
+      liked: false,
+      likeCount,
+    });
+  }
+
+await prisma.postLike.create({
+  data: {
+    postId,
+    userId,
+    guestId: userId ? null : guestId,
+    guestName: userId ? null : guestName,
+  },
+});
+  const likeCount = await prisma.postLike.count({
+    where: { postId },
+  });
+
+  res.json({
+    liked: true,
+    likeCount,
+  });
+});
+
 
 // ---------- Delete a post (the author, or an Admin/Founder moderating) ----------
 router.delete('/:postId', requireAuth, async (req, res) => {

@@ -89,8 +89,21 @@ export default function Home() {
 
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
-  const [guestName, setGuestName] = useState('');
 
+const [guestName, setGuestName] = useState(
+  localStorage.getItem('rtvcGuestName') || ''
+);
+
+const [guestId] = useState(() => {
+  let id = localStorage.getItem('rtvcGuestId');
+
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('rtvcGuestId', id);
+  }
+
+  return id;
+});
   async function loadPosts() {
     try {
       const data = await api('/posts', { token });
@@ -147,25 +160,42 @@ export default function Home() {
     }
   }
 
-  async function handleToggleLike(postId: string) {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    // Optimistic update so it feels instant
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likeCount + (p.likedByMe ? -1 : 1) }
-          : p
-      )
-    );
-    try {
-      await api(`/posts/${postId}/like`, { method: 'POST', token });
-    } catch {
-      await loadPosts(); // revert on failure by reloading real state
-    }
+
+async function handleToggleLike(postId: string) {
+if (!user && !guestName.trim()) {
+
+    alert('Please enter your name before liking');
+    return;
   }
+
+  // Optimistic update
+  setPosts((prev) =>
+    prev.map((p) =>
+      p.id === postId
+        ? {
+            ...p,
+            likedByMe: !p.likedByMe,
+            likeCount: p.likeCount + (p.likedByMe ? -1 : 1),
+          }
+        : p
+    )
+  );
+
+  try {
+    await api(`/posts/${postId}/like`, {
+      method: 'POST',
+
+body: {
+  guestId: user ? null : guestId,
+  guestName: user ? null : guestName,
+},
+      token,
+    });
+  } catch {
+    await loadPosts();
+  }
+}
+
 
   async function handleReply(postId: string) {
     const content = replyDrafts[postId];
@@ -213,8 +243,17 @@ export default function Home() {
             Apply
           </button>
           <button onClick={() => navigate('/browser')} className="text-sm text-gray-600 underline">
-            Browser
+            Browser          
           </button>
+          
+<button
+  onClick={() => navigate('/about-rtvc')}
+  className="font-bold text-rgreen"
+>
+  About Runyenjes TVC
+</button>
+
+
           {user && (
             <button onClick={() => navigate('/ai')} className="text-sm text-gray-600 underline">
               AI Assistance
@@ -335,12 +374,38 @@ export default function Home() {
             </div>
           </form>
         ) : (
-          <div className="bg-white rounded-xl shadow p-4 text-sm text-gray-500 text-center">
-            <button onClick={() => navigate('/login')} className="text-rgreen underline">
-              Sign in
-            </button>{' '}
-            to post an update. Anyone can still like or reply to posts below.
-          </div>
+
+
+<div className="bg-white rounded-xl shadow p-4 text-sm text-gray-600">
+  <div className="text-center mb-3">
+    <button
+      onClick={() => navigate('/login')}
+      className="text-rgreen underline font-medium"
+    >
+      Sign in
+    </button>{' '}
+    to post updates as a member.
+  </div>
+
+  {!user && (
+    <div className="border-t pt-3">
+      <p className="text-xs text-gray-500 mb-2">
+        Commenting and liking as:
+      </p>
+
+      <input
+        value={guestName}
+        onChange={(e) => {
+          setGuestName(e.target.value);
+          localStorage.setItem('rtvcGuestName', e.target.value);
+        }}
+        placeholder="Your name"
+        className="w-full border border-gray-200 rounded-full px-4 py-2 text-sm"
+      />
+    </div>
+  )}
+</div>
+
         )}
 
         {/* Feed */}
@@ -410,7 +475,10 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Action bar */}
+                
+
+
+{/* Action bar */}
                 <div className="flex border-t border-gray-100 mt-2 text-sm">
                   <button
                     onClick={() => handleToggleLike(post.id)}
@@ -455,14 +523,8 @@ export default function Home() {
                     })}
 
                     <div className="flex gap-2 items-center">
-                      {!user && (
-                        <input
-                          value={guestName}
-                          onChange={(e) => setGuestName(e.target.value)}
-                          placeholder="Your name"
-                          className="w-24 border border-gray-200 rounded-full px-3 py-1.5 text-xs bg-white"
-                        />
-                      )}
+
+
                       {user && <Avatar name={user.name} avatarUrl={user.avatarUrl} />}
                       <input
                         value={replyDrafts[post.id] ?? ''}

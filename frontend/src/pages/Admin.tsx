@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api/client';
-
+import { api, uploadInstitutionLogo } from '../api/client';
 interface Stats {
   students: number;
   teachers: number;
@@ -101,6 +100,11 @@ export default function Admin() {
   const [siteSettings, setSiteSettings] = useState<any>(null);
   const [settingsForm, setSettingsForm] = useState<any>({});
 
+const [uploadingLogo, setUploadingLogo] = useState(false);
+
+const [logoFile, setLogoFile] = useState<File | null>(null);
+const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
   async function loadUsers() {
     try {
       const params = new URLSearchParams();
@@ -130,6 +134,7 @@ export default function Admin() {
       ]);
       setSiteSettings(settings);
       setSettingsForm(settings);
+      setLogoPreview(settings.logoUrl ?? null);      
       setStats(s);
       setDepartments(d.map((dept: any) => ({ id: dept.id, name: dept.name })));
       setCatalog(d);
@@ -427,6 +432,29 @@ export default function Admin() {
       setError(err instanceof Error ? err.message : 'Could not update settings');
     }
   }
+
+async function handleLogoUpload(file: File) {
+  if (!token) return;
+
+  try {
+    setUploadingLogo(true);
+
+    const image = await uploadInstitutionLogo(file, token);
+
+    setSettingsForm({
+      ...settingsForm,
+      logoUrl: image.url,
+      logoPublicId: image.publicId,
+    });
+
+    setSuccess('Logo uploaded. Click Save settings to apply it.');
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Logo upload failed');
+  } finally {
+    setUploadingLogo(false);
+  }
+}
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1033,14 +1061,75 @@ export default function Admin() {
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
             </div>
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">Logo URL</label>
-              <input
-                value={settingsForm.logoUrl ?? ''}
-                onChange={(e) => setSettingsForm({ ...settingsForm, logoUrl: e.target.value })}
-                placeholder="Paste a link to the logo image"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
+<div>
+  <label className="block text-xs text-gray-600 mb-1">About the Institution</label>
+  <textarea
+    value={settingsForm.about ?? ''}
+    onChange={(e) => setSettingsForm({ ...settingsForm, about: e.target.value })}
+    placeholder="Write a short description about the institution"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+    rows={4}
+  />
+</div>
+
+<div>
+  <label className="block text-xs text-gray-600 mb-1">Physical Location</label>
+  <input
+    value={settingsForm.physicalLocation ?? ''}
+    onChange={(e) => setSettingsForm({ ...settingsForm, physicalLocation: e.target.value })}
+    placeholder="Example: Karurumo Location, Kavai Village, Embu County, Kenya"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+  />
+</div>
+
+<div>
+  <label className="block text-xs text-gray-600 mb-1">Google Maps Link</label>
+  <input
+    value={settingsForm.googleMapsUrl ?? ''}
+    onChange={(e) => setSettingsForm({ ...settingsForm, googleMapsUrl: e.target.value })}
+    placeholder="Paste Google Maps location link"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+  />
+</div>            
+
+<div>
+
+
+<div>
+  <label className="block text-xs text-gray-600 mb-1">
+    Institution Logo
+  </label>
+
+  <div className="flex items-center gap-3">
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          handleLogoUpload(file);
+        }
+      }}
+      className="text-sm"
+    />
+
+    {uploadingLogo && (
+      <span className="text-sm text-gray-500">
+        Uploading...
+      </span>
+    )}
+  </div>
+
+  {settingsForm.logoUrl && (
+    <img
+      src={settingsForm.logoUrl}
+      alt="Institution logo"
+      className="mt-3 w-24 h-24 object-contain border rounded"
+    />
+  )}
+</div>
+
+
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

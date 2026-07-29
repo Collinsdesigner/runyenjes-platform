@@ -39,6 +39,39 @@ export async function uploadImage(
   };
 }
 
+
+export async function uploadInstitutionLogo(
+  file: File,
+  token: string | null
+): Promise<UploadedImage> {
+  const formData = new FormData();
+  formData.append('logo', file);
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_URL}/admin/institution-logo`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.error || 'Logo upload failed');
+  }
+
+  return {
+    url: data.logoUrl ?? data.url,
+    publicId: data.logoPublicId ?? data.publicId,
+  };
+}
+
+
+
 export async function api(path: string, options: RequestOptions = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

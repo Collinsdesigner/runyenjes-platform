@@ -1,9 +1,23 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import multer from 'multer';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { uploadImage, deleteImage } from '../services/media.service';
 
 const router = Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+});
 
 // All admin routes require Admin or Founder. (Registrar has its own scoped
 // routes under /applications and /terms — this dashboard is broader.)
@@ -457,6 +471,9 @@ router.patch('/settings', async (req, res) => {
     phone,
     email,
     website,
+    about,
+    physicalLocation,
+    googleMapsUrl,
   } = req.body;
 
   const settings = await prisma.siteSettings.update({
@@ -472,6 +489,10 @@ router.patch('/settings', async (req, res) => {
       ...(phone !== undefined && { phone }),
       ...(email !== undefined && { email }),
       ...(website !== undefined && { website }),
+      ...(about !== undefined && { about }),
+      ...(physicalLocation !== undefined && { physicalLocation }),
+      ...(googleMapsUrl !== undefined && { googleMapsUrl }),
+
     },
   });
 
@@ -513,6 +534,42 @@ router.post('/repair-group-memberships', async (req, res) => {
   }
 
   res.json({ message: `Repaired ${fixedCount} missing group membership(s).` });
+});
+
+// ---------- Upload institution logo ----------
+router.post('/institution-logo', upload.single('logo'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No logo uploaded' });
+    }
+
+    const current = await prisma.siteSettings.findUnique({
+      where: { id: 1 },
+    });
+
+    // Delete old Cloudinary logo
+    if (current?.logoPublicId) {
+      await deleteImage(current.logoPublicId);
+    }
+
+    const image = await uploadImage(req.file, 'institution');
+
+    const settings = await prisma.siteSettings.update({
+      where: { id: 1 },
+      data: {
+        logoUrl: image.secureUrl,
+        logoPublicId: image.publicId,
+      },
+    });
+
+    res.json(settings);
+
+  } catch (error) {
+    console.error('Logo upload failed:', error);
+    res.status(500).json({
+      error: 'Logo upload failed',
+    });
+  }
 });
 
 export default router;

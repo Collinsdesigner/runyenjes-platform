@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import path from 'path';
+
+import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
 import postsRoutes from './routes/posts.routes';
 import settingsRoutes from './routes/settings.routes';
@@ -14,19 +17,116 @@ import adminRoutes from './routes/admin.routes';
 import uploadsRoutes from './routes/uploads.routes';
 import profileRoutes from './routes/profile.routes';
 import aiRoutes from './routes/ai.routes';
+import { errorHandler } from './middleware/errorHandler';
+import morgan from 'morgan';
+
+import {
+  apiLimiter,
+  loginLimiter,
+  uploadLimiter,
+} from './middleware/rateLimit';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+/**
+ * =========================
+ * Security Configuration
+ * =========================
+ */
 
-// Simple health check — visit this in a browser to confirm the server is alive
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Runyenjes backend is running' });
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
+/**
+ * =========================
+ * CORS Configuration
+ * =========================
+ */
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow Postman, curl and server-to-server requests
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('CORS: Origin not allowed'));
+    },
+    credentials: true,
+  })
+);
+
+/**
+ * =========================
+ * Request Logging
+ * =========================
+ */
+
+app.use(morgan('dev'));
+
+/**
+ * =========================
+ * Body Parsing
+ * =========================
+ */
+
+app.use(express.json());
+
+/**
+ * =========================
+ * Global API Rate Limit
+ * =========================
+ */
+
+app.use(apiLimiter);
+
+/**
+ * =========================
+ * Static Files
+ * =========================
+ */
+
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '..', 'uploads'))
+);
+
+/**
+ * =========================
+ * Health Check
+ * =========================
+ */
+
+app.get('/', (_, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Runyenjes backend is running',
+  });
 });
 
-app.use('/auth', authRoutes);
+/**
+ * =========================
+ * Routes
+ * =========================
+ */
+
+app.use('/auth', loginLimiter, authRoutes);
 app.use('/posts', postsRoutes);
 app.use('/settings', settingsRoutes);
 app.use('/programs', programsRoutes);
@@ -35,11 +135,31 @@ app.use('/groups', groupsRoutes);
 app.use('/terms', termsRoutes);
 app.use('/library', libraryRoutes);
 app.use('/admin', adminRoutes);
-app.use('/uploads', uploadsRoutes);
+app.use('/uploads', uploadLimiter, uploadsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/ai', aiRoutes);
 
-const PORT = process.env.PORT || 4000;
+/**
+ * =========================
+ * 404 Handler
+ * =========================
+ */
+
+app.use((req, res) => {
+  res.status(404).json({
+    message: `Route '${req.originalUrl}' not found`,
+  });
+});
+
+app.use(errorHandler);
+
+/**
+ * =========================
+ * Start Server
+ * =========================
+ */
+
+const PORT = Number(env.PORT);
 app.listen(PORT, () => {
   console.log(`✔ Server running at http://localhost:${PORT}`);
 });

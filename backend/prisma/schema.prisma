@@ -21,13 +21,19 @@ model SiteSettings {
   institutionName String   @default("Runyenjes Technical & Vocational College")
   shortName       String   @default("Runyenjes")
   tagline         String   @default("Empowering Through Skills and Technology")
+  
   logoUrl         String?
+  logoPublicId    String?
+
   primaryColor    String   @default("#0B7A2B")
   secondaryColor  String   @default("#5C0F00")
   address         String   @default("P.O. Box 239-60103, Runyenjes")
   phone           String   @default("0797210054")
   email           String   @default("runyenjestti@gmail.com")
   website         String   @default("www.runyenjestechnical.ac.ke")
+  about            String?
+  physicalLocation String?
+  googleMapsUrl    String?
   updatedAt       DateTime @default(now()) @updatedAt
 }
 
@@ -203,16 +209,23 @@ model Post {
   createdAt        DateTime   @default(now())
 }
 
+
 model PostLike {
   id        String   @id @default(uuid())
+
   postId    String
-  post      Post     @relation(fields: [postId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+guestId   String?
+guestName String?
   createdAt DateTime @default(now())
 
   @@unique([postId, userId])
 }
+
 
 model Comment {
   id               String   @id @default(uuid())

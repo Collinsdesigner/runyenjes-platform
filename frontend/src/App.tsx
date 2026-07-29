@@ -5,6 +5,7 @@ import { api } from './api/client';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Apply from './pages/Apply';
+import AboutRTVC from './pages/AboutRTVC';
 import Admissions from './pages/Admissions';
 import Groups from './pages/Groups';
 import GroupChat from './pages/GroupChat';
@@ -40,6 +41,9 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+
+          <Route path="/about-rtvc" element={<AboutRTVC />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/admissions" element={<Admissions />} />
