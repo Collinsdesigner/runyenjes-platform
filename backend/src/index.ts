@@ -16,6 +16,7 @@ import libraryRoutes from './routes/library.routes';
 import adminRoutes from './routes/admin.routes';
 import uploadsRoutes from './routes/uploads.routes';
 import profileRoutes from './routes/profile.routes';
+import securityRoutes from './routes/security.routes';
 import aiRoutes from './routes/ai.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
@@ -23,7 +24,8 @@ import morgan from 'morgan';
 import {
   apiLimiter,
   loginLimiter,
-  uploadLimiter,
+securityLimiter,  
+uploadLimiter,
 } from './middleware/rateLimit';
 
 const app = express();
@@ -137,6 +139,7 @@ app.use('/library', libraryRoutes);
 app.use('/admin', adminRoutes);
 app.use('/uploads', uploadLimiter, uploadsRoutes);
 app.use('/profile', profileRoutes);
+app.use('/security', securityLimiter, securityRoutes);
 app.use('/ai', aiRoutes);
 
 /**

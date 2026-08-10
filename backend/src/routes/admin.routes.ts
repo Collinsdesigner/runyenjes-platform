@@ -178,9 +178,19 @@ router.post('/users/:id/reset-password', async (req, res) => {
     return res.status(400).json({ error: 'Students log in with their admission number, not a password' });
   }
 
-  const passwordHash = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({ where: { id }, data: { passwordHash } });
-  res.json({ success: true });
+
+const passwordHash = await bcrypt.hash(newPassword, 10);
+
+await prisma.user.update({
+  where: { id },
+  data: {
+    passwordHash,
+    mustChangePassword: true,
+    passwordChangedAt: null,
+  },
+});
+
+res.json({ success: true });
 });
 
 // ---------- Change a staff member's department after creation ----------

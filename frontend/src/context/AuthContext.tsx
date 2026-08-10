@@ -6,15 +6,16 @@ interface CurrentUser {
   name: string;
   role: string;
   avatarUrl: string | null;
+  mustChangePassword?: boolean;
 }
 
 interface AuthContextValue {
   user: CurrentUser | null;
   token: string | null;
   studentLogin: (email: string, admissionNumber: string) => Promise<void>;
-  staffLogin: (email: string, password: string) => Promise<void>;
+  staffLogin: (email: string, password: string) => Promise<CurrentUser>;
   logout: () => void;
-  updateAvatar: (avatarUrl: string) => void;
+  updateAvatar: (avatarUrl: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -43,13 +44,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persist(data.token, data.user);
   }
 
-  async function staffLogin(email: string, password: string) {
-    const data = await api('/auth/staff-login', {
-      method: 'POST',
-      body: { email, password },
-    });
-    persist(data.token, data.user);
-  }
+async function staffLogin(email: string, password: string): Promise<CurrentUser> {
+  const data = await api('/auth/staff-login', {
+    method: 'POST',
+    body: { email, password },
+  });
+
+  persist(data.token, data.user);
+
+  return data.user;
+}
 
   function logout() {
     localStorage.removeItem('runyenjes_token');
@@ -58,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
-  function updateAvatar(avatarUrl: string) {
+function updateAvatar(avatarUrl: string | null) {
     setUser((prev) => {
       if (!prev) return prev;
       const updated = { ...prev, avatarUrl };

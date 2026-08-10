@@ -59,6 +59,7 @@ model User {
   admissionNumber String?    @unique
   phone           String?
   avatarUrl       String?
+  avatarPublicId  String?
   role            Role
   status          UserStatus @default(ACTIVE)
   departmentId    String?
@@ -76,7 +77,10 @@ model User {
   likes            PostLike[]
   aiConversations  AIConversation[]
 
-  createdAt DateTime @default(now())
+mustChangePassword Boolean  @default(false)
+passwordChangedAt  DateTime?
+
+createdAt DateTime @default(now())
 }
 
 // ─────────────────────────────────────────────

@@ -39,10 +39,18 @@ export default function Profile() {
     setSuccess(null);
     setUploading(true);
     try {
-      const image = await uploadImage(file, token);
-      const url = image.url;
-      await api('/profile/avatar', { method: 'PATCH', body: { avatarUrl: url }, token });
-      updateAvatar(url);
+const image = await uploadImage(file, token);
+
+await api('/profile/avatar', {
+  method: 'PATCH',
+  body: {
+    avatarUrl: image.url,
+    avatarPublicId: image.publicId,
+  },
+  token,
+});
+
+updateAvatar(image.url);
       setSuccess('Profile picture updated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update profile picture');
@@ -50,6 +58,30 @@ export default function Profile() {
       setUploading(false);
     }
   }
+
+async function handleRemoveAvatar() {
+  if (!token) return;
+
+  setError(null);
+  setSuccess(null);
+
+  try {
+    await api('/profile/avatar', {
+      method: 'DELETE',
+      token,
+    });
+
+    updateAvatar(null);
+    setImgError(false);
+    setSuccess('Profile picture removed.');
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : 'Could not remove profile picture.'
+    );
+  }
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -78,6 +110,18 @@ export default function Profile() {
           <p className="font-semibold mt-3">{user.name}</p>
           <p className="text-xs text-gray-400">{user.role}</p>
 
+{user.role !== 'STUDENT' && (
+  <div className="mt-4">
+    <button
+      type="button"
+      onClick={() => navigate('/security')}
+      className="text-sm text-rgreen underline"
+    >
+      Security Settings
+    </button>
+  </div>
+)}
+
           <label className="inline-block mt-4 text-sm text-rgreen underline cursor-pointer">
             <input
               type="file"
@@ -88,6 +132,15 @@ export default function Profile() {
             />
             {uploading ? 'Uploading…' : 'Change profile picture'}
           </label>
+{user.avatarUrl && (
+  <button
+    type="button"
+    onClick={handleRemoveAvatar}
+    className="block mx-auto mt-3 text-sm text-red-600 underline"
+  >
+    Remove profile picture
+  </button>
+)}
 
           {error && <p className="text-xs text-rmaroon mt-2">{error}</p>}
           {success && <p className="text-xs text-green-700 mt-2">✔ {success}</p>}

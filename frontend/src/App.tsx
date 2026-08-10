@@ -15,6 +15,7 @@ import LibraryUnits from './pages/LibraryUnits';
 import Admin from './pages/Admin';
 import Browser from './pages/Browser';
 import Profile from './pages/Profile';
+import Security from './pages/Security';
 import VideoCall from './pages/VideoCall';
 import AIAssistant from './pages/AIAssistant';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
@@ -55,8 +56,10 @@ export default function App() {
           <Route path="/library/:programId" element={<LibraryUnits />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/browser" element={<Browser />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/ai" element={<AIAssistant />} />
+         <Route path="/profile" element={<Profile />} />
+         <Route path="/security" element={<Security />} />
+         <Route path="/ai" element={<AIAssistant />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

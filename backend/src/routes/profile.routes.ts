@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
+import { deleteImage } from '../services/media.service';
 
 const router = Router();
 
@@ -26,16 +27,86 @@ router.get('/me', requireAuth, async (req, res) => {
 // The frontend first uploads the image file via POST /uploads (which returns a URL),
 // then calls this with that URL to attach it to the account.
 router.patch('/avatar', requireAuth, async (req, res) => {
-  const { avatarUrl } = req.body;
-  if (!avatarUrl) return res.status(400).json({ error: 'avatarUrl is required' });
+  try {
+    const { avatarUrl, avatarPublicId } = req.body;
 
-  const user = await prisma.user.update({
-    where: { id: req.user!.userId },
-    data: { avatarUrl },
-    select: { id: true, name: true, avatarUrl: true },
-  });
+    if (!avatarUrl || !avatarPublicId) {
+      return res.status(400).json({
+        error: 'avatarUrl and avatarPublicId are required',
+      });
+    }
 
-  res.json(user);
+    const existingUser = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      select: {
+        avatarPublicId: true,
+      },
+    });
+
+    if (existingUser?.avatarPublicId) {
+      try {
+        await deleteImage(existingUser.avatarPublicId);
+      } catch (error) {
+        console.error('Failed to delete old avatar:', error);
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user!.userId },
+      data: {
+        avatarUrl,
+        avatarPublicId,
+      },
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+        avatarPublicId: true,
+      },
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Avatar update failed:', error);
+    res.status(500).json({
+      error: 'Failed to update avatar',
+    });
+  }
 });
+// ---------- Delete my profile picture ----------
+router.delete('/avatar', requireAuth, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      select: {
+        avatarPublicId: true,
+      },
+    });
 
+    if (user?.avatarPublicId) {
+      try {
+        await deleteImage(user.avatarPublicId);
+      } catch (error) {
+        console.error('Failed to delete avatar from Cloudinary:', error);
+      }
+    }
+
+    await prisma.user.update({
+      where: { id: req.user!.userId },
+      data: {
+        avatarUrl: null,
+        avatarPublicId: null,
+      },
+    });
+
+    res.json({
+      message: 'Profile picture removed successfully.',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: 'Failed to remove profile picture.',
+    });
+  }
+});
 export default router;
