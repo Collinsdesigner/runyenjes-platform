@@ -11,6 +11,36 @@ export interface UploadedImage {
   publicId: string;
 }
 
+// ------------------------------------------------------------
+// Session-expiration handler
+// AuthContext registers this when the app starts.
+// The API client calls it whenever an authenticated request
+// receives HTTP 401 Unauthorized.
+// ------------------------------------------------------------
+let onSessionExpired: (() => void) | null = null;
+
+export function registerSessionExpiredHandler(
+  handler: () => void
+): () => void {
+  onSessionExpired = handler;
+
+  // Return a cleanup function so React can unregister it.
+  return () => {
+    if (onSessionExpired === handler) {
+      onSessionExpired = null;
+    }
+  };
+}
+
+function handleUnauthorized() {
+  if (onSessionExpired) {
+    onSessionExpired();
+  }
+}
+
+// ------------------------------------------------------------
+// Upload image
+// ------------------------------------------------------------
 export async function uploadImage(
   file: File,
   token: string | null
@@ -19,7 +49,10 @@ export async function uploadImage(
   formData.append('image', file);
 
   const headers: Record<string, string> = {};
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${API_URL}/uploads`, {
     method: 'POST',
@@ -28,6 +61,10 @@ export async function uploadImage(
   });
 
   const data = await res.json().catch(() => ({}));
+
+  if (res.status === 401) {
+    handleUnauthorized();
+  }
 
   if (!res.ok) {
     throw new Error(data.error || 'Image upload failed');
@@ -39,7 +76,9 @@ export async function uploadImage(
   };
 }
 
-
+// ------------------------------------------------------------
+// Upload institution logo
+// ------------------------------------------------------------
 export async function uploadInstitutionLogo(
   file: File,
   token: string | null
@@ -48,6 +87,7 @@ export async function uploadInstitutionLogo(
   formData.append('logo', file);
 
   const headers: Record<string, string> = {};
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -60,6 +100,10 @@ export async function uploadInstitutionLogo(
 
   const data = await res.json().catch(() => ({}));
 
+  if (res.status === 401) {
+    handleUnauthorized();
+  }
+
   if (!res.ok) {
     throw new Error(data.error || 'Logo upload failed');
   }
@@ -70,9 +114,13 @@ export async function uploadInstitutionLogo(
   };
 }
 
-
-
-export async function api(path: string, options: RequestOptions = {}) {
+// ------------------------------------------------------------
+// Standard API client
+// ------------------------------------------------------------
+export async function api(
+  path: string,
+  options: RequestOptions = {}
+) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -84,13 +132,21 @@ export async function api(path: string, options: RequestOptions = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     method: options.method || 'GET',
     headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: options.body
+      ? JSON.stringify(options.body)
+      : undefined,
   });
 
   const data = await res.json().catch(() => ({}));
 
+  if (res.status === 401) {
+    handleUnauthorized();
+  }
+
   if (!res.ok) {
-    throw new Error(data.error || `Request failed (${res.status})`);
+    throw new Error(
+      data.error || `Request failed (${res.status})`
+    );
   }
 
   return data;
