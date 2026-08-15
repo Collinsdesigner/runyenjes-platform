@@ -19,7 +19,7 @@ interface RosterEntry {
   confirmedAt: string | null;
 }
 
-const ADMIN_ROLES = ['REGISTRAR', 'ADMIN', 'FOUNDER'];
+const ADMIN_ROLES = ['REGISTRAR', 'ADMIN'];
 
 export default function Continuation() {
   const { user, token } = useAuth();
@@ -137,7 +137,7 @@ export default function Continuation() {
         {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
 
         {/* Admin/Founder: open a new term */}
-        {user.role === 'ADMIN' || user.role === 'FOUNDER' ? (
+        {user.role === 'ADMIN' ? (
           <form onSubmit={handleOpenTerm} className="bg-white rounded-lg shadow p-4 space-y-2">
             <p className="text-sm font-medium">Open a new term</p>
             <input

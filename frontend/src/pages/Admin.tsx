@@ -31,7 +31,7 @@ interface ProgramOption {
   label: string;
 }
 
-const ALLOWED = ['ADMIN', 'FOUNDER'];
+const ALLOWED = ['ADMIN'];
 type Tab = 'stats' | 'users' | 'departments' | 'import' | 'settings';
 
 export default function Admin() {
@@ -651,29 +651,26 @@ async function handleLogoUpload(file: File) {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {u.role !== 'FOUNDER' && (
-                        <button
-                          onClick={() => {
-                            setExpandedUserId(expandedUserId === u.id ? null : u.id);
-                            setDeptChangeFor(u.department?.id ?? '');
-                            setNewPasswordFor('');
-                          }}
-                          className="text-xs text-gray-500 underline"
-                        >
-                          Manage
-                        </button>
-                      )}
-                      {u.role !== 'FOUNDER' && (
-                        <button
-                          onClick={() => toggleStatus(u)}
-                          className={`text-xs px-2 py-1 rounded-md ${
-                            u.status === 'ACTIVE' ? 'bg-rmaroon text-white' : 'bg-rgreen text-white'
-                          }`}
-                        >
-                          {u.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
-                        </button>
-                      )}
-                      {u.role !== 'FOUNDER' && u.status !== 'ARCHIVED' && (
+                      <button
+                        onClick={() => {
+                          setExpandedUserId(expandedUserId === u.id ? null : u.id);
+                          setDeptChangeFor(u.department?.id ?? '');
+                          setNewPasswordFor('');
+                        }}
+                        className="text-xs text-gray-500 underline"
+                      >
+                        Manage
+                      </button>
+
+                      <button
+                        onClick={() => toggleStatus(u)}
+                        className={`text-xs px-2 py-1 rounded-md ${
+                          u.status === 'ACTIVE' ? 'bg-rmaroon text-white' : 'bg-rgreen text-white'
+                        }`}
+                      >
+                        {u.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
+                      </button>
+                      {u.status !== 'ARCHIVED' && (
                         <button
                           onClick={async () => {
                             if (!confirm(`Archive ${u.name}? This is for people who never joined or completed — their account becomes permanently inactive but records are kept.`)) return;

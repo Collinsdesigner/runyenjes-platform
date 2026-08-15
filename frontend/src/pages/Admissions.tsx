@@ -25,8 +25,7 @@ interface Application {
   program: { name: string; level: string | null; department: { name: string } };
 }
 
-const ALLOWED_ROLES = ['REGISTRAR', 'ADMIN', 'FOUNDER'];
-
+const ALLOWED_ROLES = ['REGISTRAR', 'ADMIN'];
 export default function Admissions() {
   const { user, token } = useAuth();
   const navigate = useNavigate();

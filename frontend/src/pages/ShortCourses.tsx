@@ -31,7 +31,7 @@ export default function ShortCourses() {
 
   // NOT publicly launched yet — awaiting Admin/Founder approval to go live.
   // To make this public later, just remove this check.
-  if (!user || !['ADMIN', 'FOUNDER'].includes(user.role)) {
+if (!user || user.role !== 'ADMIN') {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 text-center p-6">
         This page is a preview, not yet approved for public launch.

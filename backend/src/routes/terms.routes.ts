@@ -11,7 +11,7 @@ router.get('/active', async (req, res) => {
 });
 
 // ---------- Admin/Founder: open a new term (deactivates any previous active term) ----------
-router.post('/', requireAuth, requireRole('ADMIN', 'FOUNDER'), async (req, res) => {
+router.post('/', requireAuth, requireRole('ADMIN'), async (req, res) => {
   const { name, startDate, endDate } = req.body;
   if (!name || !startDate) {
     return res.status(400).json({ error: 'Term name and start date are required' });
@@ -72,7 +72,7 @@ router.post('/confirm', requireAuth, requireRole('STUDENT'), async (req, res) =>
 router.get(
   '/status',
   requireAuth,
-  requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'),
+requireRole('REGISTRAR', 'ADMIN'),
   async (req, res) => {
     const activeTerm = await prisma.term.findFirst({ where: { isActive: true } });
     if (!activeTerm) return res.status(404).json({ error: 'No active term' });
@@ -102,7 +102,7 @@ router.get(
 router.post(
   '/confirm-for/:userId',
   requireAuth,
-  requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'),
+  requireRole('REGISTRAR', 'ADMIN'),
   async (req, res) => {
     const { userId } = req.params;
 

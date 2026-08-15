@@ -43,7 +43,7 @@ export function optionalAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// Use to restrict a route to specific roles, e.g. requireRole('ADMIN', 'FOUNDER')
+// Use to restrict a route to specific roles, e.g. requireRole('ADMIN')
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {

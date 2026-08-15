@@ -17,6 +17,10 @@ import Browser from './pages/Browser';
 import Profile from './pages/Profile';
 import Security from './pages/Security';
 import VideoCall from './pages/VideoCall';
+import PortalRedirect from './pages/PortalRedirect';
+import StudentPortal from './pages/portal/StudentPortal';
+import TeacherPortal from './pages/portal/TeacherPortal';
+import AdminPortal from './pages/portal/AdminPortal';
 import AIAssistant from './pages/AIAssistant';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
 
@@ -54,9 +58,12 @@ export default function App() {
           <Route path="/continuation" element={<Continuation />} />
           <Route path="/library" element={<Library />} />
           <Route path="/library/:programId" element={<LibraryUnits />} />
-          <Route path="/admin" element={<Admin />} />
+         <Route path="/admin" element={<AdminPortal />} />
           <Route path="/browser" element={<Browser />} />
          <Route path="/profile" element={<Profile />} />
+         <Route path="/portal" element={<PortalRedirect />} />
+         <Route path="/student" element={<StudentPortal />} />
+         <Route path="/teacher" element={<TeacherPortal />} />
          <Route path="/security" element={<Security />} />
          <Route path="/ai" element={<AIAssistant />} />
 

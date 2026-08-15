@@ -167,7 +167,7 @@ export default function GroupChat() {
             messages.map((m) => {
               const canDelete =
                 user &&
-                (m.senderId === user.id || ['TEACHER', 'ADMIN', 'FOUNDER'].includes(user.role));
+                (m.senderId === user.id || ['TEACHER', 'ADMIN'].includes(user.role));
               return (
                 <div key={m.id} className="flex gap-2 items-start">
                   <MiniAvatar name={m.sender.name} avatarUrl={m.sender.avatarUrl} />

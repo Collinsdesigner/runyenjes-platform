@@ -21,8 +21,7 @@ const upload = multer({
 
 // All admin routes require Admin or Founder. (Registrar has its own scoped
 // routes under /applications and /terms — this dashboard is broader.)
-router.use(requireAuth, requireRole('ADMIN', 'FOUNDER'));
-
+router.use(requireAuth, requireRole('ADMIN'));
 // ---------- Quick stats for the dashboard home ----------
 router.get('/stats', async (req, res) => {
   const [students, teachers, departments, pendingApplications, visitCounter] = await Promise.all([
@@ -149,9 +148,6 @@ router.patch('/users/:id/status', async (req, res) => {
 
   const target = await prisma.user.findUnique({ where: { id } });
   if (!target) return res.status(404).json({ error: 'User not found' });
-  if (target.role === 'FOUNDER') {
-    return res.status(403).json({ error: 'The Founder account cannot be modified here' });
-  }
 
   const user = await prisma.user.update({
     where: { id },
@@ -171,9 +167,6 @@ router.post('/users/:id/reset-password', async (req, res) => {
 
   const target = await prisma.user.findUnique({ where: { id } });
   if (!target) return res.status(404).json({ error: 'User not found' });
-  if (target.role === 'FOUNDER') {
-    return res.status(403).json({ error: 'The Founder account cannot be modified here' });
-  }
   if (!target.passwordHash) {
     return res.status(400).json({ error: 'Students log in with their admission number, not a password' });
   }
@@ -200,9 +193,6 @@ router.patch('/users/:id/department', async (req, res) => {
 
   const target = await prisma.user.findUnique({ where: { id } });
   if (!target) return res.status(404).json({ error: 'User not found' });
-  if (target.role === 'FOUNDER') {
-    return res.status(403).json({ error: 'The Founder account cannot be modified here' });
-  }
 
   if (target.departmentId) {
     const oldGroup = await prisma.group.findFirst({
@@ -524,9 +514,13 @@ router.post('/repair-group-memberships', async (req, res) => {
   for (const u of users) {
     const groupIds: string[] = [];
     if (schoolGroup) groupIds.push(schoolGroup.id);
-    if ((u.role === 'TEACHER' || u.role === 'FOUNDER') && teachersGroup) groupIds.push(teachersGroup.id);
-    if ((u.role === 'ADMIN' || u.role === 'FOUNDER') && adminsGroup) groupIds.push(adminsGroup.id);
+    if (u.role === 'TEACHER' && teachersGroup) {
+      groupIds.push(teachersGroup.id);
+    }
 
+    if (u.role === 'ADMIN' && adminsGroup) {
+      groupIds.push(adminsGroup.id);
+    }
     if (u.departmentId) {
       const deptGroup = await prisma.group.findFirst({
         where: { type: 'DEPARTMENT', departmentId: u.departmentId },

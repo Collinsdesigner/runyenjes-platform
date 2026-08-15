@@ -29,7 +29,7 @@ export default function LibraryUnits() {
   const [newUnitName, setNewUnitName] = useState('');
   const [materialDrafts, setMaterialDrafts] = useState<Record<string, { url: string; type: string }>>({});
 
-  const canManage = user && ['TEACHER', 'ADMIN', 'FOUNDER'].includes(user.role);
+  const canManage = user && ['TEACHER', 'ADMIN'].includes(user.role);
 
   async function load() {
     if (!programId) return;

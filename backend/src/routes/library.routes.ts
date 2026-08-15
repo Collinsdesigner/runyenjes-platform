@@ -34,7 +34,7 @@ router.get('/programs/:programId/units', requireAuth, async (req, res) => {
 // Helper: a Teacher may only manage units/materials for programs inside their
 // own department. Admin/Founder keep platform-wide authority, unrestricted.
 async function canManageProgram(userRole: string, userDepartmentId: string | null, programId: string) {
-  if (userRole === 'ADMIN' || userRole === 'FOUNDER') return true;
+if (userRole === 'ADMIN') return true;
   if (userRole !== 'TEACHER') return false;
   if (!userDepartmentId) return false;
 
@@ -46,7 +46,7 @@ async function canManageProgram(userRole: string, userDepartmentId: string | nul
 router.post(
   '/programs/:programId/units',
   requireAuth,
-  requireRole('TEACHER', 'ADMIN', 'FOUNDER'),
+requireRole('TEACHER', 'ADMIN'),
   async (req, res) => {
     const { programId } = req.params;
     const { name } = req.body;
@@ -69,7 +69,7 @@ router.post(
 router.post(
   '/units/:unitId/materials',
   requireAuth,
-  requireRole('TEACHER', 'ADMIN', 'FOUNDER'),
+  requireRole('TEACHER', 'ADMIN'),
   async (req, res) => {
     const { unitId } = req.params;
     const { fileUrl, type } = req.body;
@@ -100,7 +100,7 @@ router.post(
 router.delete(
   '/units/:unitId',
   requireAuth,
-  requireRole('TEACHER', 'ADMIN', 'FOUNDER'),
+  requireRole('TEACHER', 'ADMIN'),
   async (req, res) => {
     const { unitId } = req.params;
 

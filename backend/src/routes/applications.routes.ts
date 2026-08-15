@@ -59,7 +59,7 @@ router.post('/:id/payments', async (req, res) => {
 router.patch(
   '/payments/:paymentId/verify',
   requireAuth,
-  requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'),
+requireRole('REGISTRAR', 'ADMIN'),
   async (req, res) => {
     const { paymentId } = req.params;
     const { status } = req.body; // 'verified' | 'rejected'
@@ -89,7 +89,7 @@ router.patch(
 );
 
 // ---------- Registrar/Admin/Founder: list all applications ----------
-router.get('/', requireAuth, requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'), async (req, res) => {
+router.get('/', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req, res) => {
   const applications = await prisma.application.findMany({
     orderBy: { createdAt: 'desc' },
     include: { program: { include: { department: true } }, payments: true },
@@ -122,7 +122,7 @@ router.get('/', requireAuth, requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'), async
 router.patch(
   '/:id/status',
   requireAuth,
-  requireRole('REGISTRAR', 'ADMIN', 'FOUNDER'),
+requireRole('REGISTRAR', 'ADMIN'),
   async (req, res) => {
     const { id } = req.params;
     const { status } = req.body; // 'ADMITTED' | 'REJECTED' | 'WAITLISTED'

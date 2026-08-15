@@ -190,20 +190,9 @@ async function main() {
   console.log('✔ School-wide groups created');
 
   // 5. Starter accounts — CHANGE THESE PASSWORDS after first login
-  const founderPass = await bcrypt.hash('ChangeMe123!', 10);
   const adminPass = await bcrypt.hash('ChangeMe123!', 10);
   const registrarPass = await bcrypt.hash('ChangeMe123!', 10);
 
-  await prisma.user.upsert({
-    where: { email: 'founder@runyenjestechnical.ac.ke' },
-    update: {},
-    create: {
-      name: 'Collins Kariuki (Founder)',
-      email: 'founder@runyenjestechnical.ac.ke',
-      passwordHash: founderPass,
-      role: Role.FOUNDER,
-    },
-  });
 
   await prisma.user.upsert({
     where: { email: 'admin@runyenjestechnical.ac.ke' },
@@ -227,7 +216,7 @@ async function main() {
     },
   });
 
-  console.log('✔ Starter accounts created (founder, admin, registrar) — password for all: ChangeMe123!');
+  console.log('✔ Starter accounts created (admin, registrar) — password for all: ChangeMe123!');
   console.log('\nSeed complete.');
 }
 

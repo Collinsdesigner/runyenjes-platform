@@ -28,7 +28,7 @@ export default function Library() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isStaff = user && ['TEACHER', 'ADMIN', 'FOUNDER'].includes(user.role);
+  const isStaff = user && ['TEACHER', 'ADMIN'].includes(user.role);
 
   useEffect(() => {
     if (!user) return;

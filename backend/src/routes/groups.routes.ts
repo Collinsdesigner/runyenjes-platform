@@ -77,8 +77,7 @@ router.delete('/:groupId/messages/:messageId', requireAuth, async (req, res) => 
   }
 
   const isSender = message.senderId === req.user!.userId;
-  const isPlatformModerator = ['ADMIN', 'FOUNDER'].includes(req.user!.role);
-
+const isPlatformModerator = req.user!.role === 'ADMIN';
   let isTeacherModerator = false;
   if (!isSender && !isPlatformModerator && req.user!.role === 'TEACHER') {
     const membership = await prisma.groupMember.findUnique({

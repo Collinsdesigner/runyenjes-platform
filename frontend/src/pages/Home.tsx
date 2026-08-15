@@ -282,7 +282,7 @@ body: {
               Continuation
             </button>
           )}
-          {user && ['REGISTRAR', 'ADMIN', 'FOUNDER'].includes(user.role) && (
+          {user && ['REGISTRAR', 'ADMIN'].includes(user.role) && (
             <button
               onClick={() => navigate('/admissions')}
               className="text-sm text-gray-600 underline"
@@ -290,7 +290,7 @@ body: {
               Admissions
             </button>
           )}
-          {user && ['ADMIN', 'FOUNDER'].includes(user.role) && (
+          {user && ['ADMIN'].includes(user.role) && (
             <button onClick={() => navigate('/admin')} className="text-sm text-gray-600 underline">
               Admin
             </button>
@@ -417,7 +417,7 @@ body: {
           posts.map((post) => {
             const authorName = post.author?.name ?? 'Unknown';
             const commentsOpen = openComments[post.id];
-            const canDelete = user && (post.authorId === user.id || ['ADMIN', 'FOUNDER'].includes(user.role));
+            const canDelete = user && (post.authorId === user.id || ['ADMIN'].includes(user.role));
             return (
               <div key={post.id} className="bg-white rounded-xl shadow overflow-hidden">
                 <div className="p-4 pb-2">
@@ -507,7 +507,7 @@ body: {
                           <div className="bg-white rounded-2xl px-3 py-2 flex-1">
                             <div className="flex items-center justify-between">
                               <p className="text-xs font-semibold">{cName}</p>
-                              {user && (c.authorId === user.id || ['ADMIN', 'FOUNDER'].includes(user.role)) && (
+                              {user && (c.authorId === user.id || ['ADMIN'].includes(user.role)) && (
                                 <button
                                   onClick={() => handleDeleteComment(post.id, c.id)}
                                   className="text-[10px] text-gray-400 hover:text-rmaroon"
