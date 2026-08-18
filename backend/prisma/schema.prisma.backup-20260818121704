@@ -42,10 +42,6 @@ enum Role {
   REGISTRAR
   TEACHER
   STUDENT
-  FINANCE_OFFICER
-  HR_OFFICER
-  EXAM_OFFICER
-  STORES_OFFICER
 }
 
 enum UserStatus {
@@ -89,23 +85,6 @@ model User {
   createdAt DateTime @default(now())
 
   timetableEntriesAsLecturer TimetableEntry[] @relation("TimetableLecturer")
-
-  // Finance
-  invoices             Invoice[]     @relation("StudentInvoices")
-  feePaymentsRecorded  FeePayment[]  @relation("FeePaymentRecordedBy")
-
-  // HR
-  staffProfile    StaffProfile?
-  leaveRequests   LeaveRequest[] @relation("StaffLeaveRequests")
-  leaveApprovals  LeaveRequest[] @relation("LeaveApprovedBy")
-
-  // Examinations
-  examsCreated         Exam[]       @relation("ExamCreatedBy")
-  examResults          ExamResult[] @relation("StudentExamResults")
-  examResultsRecorded  ExamResult[] @relation("ExamResultRecordedBy")
-
-  // Stores / Inventory
-  stockMovementsRecorded StockMovement[] @relation("StockMovementRecordedBy")
 }
 
 // ─────────────────────────────────────────────
@@ -113,13 +92,12 @@ model User {
 // ─────────────────────────────────────────────
 
 model Department {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  users          User[]
-  programs       Program[]
-  groups         Group[]
-  inventoryItems InventoryItem[]
-  createdAt      DateTime        @default(now())
+  id        String    @id @default(uuid())
+  name      String    @unique
+  users     User[]
+  programs  Program[]
+  groups    Group[]
+  createdAt DateTime  @default(now())
 }
 
 model Program {
@@ -162,7 +140,6 @@ model Unit {
   lecturerAssignments UnitLecturer[]
   createdAt           DateTime           @default(now())
   timetableEntries    TimetableEntry[]
-  exams               Exam[]
 }
 
 model Material {
@@ -382,8 +359,6 @@ model Term {
   lecturerAssignments UnitLecturer[]
   createdAt           DateTime              @default(now())
   timetableEntries    TimetableEntry[]
-  invoices            Invoice[]
-  exams               Exam[]
 }
 
 model ContinuationCheckIn {
@@ -467,212 +442,4 @@ model TimetableEntry {
   @@unique([unitId, termId, dayOfWeek, startTime])
   @@index([termId])
   @@index([unitId])
-}
-
-// ─────────────────────────────────────────────
-// FINANCE MODULE
-// ─────────────────────────────────────────────
-// Lean v1: invoices billed to a student for a term, with payments recorded
-// against them. Kept separate from the admissions Payment model above,
-// which is specifically for application fees.
-
-enum InvoiceStatus {
-  PENDING
-  PARTIALLY_PAID
-  PAID
-  OVERDUE
-  CANCELLED
-}
-
-model Invoice {
-  id          String        @id @default(uuid())
-  studentId   String
-  student     User          @relation("StudentInvoices", fields: [studentId], references: [id])
-  termId      String
-  term        Term          @relation(fields: [termId], references: [id])
-  description String
-  amount      Decimal
-  dueDate     DateTime?
-  status      InvoiceStatus @default(PENDING)
-
-  payments  FeePayment[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([studentId])
-  @@index([termId])
-}
-
-model FeePayment {
-  id            String   @id @default(uuid())
-  invoiceId     String
-  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
-  amount        Decimal
-  method        String // CASH | MPESA | BANK | CHEQUE | OTHER
-  reference     String?
-  recordedById  String
-  recordedBy    User     @relation("FeePaymentRecordedBy", fields: [recordedById], references: [id])
-  paidAt        DateTime @default(now())
-
-  @@index([invoiceId])
-}
-
-// ─────────────────────────────────────────────
-// HUMAN RESOURCES MODULE
-// ─────────────────────────────────────────────
-// Lean v1: one profile per staff User, plus leave requests. Payroll is
-// deliberately out of scope for now — this is enough to test real HR
-// workflows end-to-end.
-
-enum EmploymentType {
-  FULL_TIME
-  PART_TIME
-  CONTRACT
-}
-
-enum StaffStatus {
-  ACTIVE
-  ON_LEAVE
-  SUSPENDED
-  TERMINATED
-}
-
-model StaffProfile {
-  id             String         @id @default(uuid())
-  userId         String         @unique
-  user           User           @relation(fields: [userId], references: [id])
-  employeeNumber String?        @unique
-  position       String?
-  employmentType EmploymentType @default(FULL_TIME)
-  dateHired      DateTime?
-  nationalId     String?
-  status         StaffStatus    @default(ACTIVE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum LeaveType {
-  ANNUAL
-  SICK
-  MATERNITY
-  PATERNITY
-  UNPAID
-  OTHER
-}
-
-enum LeaveStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-model LeaveRequest {
-  id           String      @id @default(uuid())
-  staffId      String
-  staff        User        @relation("StaffLeaveRequests", fields: [staffId], references: [id])
-  type         LeaveType
-  startDate    DateTime
-  endDate      DateTime
-  reason       String?
-  status       LeaveStatus @default(PENDING)
-  approvedById String?
-  approvedBy   User?       @relation("LeaveApprovedBy", fields: [approvedById], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([staffId])
-}
-
-// ─────────────────────────────────────────────
-// EXAMINATIONS MODULE
-// ─────────────────────────────────────────────
-// Lean v1: an Exam belongs to a Unit + Term (reuses existing academic
-// structure); ExamResult records one student's score for that exam.
-
-model Exam {
-  id          String   @id @default(uuid())
-  unitId      String
-  unit        Unit     @relation(fields: [unitId], references: [id])
-  termId      String
-  term        Term     @relation(fields: [termId], references: [id])
-  name        String // e.g. "CAT 1", "End of Term Exam"
-  examDate    DateTime?
-  maxScore    Decimal  @default(100)
-  weight      Decimal? // optional weighting toward final grade
-  createdById String
-  createdBy   User     @relation("ExamCreatedBy", fields: [createdById], references: [id])
-
-  results ExamResult[]
-
-  createdAt DateTime @default(now())
-
-  @@index([unitId])
-  @@index([termId])
-}
-
-model ExamResult {
-  id           String   @id @default(uuid())
-  examId       String
-  exam         Exam     @relation(fields: [examId], references: [id])
-  studentId    String
-  student      User     @relation("StudentExamResults", fields: [studentId], references: [id])
-  score        Decimal
-  grade        String?
-  remarks      String?
-  recordedById String
-  recordedBy   User     @relation("ExamResultRecordedBy", fields: [recordedById], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([examId, studentId])
-}
-
-// ─────────────────────────────────────────────
-// STORES / INVENTORY MODULE
-// ─────────────────────────────────────────────
-// Lean v1: item catalog with a running quantityOnHand, plus a movement
-// log (receipts/issues/adjustments) that is the audit trail for how
-// quantityOnHand changed over time.
-
-enum StockMovementType {
-  RECEIPT
-  ISSUE
-  ADJUSTMENT
-}
-
-model InventoryItem {
-  id               String   @id @default(uuid())
-  name             String
-  category         String?
-  uom              String   @default("pcs") // unit of measure: pcs, kg, litres, etc.
-  quantityOnHand   Decimal  @default(0)
-  reorderLevel     Decimal  @default(0)
-  departmentId     String?
-  department       Department? @relation(fields: [departmentId], references: [id])
-
-  movements StockMovement[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([departmentId])
-}
-
-model StockMovement {
-  id           String            @id @default(uuid())
-  itemId       String
-  item         InventoryItem     @relation(fields: [itemId], references: [id])
-  type         StockMovementType
-  quantity     Decimal
-  reason       String?
-  recordedById String
-  recordedBy   User              @relation("StockMovementRecordedBy", fields: [recordedById], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@index([itemId])
 }
