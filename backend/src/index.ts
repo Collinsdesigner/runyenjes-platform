@@ -20,6 +20,10 @@ import profileRoutes from './routes/profile.routes';
 import securityRoutes from './routes/security.routes';
 import aiRoutes from './routes/ai.routes';
 import academicRoutes from './routes/academic.routes';
+import financeRoutes from './routes/finance.routes';
+import hrRoutes from './routes/hr.routes';
+import examinationsRoutes from './routes/examinations.routes';
+import storesRoutes from './routes/stores.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
 
@@ -146,6 +150,10 @@ app.use('/profile', profileRoutes);
 app.use('/security', securityLimiter, securityRoutes);
 app.use('/ai', aiRoutes);
 app.use('/academic', academicRoutes);
+app.use('/finance', financeRoutes);
+app.use('/hr', hrRoutes);
+app.use('/examinations', examinationsRoutes);
+app.use('/stores', storesRoutes);
 
 /**
  * =========================
