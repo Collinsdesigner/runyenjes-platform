@@ -23,14 +23,14 @@ export default function Login() {
     try {
       if (mode === 'student') {
         await studentLogin(email, admissionNumber);
-        navigate('/');
+        navigate('/portal');
       } else {
         const user = await staffLogin(email, password);
 
         if (user.mustChangePassword) {
           navigate('/security');
         } else {
-          navigate('/');
+          navigate('/portal');
         }
       }
     } catch (err) {
@@ -148,7 +148,7 @@ export default function Login() {
 
         <button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/portal')}
           className="w-full text-center text-sm text-gray-500 mt-4 underline"
         >
           Continue to Home feed without logging in

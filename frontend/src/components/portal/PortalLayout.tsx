@@ -14,6 +14,11 @@ interface NavItem {
   icon: string;
 }
 
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
 interface SiteSettings {
   institutionName: string;
   shortName: string;
@@ -22,46 +27,160 @@ interface SiteSettings {
   secondaryColor: string;
 }
 
-const commonItems: NavItem[] = [
-  { label: 'Dashboard', path: '/portal', icon: '⌂' },
-  { label: 'Profile', path: '/profile', icon: '◉' },
-  { label: 'Groups', path: '/groups', icon: '◎' },
-  { label: 'AI Assistant', path: '/ai', icon: '✦' },
-  { label: 'Security', path: '/security', icon: '🔒' },
+/*
+ * Shared navigation
+ * These appear for authenticated users in every portal.
+ */
+const commonSections: NavSection[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { label: 'AI Assistant', path: '/ai', icon: '✦' },
+      { label: 'Notebook', path: '/notebook', icon: '📝' },
+      { label: 'Groups', path: '/groups', icon: '💬' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { label: 'Profile', path: '/profile', icon: '◉' },
+      { label: 'Security', path: '/security', icon: '🔒' },
+    ],
+  },
 ];
 
-const roleItems: Record<string, NavItem[]> = {
+/*
+ * Role-specific navigation
+ */
+const roleSections: Record<string, NavSection[]> = {
   STUDENT: [
-    { label: 'My Academics', path: '/student/academics', icon: '🎓' },
-    { label: 'Learning Materials', path: '/library', icon: '📚' },
-    { label: 'Timetable', path: '/student/timetable', icon: '▦' },
-    { label: 'Assignments', path: '/student/assignments', icon: '✓' },
-    { label: 'Results', path: '/student/results', icon: '▤' },
-    { label: 'Fees & Payments', path: '/student/fees', icon: '▣' },
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', path: '/student', icon: '⌂' },
+      ],
+    },
+    {
+      title: 'Academics',
+      items: [
+        { label: 'My Academics', path: '/student/academics', icon: '🎓' },
+        { label: 'Learning Materials', path: '/library', icon: '📚' },
+        { label: 'Timetable', path: '/student/timetable', icon: '▦' },
+        { label: 'Assignments', path: '/student/assignments', icon: '✓' },
+        { label: 'Results', path: '/student/results', icon: '📊' },
+      ],
+    },
+    {
+      title: 'Student Services',
+      items: [
+        { label: 'Fees & Payments', path: '/student/fees', icon: '💰' },
+      ],
+    },
   ],
 
   TEACHER: [
-    { label: 'My Classes', path: '/teacher/classes', icon: '🏫' },
-    { label: 'My Units', path: '/teacher/units', icon: '📖' },
-    { label: 'Students', path: '/teacher/students', icon: '👥' },
-    { label: 'Attendance', path: '/teacher/attendance', icon: '✓' },
-    { label: 'Assignments', path: '/teacher/assignments', icon: '▤' },
-    { label: 'Assessments', path: '/teacher/assessments', icon: '▣' },
-    { label: 'Results', path: '/teacher/results', icon: '📊' },
-    { label: 'Learning Materials', path: '/library', icon: '📚' },
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', path: '/teacher', icon: '⌂' },
+      ],
+    },
+    {
+      title: 'Teaching',
+      items: [
+        { label: 'My Classes', path: '/teacher/classes', icon: '🏫' },
+        { label: 'My Units', path: '/teacher/units', icon: '📖' },
+        { label: 'Students', path: '/teacher/students', icon: '👥' },
+        { label: 'Attendance', path: '/teacher/attendance', icon: '✓' },
+        { label: 'Assignments', path: '/teacher/assignments', icon: '📝' },
+        { label: 'Assessments', path: '/teacher/assessments', icon: '▣' },
+        { label: 'Results', path: '/teacher/results', icon: '📊' },
+        { label: 'Learning Materials', path: '/library', icon: '📚' },
+      ],
+    },
+  ],
+
+  REGISTRAR: [
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', path: '/registrar', icon: '⌂' },
+      ],
+    },
+    {
+      title: 'Admissions & Registration',
+      items: [
+        { label: 'Admissions', path: '/admissions', icon: '📝' },
+        { label: 'Student Records', path: '/registrar/students', icon: '🎓' },
+        { label: 'Continuation', path: '/continuation', icon: '🔄' },
+      ],
+    },
+    {
+      title: 'Academic Administration',
+      items: [
+        { label: 'Academic Records', path: '/registrar/academic', icon: '📚' },
+        { label: 'Programmes & Departments', path: '/registrar/programmes', icon: '🏛️' },
+        { label: 'Timetable', path: '/registrar/timetable', icon: '▦' },
+      ],
+    },
+    {
+      title: 'Documents',
+      items: [
+        { label: 'Student Documents', path: '/registrar/documents', icon: '📄' },
+        { label: 'Letters & Certificates', path: '/registrar/letters', icon: '📜' },
+      ],
+    },
+    {
+      title: 'Communication',
+      items: [
+        { label: 'Announcements', path: '/registrar/announcements', icon: '📢' },
+      ],
+    },
+    {
+      title: 'Reports',
+      items: [
+        { label: 'Registrar Reports', path: '/registrar/reports', icon: '📊' },
+      ],
+    },
   ],
 
   ADMIN: [
-    { label: 'Users', path: '/admin/users', icon: '👥' },
-    { label: 'Students', path: '/admin/students', icon: '🎓' },
-    { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
-    { label: 'Academic', path: '/admin/academic', icon: '📚' },
-    { label: 'Admissions', path: '/admin/admissions', icon: '📝' },
-    { label: 'Finance', path: '/admin/finance', icon: '💰' },
-    { label: 'Library', path: '/admin/library', icon: '📖' },
-    { label: 'Communication', path: '/admin/communication', icon: '💬' },
-    { label: 'Reports', path: '/admin/reports', icon: '📊' },
-    { label: 'Settings', path: '/admin/settings', icon: '⚙' },
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', path: '/admin', icon: '⌂' },
+      ],
+    },
+    {
+      title: 'Administration',
+      items: [
+        { label: 'Users', path: '/admin/users', icon: '👥' },
+        { label: 'Students', path: '/admin/students', icon: '🎓' },
+        { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
+      ],
+    },
+    {
+      title: 'Academic',
+      items: [
+        { label: 'Academic', path: '/admin/academic', icon: '📚' },
+        { label: 'Admissions', path: '/admin/admissions', icon: '📝' },
+      ],
+    },
+    {
+      title: 'Operations',
+      items: [
+        { label: 'Finance', path: '/admin/finance', icon: '💰' },
+        { label: 'Library', path: '/admin/library', icon: '📖' },
+        { label: 'Communication', path: '/admin/communication', icon: '💬' },
+      ],
+    },
+    {
+      title: 'Management',
+      items: [
+        { label: 'Reports', path: '/admin/reports', icon: '📊' },
+        { label: 'Settings', path: '/admin/settings', icon: '⚙' },
+      ],
+    },
   ],
 };
 
@@ -94,7 +213,7 @@ export default function PortalLayout({
         }
       })
       .catch(() => {
-        // Keep the default branding if settings cannot be loaded.
+        // Keep default branding if settings cannot be loaded.
       });
   }, []);
 
@@ -102,9 +221,9 @@ export default function PortalLayout({
     return null;
   }
 
-  const items = [
-    ...(roleItems[user.role] ?? []),
-    ...commonItems,
+  const sections: NavSection[] = [
+    ...(roleSections[user.role] ?? []),
+    ...commonSections,
   ];
 
   function handleLogout() {
@@ -122,10 +241,14 @@ export default function PortalLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
+
+      {/* ================= SIDEBAR ================= */}
       <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col">
+
+        {/* Branding */}
         <div className="px-5 py-5 border-b border-gray-200">
           <div className="flex items-center gap-3">
+
             {settings?.logoUrl ? (
               <img
                 src={settings.logoUrl}
@@ -147,6 +270,7 @@ export default function PortalLayout({
                 {institutionName}
               </div>
             </div>
+
           </div>
 
           <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -154,62 +278,86 @@ export default function PortalLayout({
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {items.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition ${
-                  isActive
-                    ? 'bg-rgreen text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`
-              }
-            >
-              <span className="w-5 text-center">
-                {item.icon}
-              </span>
+        {/* Navigation */}
+        <nav className="flex-1 p-3 overflow-y-auto">
 
-              <span>{item.label}</span>
-            </NavLink>
+          {sections.map((section) => (
+            <div key={section.title} className="mb-5">
+
+              <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                {section.title}
+              </div>
+
+              <div className="space-y-1">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
+                        isActive
+                          ? 'bg-rgreen text-white shadow-sm'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`
+                    }
+                  >
+                    <span className="w-5 text-center shrink-0">
+                      {item.icon}
+                    </span>
+
+                    <span className="truncate">
+                      {item.label}
+                    </span>
+                  </NavLink>
+                ))}
+              </div>
+
+            </div>
           ))}
+
         </nav>
 
+        {/* Sign out */}
         <div className="p-3 border-t border-gray-200">
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-100"
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition"
           >
             🚪 Sign out
           </button>
         </div>
+
       </aside>
 
-      {/* Main area */}
+      {/* ================= MAIN AREA ================= */}
       <div className="flex-1 min-w-0">
+
         {/* Top bar */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
-          <div>
-            <h1 className="font-semibold text-gray-900">
+
+          <div className="min-w-0">
+            <h1 className="font-semibold text-gray-900 truncate">
               {title}
             </h1>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 truncate">
               Welcome, {user.name}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+
+            {/* Notifications */}
             <button
               type="button"
-              className="text-gray-500 hover:text-gray-800 text-lg"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
               aria-label="Notifications"
             >
               🔔
             </button>
 
+            {/* Profile */}
             <button
               type="button"
               onClick={() => navigate('/profile')}
@@ -231,14 +379,18 @@ export default function PortalLayout({
                 {user.name}
               </span>
             </button>
+
           </div>
+
         </header>
 
         {/* Page */}
         <main className="p-4 md:p-6">
           {children}
         </main>
+
       </div>
+
     </div>
   );
 }

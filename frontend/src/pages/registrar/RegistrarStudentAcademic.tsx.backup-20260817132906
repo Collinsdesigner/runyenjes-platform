@@ -1,0 +1,614 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import PortalLayout from '../../components/portal/PortalLayout';
+import { api } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
+
+type Student = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  admissionNumber: string | null;
+  status: string;
+  department: {
+    id: string;
+    name: string;
+  } | null;
+  program: {
+    id: string;
+    name: string;
+    level: string | null;
+  } | null;
+  intake: string | null;
+};
+
+type Unit = {
+  id: string;
+  name: string;
+};
+
+type Program = {
+  id: string;
+  name: string;
+  level: string | null;
+  department: {
+    id: string;
+    name: string;
+  };
+  units: Unit[];
+};
+
+type Registration = {
+  id: string;
+  status: string;
+  createdAt: string;
+  unit: Unit;
+  term: {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string | null;
+  };
+};
+
+type Enrollment = {
+  id: string;
+  status: string;
+  enrolledAt: string;
+  program: Program;
+  unitRegistrations: Registration[];
+};
+
+type AcademicData = {
+  enrollments: Enrollment[];
+};
+
+type Term = {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string | null;
+  isActive: boolean;
+};
+
+export default function RegistrarStudentAcademic() {
+  const { studentId } = useParams();
+  const { token } = useAuth();
+  const navigate = useNavigate();
+
+  const [student, setStudent] = useState<Student | null>(null);
+  const [academic, setAcademic] = useState<AcademicData>({
+    enrollments: [],
+  });
+  const [term, setTerm] = useState<Term | null>(null);
+
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [selectedProgram, setSelectedProgram] = useState('');
+
+  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [savingProgram, setSavingProgram] = useState(false);
+  const [registering, setRegistering] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  const currentEnrollment = academic.enrollments[0] ?? null;
+
+  const registeredUnitIds = useMemo(() => {
+    const ids = new Set<string>();
+
+    currentEnrollment?.unitRegistrations
+      .filter((registration) => registration.status === 'REGISTERED')
+      .forEach((registration) => ids.add(registration.unit.id));
+
+    return ids;
+  }, [currentEnrollment]);
+
+  async function load() {
+    if (!token || !studentId) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const [studentsResponse, academicResponse, programsResponse, termResponse] =
+        await Promise.all([
+          api(`/registrar/students/${encodeURIComponent(studentId)}`, {
+            token,
+          }),
+          api(`/academic/students/${studentId}/enrollments`, {
+            token,
+          }),
+          api('/academic/programmes', {
+            token,
+          }),
+          api('/terms/active', {
+            token,
+          }),
+        ]);
+
+      const foundStudent = studentsResponse;
+
+      if (!foundStudent || foundStudent.id !== studentId) {
+        throw new Error('Student record could not be found');
+      }
+
+      setStudent(foundStudent);
+      setAcademic({ enrollments: academicResponse ?? [] });
+      setPrograms(programsResponse ?? []);
+      setTerm(termResponse ?? null);
+
+      if (academicResponse?.[0]?.program?.id) {
+        setSelectedProgram(academicResponse[0].program.id);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not load the student academic record'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+  }, [token, studentId]);
+
+  async function enrolStudent() {
+    if (!token || !studentId || !selectedProgram) return;
+
+    setSavingProgram(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await api('/academic/enrollments', {
+        method: 'POST',
+        token,
+        body: {
+          studentId,
+          programId: selectedProgram,
+        },
+      });
+
+      setMessage('Student enrolled in the programme successfully.');
+      await load();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not enrol the student'
+      );
+    } finally {
+      setSavingProgram(false);
+    }
+  }
+
+  function toggleUnit(unitId: string) {
+    if (registeredUnitIds.has(unitId)) return;
+
+    setSelectedUnits((current) =>
+      current.includes(unitId)
+        ? current.filter((id) => id !== unitId)
+        : [...current, unitId]
+    );
+  }
+
+  async function registerSelectedUnits() {
+    if (!token || !currentEnrollment || selectedUnits.length === 0) return;
+
+    setRegistering(true);
+    setError('');
+    setMessage('');
+
+    try {
+      for (const unitId of selectedUnits) {
+        await api('/academic/unit-registrations', {
+          method: 'POST',
+          token,
+          body: {
+            enrollmentId: currentEnrollment.id,
+            unitId,
+          },
+        });
+      }
+
+      setSelectedUnits([]);
+      setMessage(
+        `${selectedUnits.length} unit${
+          selectedUnits.length === 1 ? '' : 's'
+        } registered successfully.`
+      );
+
+      await load();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not register the selected units'
+      );
+
+      await load();
+    } finally {
+      setRegistering(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <PortalLayout title="Student Academic Record">
+        <div className="bg-white border border-gray-200 rounded-lg p-10 text-center text-gray-500">
+          Loading student academic record...
+        </div>
+      </PortalLayout>
+    );
+  }
+
+  if (!student) {
+    return (
+      <PortalLayout title="Student Academic Record">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-5">
+          {error || 'Student record not found.'}
+        </div>
+      </PortalLayout>
+    );
+  }
+
+  const programmeUnits = currentEnrollment?.program.units ?? [];
+
+  return (
+    <PortalLayout title="Student Academic Record">
+      <div className="space-y-6">
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <button
+              onClick={() => navigate('/registrar/students')}
+              className="text-sm text-gray-500 hover:text-gray-900 mb-2"
+            >
+              ← Back to Student Records
+            </button>
+
+            <h2 className="text-2xl font-bold text-gray-900">
+              Student Academic Record
+            </h2>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Manage programme enrolment and current unit registration.
+            </p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">
+            {message}
+          </div>
+        )}
+
+        {/* Student profile */}
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">
+              Student Information
+            </h3>
+          </div>
+
+          <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <p className="text-xs text-gray-500">Full Name</p>
+              <p className="font-medium text-gray-900 mt-1">
+                {student.name}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Admission Number</p>
+              <p className="font-medium text-gray-900 mt-1">
+                {student.admissionNumber ?? '—'}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Status</p>
+              <p className="font-medium text-gray-900 mt-1">
+                {student.status}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Email</p>
+              <p className="text-gray-900 mt-1">
+                {student.email}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Phone</p>
+              <p className="text-gray-900 mt-1">
+                {student.phone ?? '—'}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Intake</p>
+              <p className="text-gray-900 mt-1">
+                {student.intake ?? '—'}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Department</p>
+              <p className="text-gray-900 mt-1">
+                {student.department?.name ?? '—'}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500">Current Programme</p>
+              <p className="text-gray-900 mt-1">
+                {student.program?.name ?? 'Not assigned'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Term */}
+        <section className="bg-white border border-gray-200 rounded-lg p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-xs text-gray-500">Active Academic Term</p>
+
+              <h3 className="text-lg font-semibold text-gray-900 mt-1">
+                {term?.name ?? 'No active term'}
+              </h3>
+            </div>
+
+            <span
+              className={
+                term
+                  ? 'inline-flex w-fit px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'
+                  : 'inline-flex w-fit px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600'
+              }
+            >
+              {term ? 'OPEN' : 'CLOSED'}
+            </span>
+          </div>
+        </section>
+
+        {/* Programme enrolment */}
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">
+              Programme Enrolment
+            </h3>
+          </div>
+
+          <div className="p-5">
+            {currentEnrollment ? (
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                <div>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {currentEnrollment.program.name}
+                  </p>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    {currentEnrollment.program.department.name}
+                    {currentEnrollment.program.level
+                      ? ` • ${currentEnrollment.program.level}`
+                      : ''}
+                  </p>
+
+                  <p className="text-xs text-gray-400 mt-2">
+                    Enrolled{' '}
+                    {new Date(
+                      currentEnrollment.enrolledAt
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <span className="inline-flex w-fit px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                  {currentEnrollment.status}
+                </span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">
+                  This student has not yet been enrolled in a programme.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedProgram}
+                    onChange={(event) =>
+                      setSelectedProgram(event.target.value)
+                    }
+                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm"
+                  >
+                    <option value="">Select programme</option>
+
+                    {programs.map((program) => (
+                      <option key={program.id} value={program.id}>
+                        {program.name}
+                        {program.level ? ` — ${program.level}` : ''}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    onClick={enrolStudent}
+                    disabled={!selectedProgram || savingProgram}
+                    className="px-5 py-2 rounded-lg bg-rgreen text-white text-sm font-medium disabled:opacity-50"
+                  >
+                    {savingProgram ? 'Enrolling...' : 'Enrol Student'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Current unit registration */}
+        {currentEnrollment && (
+          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Current Unit Registration
+                </h3>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  {term?.name ?? 'No active term'} •{' '}
+                  {programmeUnits.length} programme unit
+                  {programmeUnits.length === 1 ? '' : 's'}
+                </p>
+              </div>
+
+              <button
+                onClick={registerSelectedUnits}
+                disabled={
+                  !term ||
+                  selectedUnits.length === 0 ||
+                  registering
+                }
+                className="px-5 py-2 rounded-lg bg-rgreen text-white text-sm font-medium disabled:opacity-50"
+              >
+                {registering
+                  ? 'Registering...'
+                  : `Register Selected (${selectedUnits.length})`}
+              </button>
+            </div>
+
+            {!term ? (
+              <div className="p-8 text-center text-gray-500">
+                No active academic term is open for unit registration.
+              </div>
+            ) : programmeUnits.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                No units have been defined for this programme.
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {programmeUnits.map((unit) => {
+                  const registered = registeredUnitIds.has(unit.id);
+                  const selected = selectedUnits.includes(unit.id);
+
+                  return (
+                    <label
+                      key={unit.id}
+                      className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={registered || selected}
+                        disabled={registered}
+                        onChange={() => toggleUnit(unit.id)}
+                        className="h-4 w-4"
+                      />
+
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">
+                          {unit.name}
+                        </p>
+
+                        <p className="text-xs text-gray-500 mt-1">
+                          {registered
+                            ? 'Registered for current term'
+                            : selected
+                              ? 'Selected for registration'
+                              : 'Available for registration'}
+                        </p>
+                      </div>
+
+                      {registered && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          REGISTERED
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Registration history */}
+        {currentEnrollment && (
+          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900">
+                Registration History
+              </h3>
+            </div>
+
+            {currentEnrollment.unitRegistrations.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                No unit registration history yet.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        Unit
+                      </th>
+                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        Term
+                      </th>
+                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        Status
+                      </th>
+                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        Registered
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-100">
+                    {currentEnrollment.unitRegistrations.map(
+                      (registration) => (
+                        <tr key={registration.id}>
+                          <td className="px-5 py-4 font-medium text-gray-900">
+                            {registration.unit.name}
+                          </td>
+
+                          <td className="px-5 py-4 text-gray-700">
+                            {registration.term.name}
+                          </td>
+
+                          <td className="px-5 py-4">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                              {registration.status}
+                            </span>
+                          </td>
+
+                          <td className="px-5 py-4 text-gray-500">
+                            {new Date(
+                              registration.createdAt
+                            ).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
+      </div>
+    </PortalLayout>
+  );
+}

@@ -21,7 +21,13 @@ import PortalRedirect from './pages/PortalRedirect';
 import StudentPortal from './pages/portal/StudentPortal';
 import TeacherPortal from './pages/portal/TeacherPortal';
 import AdminPortal from './pages/portal/AdminPortal';
+import RegistrarPortal from './pages/portal/RegistrarPortal';
+import RegistrarStudents from './pages/registrar/RegistrarStudents';
+import RegistrarProgrammes from './pages/registrar/RegistrarProgrammes';
+import RegistrarStudentAcademic from './pages/registrar/RegistrarStudentAcademic';
 import AIAssistant from './pages/AIAssistant';
+import RegistrarTimetable from './pages/registrar/RegistrarTimetable';
+import StudentTimetable from './pages/portal/StudentTimetable';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
 
 export default function App() {
@@ -63,11 +69,17 @@ export default function App() {
          <Route path="/profile" element={<Profile />} />
          <Route path="/portal" element={<PortalRedirect />} />
          <Route path="/student" element={<StudentPortal />} />
+         <Route path="/student/timetable" element={<StudentTimetable />} />
          <Route path="/teacher" element={<TeacherPortal />} />
          <Route path="/security" element={<Security />} />
+         <Route path="/registrar" element={<RegistrarPortal />} />
+         <Route path="/registrar/students" element={<RegistrarStudents />} />
+         <Route path="/registrar/students/:studentId/academic" element={<RegistrarStudentAcademic />} />
+          <Route path="/registrar/programmes" element={<RegistrarProgrammes />} />
          <Route path="/ai" element={<AIAssistant />} />
 
-        </Routes>
+                <Route path="/registrar/timetable" element={<RegistrarTimetable />} />
+</Routes>
       </BrowserRouter>
     </AuthProvider>
   );

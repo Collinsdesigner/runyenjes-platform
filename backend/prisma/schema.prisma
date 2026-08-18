@@ -17,24 +17,24 @@ datasource db {
 // One row only. Holds the institution's name/branding so it can be
 // changed from a settings screen later without touching any code.
 model SiteSettings {
-  id              Int      @id @default(1)
-  institutionName String   @default("Runyenjes Technical & Vocational College")
-  shortName       String   @default("Runyenjes")
-  tagline         String   @default("Empowering Through Skills and Technology")
-  
-  logoUrl         String?
-  logoPublicId    String?
+  id              Int    @id @default(1)
+  institutionName String @default("Runyenjes Technical & Vocational College")
+  shortName       String @default("Runyenjes")
+  tagline         String @default("Empowering Through Skills and Technology")
 
-  primaryColor    String   @default("#0B7A2B")
-  secondaryColor  String   @default("#5C0F00")
-  address         String   @default("P.O. Box 239-60103, Runyenjes")
-  phone           String   @default("0797210054")
-  email           String   @default("runyenjestti@gmail.com")
-  website         String   @default("www.runyenjestechnical.ac.ke")
+  logoUrl      String?
+  logoPublicId String?
+
+  primaryColor     String   @default("#0B7A2B")
+  secondaryColor   String   @default("#5C0F00")
+  address          String   @default("P.O. Box 239-60103, Runyenjes")
+  phone            String   @default("0797210054")
+  email            String   @default("runyenjestti@gmail.com")
+  website          String   @default("www.runyenjestechnical.ac.ke")
   about            String?
   physicalLocation String?
   googleMapsUrl    String?
-  updatedAt       DateTime @default(now()) @updatedAt
+  updatedAt        DateTime @default(now()) @updatedAt
 }
 
 enum Role {
@@ -51,35 +51,40 @@ enum UserStatus {
 }
 
 model User {
-  id              String     @id @default(uuid())
+  id              String      @id @default(uuid())
   name            String
-  email           String     @unique
+  email           String      @unique
   passwordHash    String?
-  admissionNumber String?    @unique
+  admissionNumber String?     @unique
   phone           String?
   avatarUrl       String?
   avatarPublicId  String?
   role            Role
-  status          UserStatus @default(ACTIVE)
+  status          UserStatus  @default(ACTIVE)
   departmentId    String?
   department      Department? @relation(fields: [departmentId], references: [id])
 
-  groupMemberships GroupMember[]
-  messages         Message[]
-  posts            Post[]
-  comments         Comment[]
-  materials        Material[]
-  auditLogs        AuditLog[]      @relation("ActorLogs")
-  reviewedApps     Application[]   @relation("ReviewedBy")
-  verifiedPayments Payment[]       @relation("VerifiedBy")
+  groupMemberships     GroupMember[]
+  messages             Message[]
+  posts                Post[]
+  comments             Comment[]
+  materials            Material[]
+  auditLogs            AuditLog[]            @relation("ActorLogs")
+  reviewedApps         Application[]         @relation("ReviewedBy")
+  verifiedPayments     Payment[]             @relation("VerifiedBy")
   continuationCheckIns ContinuationCheckIn[]
-  likes            PostLike[]
-  aiConversations  AIConversation[]
+  likes                PostLike[]
+  aiConversations      AIConversation[]
+  enrollments          Enrollment[]
+  unitRegistrations    UnitRegistration[]
+  teachingAssignments  UnitLecturer[]
 
-mustChangePassword Boolean  @default(false)
-passwordChangedAt  DateTime?
+  mustChangePassword Boolean   @default(false)
+  passwordChangedAt  DateTime?
 
-createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  timetableEntriesAsLecturer TimetableEntry[] @relation("TimetableLecturer")
 }
 
 // ─────────────────────────────────────────────
@@ -87,26 +92,27 @@ createdAt DateTime @default(now())
 // ─────────────────────────────────────────────
 
 model Department {
-  id        String     @id @default(uuid())
-  name      String     @unique
+  id        String    @id @default(uuid())
+  name      String    @unique
   users     User[]
   programs  Program[]
   groups    Group[]
-  createdAt DateTime   @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Program {
-  id                String   @id @default(uuid())
+  id                String     @id @default(uuid())
   departmentId      String
   department        Department @relation(fields: [departmentId], references: [id])
   name              String
   level             String?
   entryRequirements String?
   examBody          String?
-  isShortCourse     Boolean  @default(false)
+  isShortCourse     Boolean    @default(false)
 
   units        Unit[]
   fees         ProgramFee[]
+  enrollments  Enrollment[]
   applications Application[]
   groups       Group[]
 
@@ -125,12 +131,15 @@ model ProgramFee {
 }
 
 model Unit {
-  id        String     @id @default(uuid())
-  programId String
-  program   Program    @relation(fields: [programId], references: [id])
-  name      String
-  materials Material[]
-  createdAt DateTime   @default(now())
+  id                  String             @id @default(uuid())
+  programId           String
+  program             Program            @relation(fields: [programId], references: [id])
+  name                String
+  materials           Material[]
+  registrations       UnitRegistration[]
+  lecturerAssignments UnitLecturer[]
+  createdAt           DateTime           @default(now())
+  timetableEntries    TimetableEntry[]
 }
 
 model Material {
@@ -212,23 +221,21 @@ model Post {
   createdAt        DateTime   @default(now())
 }
 
-
 model PostLike {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
-guestId   String?
-guestName String?
+  guestId   String?
+  guestName String?
   createdAt DateTime @default(now())
 
   @@unique([postId, userId])
 }
-
 
 model Comment {
   id               String   @id @default(uuid())
@@ -287,14 +294,71 @@ model Payment {
 // TERM CONTINUATION (re-admission each term)
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+// ACADEMIC MANAGEMENT CORE
+// ─────────────────────────────────────────────
+
+// A student enrolled in a programme.
+model Enrollment {
+  id         String   @id @default(uuid())
+  studentId  String
+  student    User     @relation(fields: [studentId], references: [id])
+  programId  String
+  program    Program  @relation(fields: [programId], references: [id])
+  enrolledAt DateTime @default(now())
+  status     String   @default("ACTIVE") // ACTIVE | COMPLETED | DEFERRED | WITHDRAWN
+
+  unitRegistrations UnitRegistration[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, programId])
+}
+
+// A student's registration for a specific unit during a term.
+model UnitRegistration {
+  id           String     @id @default(uuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  studentId    String
+  student      User       @relation(fields: [studentId], references: [id])
+  unitId       String
+  unit         Unit       @relation(fields: [unitId], references: [id])
+  termId       String
+  term         Term       @relation(fields: [termId], references: [id])
+  status       String     @default("REGISTERED") // REGISTERED | DROPPED | COMPLETED
+
+  createdAt DateTime @default(now())
+
+  @@unique([enrollmentId, unitId, termId])
+}
+
+// A lecturer/teacher assigned to teach a unit for a term.
+model UnitLecturer {
+  id         String @id @default(uuid())
+  unitId     String
+  unit       Unit   @relation(fields: [unitId], references: [id])
+  lecturerId String
+  lecturer   User   @relation(fields: [lecturerId], references: [id])
+  termId     String
+  term       Term   @relation(fields: [termId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([unitId, lecturerId, termId])
+}
+
 model Term {
-  id        String                @id @default(uuid())
-  name      String                @unique // e.g. "Term 2 2026"
-  startDate DateTime
-  endDate   DateTime?
-  isActive  Boolean               @default(false)
-  checkIns  ContinuationCheckIn[]
-  createdAt DateTime              @default(now())
+  id                  String                @id @default(uuid())
+  name                String                @unique // e.g. "Term 2 2026"
+  startDate           DateTime
+  endDate             DateTime?
+  isActive            Boolean               @default(false)
+  checkIns            ContinuationCheckIn[]
+  registrations       UnitRegistration[]
+  lecturerAssignments UnitLecturer[]
+  createdAt           DateTime              @default(now())
+  timetableEntries    TimetableEntry[]
 }
 
 model ContinuationCheckIn {
@@ -351,4 +415,31 @@ model AuditLog {
   action    String
   target    String?
   createdAt DateTime @default(now())
+}
+
+model TimetableEntry {
+  id String @id @default(cuid())
+
+  unitId     String
+  lecturerId String?
+  termId     String
+
+  dayOfWeek Int
+  startTime String
+  endTime   String
+
+  room  String?
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  term Term @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  lecturer User? @relation("TimetableLecturer", fields: [lecturerId], references: [id])
+
+  @@unique([unitId, termId, dayOfWeek, startTime])
+  @@index([termId])
+  @@index([unitId])
 }

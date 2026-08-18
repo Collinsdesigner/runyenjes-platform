@@ -14,10 +14,12 @@ import groupsRoutes from './routes/groups.routes';
 import termsRoutes from './routes/terms.routes';
 import libraryRoutes from './routes/library.routes';
 import adminRoutes from './routes/admin.routes';
+import registrarRoutes from './routes/registrar.routes';
 import uploadsRoutes from './routes/uploads.routes';
 import profileRoutes from './routes/profile.routes';
 import securityRoutes from './routes/security.routes';
 import aiRoutes from './routes/ai.routes';
+import academicRoutes from './routes/academic.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
 
@@ -53,7 +55,8 @@ app.use(
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  'http://localhost:5173',
+'http://localhost:5174',  
+'http://localhost:5173',
 ].filter(Boolean);
 
 app.use(
@@ -137,10 +140,12 @@ app.use('/groups', groupsRoutes);
 app.use('/terms', termsRoutes);
 app.use('/library', libraryRoutes);
 app.use('/admin', adminRoutes);
+app.use('/registrar', registrarRoutes);
 app.use('/uploads', uploadLimiter, uploadsRoutes);
 app.use('/profile', profileRoutes);
 app.use('/security', securityLimiter, securityRoutes);
 app.use('/ai', aiRoutes);
+app.use('/academic', academicRoutes);
 
 /**
  * =========================

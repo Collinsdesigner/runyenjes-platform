@@ -161,33 +161,69 @@ requireRole('REGISTRAR', 'ADMIN'),
       if (!existingUser) {
         const admissionNumber = await generateAdmissionNumber();
 
-        const student = await prisma.user.create({
-          data: {
-            name: application.applicantName,
-            email: application.email,
-            phone: application.phone,
-            admissionNumber,
-            role: 'STUDENT',
-            departmentId: application.program.departmentId,
-          },
+        const result = await prisma.$transaction(async (tx) => {
+          const student = await tx.user.create({
+            data: {
+              name: application.applicantName,
+              email: application.email,
+              phone: application.phone,
+              admissionNumber,
+              role: 'STUDENT',
+              departmentId: application.program.departmentId,
+            },
+          });
+
+          // Automatically enroll the newly admitted student
+          // into the programme they applied for.
+          const enrollment = await tx.enrollment.create({
+            data: {
+              studentId: student.id,
+              programId: application.program.id,
+            },
+            include: {
+              program: {
+                include: {
+                  department: true,
+                },
+              },
+            },
+          });
+
+          const [classGroup, deptGroup, schoolGroup] = await Promise.all([
+            tx.group.findUnique({
+              where: { programId: application.program.id },
+            }),
+            tx.group.findFirst({
+              where: {
+                type: 'DEPARTMENT',
+                departmentId: application.program.departmentId,
+              },
+            }),
+            tx.group.findFirst({
+              where: { type: 'SCHOOL' },
+            }),
+          ]);
+
+          const groupIds = [
+            classGroup?.id,
+            deptGroup?.id,
+            schoolGroup?.id,
+          ].filter(
+            (gid): gid is string => Boolean(gid)
+          );
+
+          await tx.groupMember.createMany({
+            data: groupIds.map((groupId) => ({
+              groupId,
+              userId: student.id,
+            })),
+            skipDuplicates: true,
+          });
+
+          return { student, enrollment };
         });
 
-        const [classGroup, deptGroup, schoolGroup] = await Promise.all([
-          prisma.group.findUnique({ where: { programId: application.program.id } }),
-          prisma.group.findFirst({
-            where: { type: 'DEPARTMENT', departmentId: application.program.departmentId },
-          }),
-          prisma.group.findFirst({ where: { type: 'SCHOOL' } }),
-        ]);
-
-        const groupIds = [classGroup?.id, deptGroup?.id, schoolGroup?.id].filter(
-          (gid): gid is string => Boolean(gid)
-        );
-
-        await prisma.groupMember.createMany({
-          data: groupIds.map((groupId) => ({ groupId, userId: student.id })),
-          skipDuplicates: true,
-        });
+        const { student, enrollment } = result;
 
         sendEmail(
           student.email,
@@ -195,7 +231,11 @@ requireRole('REGISTRAR', 'ADMIN'),
           `Hello ${student.name},\n\nCongratulations! Your admission number is: ${student.admissionNumber}\n\nUse this together with your email (${student.email}) to log in as a Student on the Runyenjes platform.\n\n— Runyenjes Technical & Vocational College`
         );
 
-        return res.json({ application: updated, student });
+        return res.json({
+          application: updated,
+          student,
+          enrollment,
+        });
       }
     }
 

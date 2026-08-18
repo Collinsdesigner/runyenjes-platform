@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import PortalLayout from '../components/portal/PortalLayout';
 
 interface Term {
   id: string;
@@ -125,15 +126,8 @@ export default function Continuation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <h1 className="font-bold text-rgreen">Term Continuation</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
-          Back to Home
-        </button>
-      </header>
-
-      <main className="max-w-md mx-auto p-4 space-y-4">
+    <PortalLayout title="Term Continuation">
+      <div className="max-w-3xl mx-auto space-y-4">
         {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
 
         {/* Admin/Founder: open a new term */}
@@ -229,7 +223,7 @@ export default function Continuation() {
             )}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </PortalLayout>
   );
 }

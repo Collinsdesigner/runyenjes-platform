@@ -1,0 +1,251 @@
+import { ReactNode, useEffect, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../api/client';
+
+interface PortalLayoutProps {
+  title: string;
+  children: ReactNode;
+}
+
+interface NavItem {
+  label: string;
+  path: string;
+  icon: string;
+}
+
+interface SiteSettings {
+  institutionName: string;
+  shortName: string;
+  logoUrl: string | null;
+  primaryColor: string;
+  secondaryColor: string;
+}
+
+const commonItems: NavItem[] = [
+  { label: 'Dashboard', path: '/portal', icon: '⌂' },
+  { label: 'Profile', path: '/profile', icon: '◉' },
+  { label: 'Groups', path: '/groups', icon: '◎' },
+  { label: 'AI Assistant', path: '/ai', icon: '✦' },
+  { label: 'Security', path: '/security', icon: '🔒' },
+];
+
+const roleItems: Record<string, NavItem[]> = {
+  STUDENT: [
+    { label: 'My Academics', path: '/student/academics', icon: '🎓' },
+    { label: 'Learning Materials', path: '/library', icon: '📚' },
+    { label: 'Timetable', path: '/student/timetable', icon: '▦' },
+    { label: 'Assignments', path: '/student/assignments', icon: '✓' },
+    { label: 'Results', path: '/student/results', icon: '▤' },
+    { label: 'Fees & Payments', path: '/student/fees', icon: '▣' },
+  ],
+
+  TEACHER: [
+    { label: 'My Classes', path: '/teacher/classes', icon: '🏫' },
+    { label: 'My Units', path: '/teacher/units', icon: '📖' },
+    { label: 'Students', path: '/teacher/students', icon: '👥' },
+    { label: 'Attendance', path: '/teacher/attendance', icon: '✓' },
+    { label: 'Assignments', path: '/teacher/assignments', icon: '▤' },
+    { label: 'Assessments', path: '/teacher/assessments', icon: '▣' },
+    { label: 'Results', path: '/teacher/results', icon: '📊' },
+    { label: 'Learning Materials', path: '/library', icon: '📚' },
+  ],
+
+  REGISTRAR: [
+    { label: 'Admissions', path: '/admissions', icon: '📝' },
+    { label: 'Continuation', path: '/continuation', icon: '🔄' },
+    { label: 'Student Records', path: '/registrar/students', icon: '🎓' },
+  ],
+
+
+  ADMIN: [
+    { label: 'Users', path: '/admin/users', icon: '👥' },
+    { label: 'Students', path: '/admin/students', icon: '🎓' },
+    { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
+    { label: 'Academic', path: '/admin/academic', icon: '📚' },
+    { label: 'Admissions', path: '/admin/admissions', icon: '📝' },
+    { label: 'Finance', path: '/admin/finance', icon: '💰' },
+    { label: 'Library', path: '/admin/library', icon: '📖' },
+    { label: 'Communication', path: '/admin/communication', icon: '💬' },
+    { label: 'Reports', path: '/admin/reports', icon: '📊' },
+    { label: 'Settings', path: '/admin/settings', icon: '⚙' },
+  ],
+};
+
+export default function PortalLayout({
+  title,
+  children,
+}: PortalLayoutProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
+  useEffect(() => {
+    api('/settings')
+      .then((data) => {
+        setSettings(data);
+
+        if (data?.primaryColor) {
+          document.documentElement.style.setProperty(
+            '--color-primary',
+            data.primaryColor
+          );
+        }
+
+        if (data?.secondaryColor) {
+          document.documentElement.style.setProperty(
+            '--color-secondary',
+            data.secondaryColor
+          );
+        }
+      })
+      .catch(() => {
+        // Keep the default branding if settings cannot be loaded.
+      });
+  }, []);
+
+  if (!user) {
+    return null;
+  }
+
+  const items = [
+    ...(roleItems[user.role] ?? []),
+    ...commonItems,
+  ];
+
+  function handleLogout() {
+    logout();
+    navigate('/login');
+  }
+
+  const institutionName =
+    settings?.institutionName ||
+    'Runyenjes Technical & Vocational College';
+
+  const shortName =
+    settings?.shortName ||
+    'Runyenjes';
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col">
+        <div className="px-5 py-5 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            {settings?.logoUrl ? (
+              <img
+                src={settings.logoUrl}
+                alt={institutionName}
+                className="w-10 h-10 rounded-md object-contain border border-gray-100"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-md bg-rgreen text-white flex items-center justify-center font-bold">
+                {shortName.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <div className="min-w-0">
+              <div className="text-lg font-bold text-rgreen truncate">
+                {shortName}
+              </div>
+
+              <div className="text-xs text-gray-500 leading-tight">
+                {institutionName}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            {user.role} PORTAL
+          </div>
+        </div>
+
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {items.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition ${
+                  isActive
+                    ? 'bg-rgreen text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
+              }
+            >
+              <span className="w-5 text-center">
+                {item.icon}
+              </span>
+
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-100"
+          >
+            🚪 Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main area */}
+      <div className="flex-1 min-w-0">
+        {/* Top bar */}
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
+          <div>
+            <h1 className="font-semibold text-gray-900">
+              {title}
+            </h1>
+
+            <p className="text-xs text-gray-500">
+              Welcome, {user.name}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="text-gray-500 hover:text-gray-800 text-lg"
+              aria-label="Notifications"
+            >
+              🔔
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2"
+            >
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt=""
+                  className="w-9 h-9 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              <span className="hidden sm:block text-sm font-medium text-gray-700">
+                {user.name}
+              </span>
+            </button>
+          </div>
+        </header>
+
+        {/* Page */}
+        <main className="p-4 md:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,479 @@
+import { useEffect, useState } from 'react';
+import PortalLayout from '../../components/portal/PortalLayout';
+import { api } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
+
+type Unit = {
+  id: string;
+  name: string;
+};
+
+type Lecturer = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type TimetableEntry = {
+  id: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  room: string | null;
+  notes: string | null;
+  unit: Unit;
+  lecturer: Lecturer | null;
+  term: {
+    id: string;
+    name: string;
+  };
+};
+
+const days = [
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+  { value: 6, label: 'Saturday' },
+  { value: 7, label: 'Sunday' },
+];
+
+export default function RegistrarTimetable() {
+  const { token } = useAuth();
+
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
+  const [entries, setEntries] = useState<TimetableEntry[]>([]);
+
+  const [selectedUnit, setSelectedUnit] = useState('');
+  const [selectedLecturer, setSelectedLecturer] = useState('');
+  const [dayOfWeek, setDayOfWeek] = useState('1');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [room, setRoom] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState('');
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  async function loadData() {
+    if (!token) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const [structureResponse, lecturersResponse, timetableResponse] =
+        await Promise.all([
+          api('/academic/structure', { token }),
+          api('/registrar/lecturers', { token }),
+          api('/academic/timetable', { token }),
+        ]);
+
+      const structure = structureResponse ?? {};
+
+      const structureUnits: Unit[] =
+        structure.units ??
+        structure.programmes?.flatMap(
+          (program: { units?: Unit[] }) => program.units ?? []
+        ) ??
+        [];
+
+      setUnits(structureUnits);
+      setLecturers(lecturersResponse ?? []);
+      setEntries(timetableResponse?.entries ?? timetableResponse ?? []);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not load timetable information'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, [token]);
+
+  async function createEntry(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!token) return;
+
+    if (!selectedUnit) {
+      setError('Please select a unit.');
+      return;
+    }
+
+    if (!selectedLecturer) {
+      setError('Please select a lecturer.');
+      return;
+    }
+
+    if (!startTime || !endTime) {
+      setError('Please provide both start and end times.');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await api('/academic/timetable', {
+        method: 'POST',
+        token,
+        body: {
+          unitId: selectedUnit,
+          lecturerId: selectedLecturer,
+          dayOfWeek: Number(dayOfWeek),
+          startTime,
+          endTime,
+          room: room.trim() || null,
+          notes: notes.trim() || null,
+        },
+      });
+
+      setMessage('Timetable entry created successfully.');
+
+      setStartTime('');
+      setEndTime('');
+      setRoom('');
+      setNotes('');
+
+      await loadData();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not create timetable entry'
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteEntry(id: string) {
+    if (!token) return;
+
+    setDeleting(id);
+    setError('');
+    setMessage('');
+
+    try {
+      await api(`/academic/timetable/${id}`, {
+        method: 'DELETE',
+        token,
+      });
+
+      setMessage('Timetable entry deleted.');
+      await loadData();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not delete timetable entry'
+      );
+    } finally {
+      setDeleting('');
+    }
+  }
+
+  function dayName(day: number) {
+    return days.find((dayItem) => dayItem.value === day)?.label ?? 'Unknown';
+  }
+
+  return (
+    <PortalLayout title="Timetable Management">
+      <div className="space-y-6">
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Timetable Management
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Create and manage the academic timetable for the active term.
+          </p>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">
+            {message}
+          </div>
+        )}
+
+        <section className="bg-white border border-gray-200 rounded-lg">
+          <div className="px-5 py-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">
+              Add Timetable Entry
+            </h3>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Assign a unit, lecturer, time and room.
+            </p>
+          </div>
+
+          <form onSubmit={createEntry} className="p-5 space-y-5">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Unit
+                </label>
+
+                <select
+                  value={selectedUnit}
+                  onChange={(event) => setSelectedUnit(event.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="">Select unit</option>
+
+                  {units.map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Lecturer
+                </label>
+
+                <select
+                  value={selectedLecturer}
+                  onChange={(event) =>
+                    setSelectedLecturer(event.target.value)
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="">Select lecturer</option>
+
+                  {lecturers.map((lecturer) => (
+                    <option key={lecturer.id} value={lecturer.id}>
+                      {lecturer.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Day
+                </label>
+
+                <select
+                  value={dayOfWeek}
+                  onChange={(event) => setDayOfWeek(event.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                >
+                  {days.map((day) => (
+                    <option key={day.value} value={day.value}>
+                      {day.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Room
+                </label>
+
+                <input
+                  type="text"
+                  value={room}
+                  onChange={(event) => setRoom(event.target.value)}
+                  placeholder="e.g. ICT Lab 1"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Time
+                </label>
+
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(event) => setStartTime(event.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Time
+                </label>
+
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(event) => setEndTime(event.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
+
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notes
+              </label>
+
+              <textarea
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                rows={3}
+                placeholder="Optional timetable notes..."
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-5 py-2.5 rounded-lg bg-rgreen text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : 'Add Timetable Entry'}
+            </button>
+
+          </form>
+        </section>
+
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+
+          <div className="px-5 py-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">
+              Current Timetable
+            </h3>
+
+            <p className="text-sm text-gray-500 mt-1">
+              {loading
+                ? 'Loading...'
+                : `${entries.length} timetable entr${
+                    entries.length === 1 ? 'y' : 'ies'
+                  }`}
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="p-8 text-center text-gray-500">
+              Loading timetable...
+            </div>
+          ) : entries.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              No timetable entries have been created yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+
+              <table className="min-w-full text-sm">
+
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Day
+                    </th>
+
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Time
+                    </th>
+
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Unit
+                    </th>
+
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Lecturer
+                    </th>
+
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Room
+                    </th>
+
+                    <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-gray-100">
+
+                  {entries
+                    .slice()
+                    .sort((a, b) => {
+                      if (a.dayOfWeek !== b.dayOfWeek) {
+                        return a.dayOfWeek - b.dayOfWeek;
+                      }
+
+                      return a.startTime.localeCompare(b.startTime);
+                    })
+                    .map((entry) => (
+                      <tr key={entry.id} className="hover:bg-gray-50">
+
+                        <td className="px-5 py-4 font-medium text-gray-900">
+                          {dayName(entry.dayOfWeek)}
+                        </td>
+
+                        <td className="px-5 py-4 text-gray-700">
+                          {entry.startTime} – {entry.endTime}
+                        </td>
+
+                        <td className="px-5 py-4 text-gray-900">
+                          {entry.unit?.name ?? '—'}
+                        </td>
+
+                        <td className="px-5 py-4 text-gray-700">
+                          {entry.lecturer?.name ?? '—'}
+                        </td>
+
+                        <td className="px-5 py-4 text-gray-700">
+                          {entry.room ?? '—'}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <button
+                            type="button"
+                            onClick={() => deleteEntry(entry.id)}
+                            disabled={deleting === entry.id}
+                            className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-medium hover:bg-red-50 disabled:opacity-50"
+                          >
+                            {deleting === entry.id
+                              ? 'Deleting...'
+                              : 'Delete'}
+                          </button>
+                        </td>
+
+                      </tr>
+                    ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </section>
+
+      </div>
+    </PortalLayout>
+  );
+}
