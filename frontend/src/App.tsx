@@ -21,6 +21,11 @@ import PortalRedirect from './pages/PortalRedirect';
 import StudentPortal from './pages/portal/StudentPortal';
 import TeacherPortal from './pages/portal/TeacherPortal';
 import AdminPortal from './pages/portal/AdminPortal';
+import AlumniPortal from './pages/portal/AlumniPortal';
+import AdminAlumni from './pages/admin/AdminAlumni';
+import WorkersPortal from './pages/portal/WorkersPortal';
+import ProcurementPortal from './pages/portal/ProcurementPortal';
+import ProcurementRequests from './pages/procurement/ProcurementRequests';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminAdmissions from './pages/admin/AdminAdmissions';
 import AdminLibrary from './pages/admin/AdminLibrary';
@@ -80,6 +85,11 @@ export default function App() {
           <Route path="/library" element={<Library />} />
           <Route path="/library/:programId" element={<LibraryUnits />} />
          <Route path="/admin" element={<AdminPortal />} />
+                <Route path="/alumni" element={<AlumniPortal />} />
+                <Route path="/admin/alumni" element={<AdminAlumni />} />
+                <Route path="/workers" element={<WorkersPortal />} />
+                <Route path="/procurement" element={<ProcurementPortal />} />
+                <Route path="/procurement/requests" element={<ProcurementRequests />} />
                 <Route path="/admin/settings" element={<AdminSettings />} />
                 <Route path="/admin/admissions" element={<AdminAdmissions />} />
                 <Route path="/admin/library" element={<AdminLibrary />} />

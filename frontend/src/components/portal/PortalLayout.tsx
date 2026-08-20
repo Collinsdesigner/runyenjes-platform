@@ -226,7 +226,37 @@ const roleSections: Record<string, NavSection[]> = {
       items: [{ label: 'Inventory', path: '/stores/items', icon: '📦' }],
     },
   ],
+
+  ALUMNI: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/alumni', icon: '⌂' }],
+    },
+  ],
+
+  PROCUREMENT_OFFICER: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/procurement', icon: '⌂' }],
+    },
+    {
+      title: 'Procurement',
+      items: [{ label: 'Purchase Requests', path: '/procurement/requests', icon: '📄' }],
+    },
+  ],
 };
+
+
+const STAFF_SELF_SERVICE_ROLES = [
+  'TEACHER',
+  'REGISTRAR',
+  'ADMIN',
+  'FINANCE_OFFICER',
+  'HR_OFFICER',
+  'EXAM_OFFICER',
+  'STORES_OFFICER',
+  'PROCUREMENT_OFFICER',
+];
 
 export default function PortalLayout({
   title,
@@ -267,6 +297,9 @@ export default function PortalLayout({
 
   const sections: NavSection[] = [
     ...(roleSections[user.role] ?? []),
+    ...(STAFF_SELF_SERVICE_ROLES.includes(user.role)
+      ? [{ title: 'My Work', items: [{ label: 'Staff Self-Service', path: '/workers', icon: '🧾' }] }]
+      : []),
     ...commonSections,
   ];
 

@@ -4,6 +4,14 @@ import { requireAuth, requireRole } from '../middleware/auth';
 
 const router = Router();
 
+
+// ---------- Any authenticated staff member: view own staff profile ----------
+router.get('/my-staff-profile', requireAuth, async (req, res) => {
+  const profile = await prisma.staffProfile.findUnique({ where: { userId: req.user!.userId } });
+  if (!profile) return res.status(404).json({ error: 'No staff profile found for your account yet' });
+  res.json(profile);
+});
+
 // ---------- HR/Admin: list staff profiles ----------
 router.get('/staff', requireAuth, requireRole('HR_OFFICER', 'ADMIN'), async (req, res) => {
   const staff = await prisma.staffProfile.findMany({
