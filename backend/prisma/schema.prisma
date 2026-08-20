@@ -48,6 +48,7 @@ enum Role {
   STORES_OFFICER
   ALUMNI
   PROCUREMENT_OFFICER
+  SUPPORT_STAFF
 }
 
 enum UserStatus {

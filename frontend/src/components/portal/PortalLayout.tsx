@@ -244,6 +244,13 @@ const roleSections: Record<string, NavSection[]> = {
       items: [{ label: 'Purchase Requests', path: '/procurement/requests', icon: '📄' }],
     },
   ],
+
+  SUPPORT_STAFF: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/workers', icon: '⌂' }],
+    },
+  ],
 };
 
 
@@ -256,6 +263,7 @@ const STAFF_SELF_SERVICE_ROLES = [
   'EXAM_OFFICER',
   'STORES_OFFICER',
   'PROCUREMENT_OFFICER',
+  'SUPPORT_STAFF',
 ];
 
 export default function PortalLayout({

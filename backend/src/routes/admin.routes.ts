@@ -113,6 +113,7 @@ router.post('/users', async (req, res) => {
     'HR_OFFICER',
     'EXAM_OFFICER',
     'STORES_OFFICER',
+    'SUPPORT_STAFF',
   ];
   if (!creatableRoles.includes(role)) {
     return res.status(400).json({ error: `Role must be one of: ${creatableRoles.join(', ')}` });
@@ -183,6 +184,7 @@ router.patch('/users/:id/role', async (req, res) => {
     'HR_OFFICER',
     'EXAM_OFFICER',
     'STORES_OFFICER',
+    'SUPPORT_STAFF',
   ];
   if (!assignableRoles.includes(role)) {
     return res.status(400).json({ error: `Role must be one of: ${assignableRoles.join(', ')}` });

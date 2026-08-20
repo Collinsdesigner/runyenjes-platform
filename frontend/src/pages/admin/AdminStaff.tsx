@@ -20,6 +20,7 @@ const STAFF_ROLES = [
   'HR_OFFICER',
   'EXAM_OFFICER',
   'STORES_OFFICER',
+  'SUPPORT_STAFF',
 ];
 
 export default function AdminStaff() {

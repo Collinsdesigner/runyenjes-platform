@@ -40,6 +40,9 @@ export default function PortalRedirect() {
 
     case 'PROCUREMENT_OFFICER':
       return <Navigate to="/procurement" replace />;
+
+    case 'SUPPORT_STAFF':
+      return <Navigate to="/workers" replace />;
     default:
       return <Navigate to="/" replace />;
   }
