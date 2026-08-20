@@ -4,6 +4,19 @@ import { requireAuth, requireRole } from '../middleware/auth';
 
 const router = Router();
 
+
+// ---------- Any authenticated staff member: lightweight item list for picking an item ----------
+// Used by Procurement (and anywhere else) to let staff choose an existing
+// Stores item without needing full STORES_OFFICER/ADMIN access.
+router.get('/items-lite', requireAuth, async (req, res) => {
+  const items = await prisma.inventoryItem.findMany({
+    select: { id: true, name: true, uom: true, quantityOnHand: true },
+    orderBy: { name: 'asc' },
+  });
+
+  res.json(items);
+});
+
 // ---------- Stores/Admin: list inventory items (optionally filter by department) ----------
 router.get('/items', requireAuth, requireRole('STORES_OFFICER', 'ADMIN'), async (req, res) => {
   const { departmentId } = req.query as { departmentId?: string };
