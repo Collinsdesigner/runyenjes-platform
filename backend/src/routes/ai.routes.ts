@@ -11,7 +11,7 @@ dns.setDefaultResultOrder('ipv4first');
 const router = Router();
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.3-70b-versatile';
+const MODEL = 'openai/gpt-oss-120b';
 
 const SYSTEM_PROMPT = `You are the Runyenjes Technical & Vocational College study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,

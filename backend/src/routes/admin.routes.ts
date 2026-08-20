@@ -105,8 +105,17 @@ router.post('/users', async (req, res) => {
   if (!name || !email || !password || !role) {
     return res.status(400).json({ error: 'Name, email, password, and role are required' });
   }
-  if (!['TEACHER', 'ADMIN', 'REGISTRAR'].includes(role)) {
-    return res.status(400).json({ error: 'Role must be TEACHER, ADMIN, or REGISTRAR' });
+  const creatableRoles = [
+    'TEACHER',
+    'ADMIN',
+    'REGISTRAR',
+    'FINANCE_OFFICER',
+    'HR_OFFICER',
+    'EXAM_OFFICER',
+    'STORES_OFFICER',
+  ];
+  if (!creatableRoles.includes(role)) {
+    return res.status(400).json({ error: `Role must be one of: ${creatableRoles.join(', ')}` });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -154,6 +163,40 @@ router.patch('/users/:id/status', async (req, res) => {
     data: { status },
     select: { id: true, name: true, status: true },
   });
+  res.json(user);
+});
+
+// ---------- Grant or change a user's role ----------
+// This is how privileges are granted/revoked from now on — through the
+// platform, not by editing code or seed data. Any role, including the
+// newer ERP officer roles, can be assigned here by an Admin.
+router.patch('/users/:id/role', async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  const assignableRoles = [
+    'ADMIN',
+    'REGISTRAR',
+    'TEACHER',
+    'STUDENT',
+    'FINANCE_OFFICER',
+    'HR_OFFICER',
+    'EXAM_OFFICER',
+    'STORES_OFFICER',
+  ];
+  if (!assignableRoles.includes(role)) {
+    return res.status(400).json({ error: `Role must be one of: ${assignableRoles.join(', ')}` });
+  }
+
+  const target = await prisma.user.findUnique({ where: { id } });
+  if (!target) return res.status(404).json({ error: 'User not found' });
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { role },
+    select: { id: true, name: true, email: true, role: true },
+  });
+
   res.json(user);
 });
 

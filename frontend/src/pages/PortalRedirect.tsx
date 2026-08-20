@@ -22,6 +22,18 @@ export default function PortalRedirect() {
     case 'STUDENT':
       return <Navigate to="/student" replace />;
 
+
+    case 'FINANCE_OFFICER':
+      return <Navigate to="/finance" replace />;
+
+    case 'HR_OFFICER':
+      return <Navigate to="/hr" replace />;
+
+    case 'EXAM_OFFICER':
+      return <Navigate to="/examinations" replace />;
+
+    case 'STORES_OFFICER':
+      return <Navigate to="/stores" replace />;
     default:
       return <Navigate to="/" replace />;
   }

@@ -21,6 +21,12 @@ import PortalRedirect from './pages/PortalRedirect';
 import StudentPortal from './pages/portal/StudentPortal';
 import TeacherPortal from './pages/portal/TeacherPortal';
 import AdminPortal from './pages/portal/AdminPortal';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminAdmissions from './pages/admin/AdminAdmissions';
+import AdminLibrary from './pages/admin/AdminLibrary';
+import AdminStudents from './pages/admin/AdminStudents';
+import AdminStaff from './pages/admin/AdminStaff';
+import AdminAcademic from './pages/admin/AdminAcademic';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
 import RegistrarProgrammes from './pages/registrar/RegistrarProgrammes';
@@ -28,6 +34,15 @@ import RegistrarStudentAcademic from './pages/registrar/RegistrarStudentAcademic
 import AIAssistant from './pages/AIAssistant';
 import RegistrarTimetable from './pages/registrar/RegistrarTimetable';
 import StudentTimetable from './pages/portal/StudentTimetable';
+import FinancePortal from './pages/portal/FinancePortal';
+import FinanceInvoices from './pages/finance/FinanceInvoices';
+import HrPortal from './pages/portal/HrPortal';
+import HrStaff from './pages/hr/HrStaff';
+import ExaminationsPortal from './pages/portal/ExaminationsPortal';
+import ExaminationsResults from './pages/examinations/ExaminationsResults';
+import StoresPortal from './pages/portal/StoresPortal';
+import StoresInventory from './pages/stores/StoresInventory';
+import AdminUsers from './pages/admin/AdminUsers';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
 
 export default function App() {
@@ -65,6 +80,12 @@ export default function App() {
           <Route path="/library" element={<Library />} />
           <Route path="/library/:programId" element={<LibraryUnits />} />
          <Route path="/admin" element={<AdminPortal />} />
+                <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/admissions" element={<AdminAdmissions />} />
+                <Route path="/admin/library" element={<AdminLibrary />} />
+                <Route path="/admin/students" element={<AdminStudents />} />
+                <Route path="/admin/staff" element={<AdminStaff />} />
+                <Route path="/admin/academic" element={<AdminAcademic />} />
           <Route path="/browser" element={<Browser />} />
          <Route path="/profile" element={<Profile />} />
          <Route path="/portal" element={<PortalRedirect />} />
@@ -79,6 +100,15 @@ export default function App() {
          <Route path="/ai" element={<AIAssistant />} />
 
                 <Route path="/registrar/timetable" element={<RegistrarTimetable />} />
+                <Route path="/finance" element={<FinancePortal />} />
+                <Route path="/finance/invoices" element={<FinanceInvoices />} />
+                <Route path="/hr" element={<HrPortal />} />
+                <Route path="/hr/staff" element={<HrStaff />} />
+                <Route path="/examinations" element={<ExaminationsPortal />} />
+                <Route path="/examinations/results" element={<ExaminationsResults />} />
+                <Route path="/stores" element={<StoresPortal />} />
+                <Route path="/stores/items" element={<StoresInventory />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
 </Routes>
       </BrowserRouter>
     </AuthProvider>

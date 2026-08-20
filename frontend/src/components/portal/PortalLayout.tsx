@@ -182,6 +182,50 @@ const roleSections: Record<string, NavSection[]> = {
       ],
     },
   ],
+
+  FINANCE_OFFICER: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/finance', icon: '⌂' }],
+    },
+    {
+      title: 'Finance',
+      items: [{ label: 'Invoices & Payments', path: '/finance/invoices', icon: '💰' }],
+    },
+  ],
+
+  HR_OFFICER: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/hr', icon: '⌂' }],
+    },
+    {
+      title: 'Human Resources',
+      items: [{ label: 'Staff & Leave', path: '/hr/staff', icon: '👥' }],
+    },
+  ],
+
+  EXAM_OFFICER: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/examinations', icon: '⌂' }],
+    },
+    {
+      title: 'Examinations',
+      items: [{ label: 'Exams & Results', path: '/examinations/results', icon: '📊' }],
+    },
+  ],
+
+  STORES_OFFICER: [
+    {
+      title: 'Overview',
+      items: [{ label: 'Dashboard', path: '/stores', icon: '⌂' }],
+    },
+    {
+      title: 'Stores',
+      items: [{ label: 'Inventory', path: '/stores/items', icon: '📦' }],
+    },
+  ],
 };
 
 export default function PortalLayout({
