@@ -46,6 +46,8 @@ enum Role {
   HR_OFFICER
   EXAM_OFFICER
   STORES_OFFICER
+  ALUMNI
+  PROCUREMENT_OFFICER
 }
 
 enum UserStatus {
@@ -106,6 +108,13 @@ model User {
 
   // Stores / Inventory
   stockMovementsRecorded StockMovement[] @relation("StockMovementRecordedBy")
+
+  // Alumni
+  alumniProfile AlumniProfile?
+
+  // Procurement
+  purchaseRequestsMade     PurchaseRequest[] @relation("PurchaseRequestedBy")
+  purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
 }
 
 // ─────────────────────────────────────────────
@@ -660,6 +669,7 @@ model InventoryItem {
   updatedAt DateTime @updatedAt
 
   @@index([departmentId])
+  purchaseRequests PurchaseRequest[]
 }
 
 model StockMovement {
@@ -675,4 +685,57 @@ model StockMovement {
   createdAt DateTime @default(now())
 
   @@index([itemId])
+}
+
+// ─────────────────────────────────────────────
+// ALUMNI
+// ─────────────────────────────────────────────
+// A graduated student's account keeps its role changed from STUDENT to
+// ALUMNI (preserving all existing enrollment/academic history) and gets
+// this profile attached for post-graduation info.
+
+model AlumniProfile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  graduationYear   Int?
+  currentEmployer  String?
+  currentPosition  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// PROCUREMENT
+// ─────────────────────────────────────────────
+// Lean v1: a purchase request references an existing Stores InventoryItem
+// (rather than free-text), so approving + receiving a request can restock
+// that item directly through the existing Stores module.
+
+enum PurchaseRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ORDERED
+  RECEIVED
+}
+
+model PurchaseRequest {
+  id             String                @id @default(uuid())
+  itemId         String
+  item           InventoryItem         @relation(fields: [itemId], references: [id])
+  quantity       Decimal
+  justification  String?
+  status         PurchaseRequestStatus @default(PENDING)
+  requestedById  String
+  requestedBy    User                  @relation("PurchaseRequestedBy", fields: [requestedById], references: [id])
+  approvedById   String?
+  approvedBy     User?                 @relation("PurchaseRequestApprovedBy", fields: [approvedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([itemId])
+  @@index([requestedById])
 }
