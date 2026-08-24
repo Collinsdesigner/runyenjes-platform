@@ -91,7 +91,7 @@ export default function ProcurementRequests() {
     try {
       await api(`/procurement/requests/${id}/status`, { method: 'PATCH', token, body: { status } });
       setMessage(
-        status === 'RECEIVED' ? 'Marked received \u2014 Stores stock updated' : `Request ${status.toLowerCase()}`
+        status === 'RECEIVED' ? 'Marked received — Stores stock updated' : `Request ${status.toLowerCase()}`
       );
       load();
     } catch (err) {
@@ -105,7 +105,7 @@ export default function ProcurementRequests() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Purchase Requests</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Requests reference existing Stores items \u2014 marking one received restocks it automatically.
+            Requests reference existing Stores items — marking one received restocks it automatically.
           </p>
         </div>
 

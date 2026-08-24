@@ -157,6 +157,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Students', path: '/admin/students', icon: '🎓' },
         { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
+        { label: 'Alumni', path: '/admin/alumni', icon: '🎓' },
       ],
     },
     {
@@ -172,6 +173,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Finance', path: '/admin/finance', icon: '💰' },
         { label: 'Library', path: '/admin/library', icon: '📖' },
         { label: 'Communication', path: '/admin/communication', icon: '💬' },
+        { label: 'Procurement', path: '/procurement/requests', icon: '📄' },
       ],
     },
     {
@@ -231,6 +233,10 @@ const roleSections: Record<string, NavSection[]> = {
     {
       title: 'Overview',
       items: [{ label: 'Dashboard', path: '/alumni', icon: '⌂' }],
+    },
+    {
+      title: 'Career',
+      items: [{ label: 'Job Board', path: '/jobs', icon: '💼' }],
     },
   ],
 
@@ -306,7 +312,7 @@ export default function PortalLayout({
   const sections: NavSection[] = [
     ...(roleSections[user.role] ?? []),
     ...(STAFF_SELF_SERVICE_ROLES.includes(user.role)
-      ? [{ title: 'My Work', items: [{ label: 'Staff Self-Service', path: '/workers', icon: '🧾' }] }]
+      ? [{ title: 'My Work', items: [{ label: 'Staff Self-Service', path: '/workers', icon: '🧾' }, { label: 'Job Board', path: '/jobs', icon: '💼' }] }]
       : []),
     ...commonSections,
   ];

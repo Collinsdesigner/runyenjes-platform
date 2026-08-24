@@ -133,7 +133,7 @@ export default function AdminLibrary() {
           <option value="">{loading ? 'Loading programmes...' : 'Select a programme'}</option>
           {programmes.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.department.name} \u2014 {p.name} {p.level || ''}
+              {p.department.name} — {p.name} {p.level || ''}
             </option>
           ))}
         </select>
@@ -201,7 +201,7 @@ export default function AdminLibrary() {
                     <ul className="mt-3 text-xs text-gray-500 space-y-1">
                       {unit.materials.map((m) => (
                         <li key={m.id}>
-                          [{m.type}] {m.fileUrl} \u2014 uploaded by {m.uploader.name}
+                          [{m.type}] {m.fileUrl} — uploaded by {m.uploader.name}
                         </li>
                       ))}
                     </ul>

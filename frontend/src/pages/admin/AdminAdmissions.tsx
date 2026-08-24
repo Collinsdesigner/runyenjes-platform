@@ -137,7 +137,7 @@ export default function AdminAdmissions() {
                     {a.payments.map((p) => (
                       <div key={p.id} className="flex items-center gap-2 text-xs mb-1">
                         <span>
-                          KES {p.amount} ({p.reference}) \u2014 {p.status}
+                          KES {p.amount} ({p.reference}) — {p.status}
                         </span>
                         {p.status === 'pending' && (
                           <>

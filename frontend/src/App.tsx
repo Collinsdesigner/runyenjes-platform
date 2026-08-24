@@ -23,6 +23,7 @@ import TeacherPortal from './pages/portal/TeacherPortal';
 import AdminPortal from './pages/portal/AdminPortal';
 import AlumniPortal from './pages/portal/AlumniPortal';
 import AdminAlumni from './pages/admin/AdminAlumni';
+import JobBoard from './pages/jobs/JobBoard';
 import WorkersPortal from './pages/portal/WorkersPortal';
 import ProcurementPortal from './pages/portal/ProcurementPortal';
 import ProcurementRequests from './pages/procurement/ProcurementRequests';
@@ -87,6 +88,7 @@ export default function App() {
          <Route path="/admin" element={<AdminPortal />} />
                 <Route path="/alumni" element={<AlumniPortal />} />
                 <Route path="/admin/alumni" element={<AdminAlumni />} />
+                <Route path="/jobs" element={<JobBoard />} />
                 <Route path="/workers" element={<WorkersPortal />} />
                 <Route path="/procurement" element={<ProcurementPortal />} />
                 <Route path="/procurement/requests" element={<ProcurementRequests />} />

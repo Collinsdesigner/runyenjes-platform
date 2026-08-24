@@ -1,4 +1,26 @@
-import { useEffect, useState } from 'react';
+#!/usr/bin/env python3
+"""
+Fixes two AdminAlumni.tsx issues:
+  1. Email wasn't shown anywhere -- added to both the student search
+     results and the final Alumni table, so you have what you need to log
+     in as that person for testing.
+  2. The student search box had no visible indication it was a dropdown --
+     added a visible chevron arrow, and the suggestion list now opens on
+     focus/click as well as while typing, closer to how a real dropdown
+     behaves.
+
+USAGE (run from ~/runyenjes-platform/frontend):
+    python3 fix_alumni_dropdown_and_email.py
+
+Always overwrites AdminAlumni.tsx with the corrected version (safe to
+re-run).
+"""
+
+import os
+
+ADMIN_ALUMNI_PATH = os.path.join("src", "pages", "admin", "AdminAlumni.tsx")
+
+ADMIN_ALUMNI_TSX = """import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -64,7 +86,7 @@ export default function AdminAlumni() {
 
   function selectStudent(s: StudentOption) {
     setSelectedStudentId(s.id);
-    setStudentSearch(`${s.name} — ${s.email}`);
+    setStudentSearch(`${s.name} \u2014 ${s.email}`);
     setDropdownOpen(false);
   }
 
@@ -97,7 +119,7 @@ export default function AdminAlumni() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Alumni</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Graduate a student to convert their account to Alumni — their history stays intact.
+            Graduate a student to convert their account to Alumni \u2014 their history stays intact.
           </p>
         </div>
 
@@ -124,7 +146,7 @@ export default function AdminAlumni() {
               }}
             />
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-              {dropdownOpen ? '▴' : '▾'}
+              {dropdownOpen ? '\u25b4' : '\u25be'}
             </span>
 
             {dropdownOpen && (
@@ -144,7 +166,7 @@ export default function AdminAlumni() {
                       <div className="font-medium text-gray-900">{s.name}</div>
                       <div className="text-xs text-gray-400">
                         {s.email}
-                        {s.admissionNumber ? ` — ${s.admissionNumber}` : ''}
+                        {s.admissionNumber ? ` \u2014 ${s.admissionNumber}` : ''}
                       </div>
                     </button>
                   ))}
@@ -204,10 +226,10 @@ export default function AdminAlumni() {
                 <tr key={a.id} className="border-t border-gray-100">
                   <td className="px-4 py-2">{a.user?.name}</td>
                   <td className="px-4 py-2">{a.user?.email}</td>
-                  <td className="px-4 py-2">{a.user?.admissionNumber || '—'}</td>
-                  <td className="px-4 py-2">{a.graduationYear || '—'}</td>
-                  <td className="px-4 py-2">{a.currentEmployer || '—'}</td>
-                  <td className="px-4 py-2">{a.currentPosition || '—'}</td>
+                  <td className="px-4 py-2">{a.user?.admissionNumber || '\u2014'}</td>
+                  <td className="px-4 py-2">{a.graduationYear || '\u2014'}</td>
+                  <td className="px-4 py-2">{a.currentEmployer || '\u2014'}</td>
+                  <td className="px-4 py-2">{a.currentPosition || '\u2014'}</td>
                 </tr>
               ))}
             </tbody>
@@ -217,3 +239,15 @@ export default function AdminAlumni() {
     </PortalLayout>
   );
 }
+"""
+
+
+def main():
+    os.makedirs(os.path.dirname(ADMIN_ALUMNI_PATH), exist_ok=True)
+    with open(ADMIN_ALUMNI_PATH, "w", encoding="utf-8") as f:
+        f.write(ADMIN_ALUMNI_TSX)
+    print("REWROTE " + ADMIN_ALUMNI_PATH + " (added Email column + visible dropdown arrow)")
+
+
+if __name__ == "__main__":
+    main()

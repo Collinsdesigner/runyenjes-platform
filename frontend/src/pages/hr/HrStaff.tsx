@@ -202,7 +202,7 @@ export default function HrStaff() {
                   <td className="px-4 py-2">{l.staff?.name}</td>
                   <td className="px-4 py-2">{l.type}</td>
                   <td className="px-4 py-2">
-                    {new Date(l.startDate).toLocaleDateString()} \u2192 {new Date(l.endDate).toLocaleDateString()}
+                    {new Date(l.startDate).toLocaleDateString()} → {new Date(l.endDate).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-2">{l.status}</td>
                   <td className="px-4 py-2 text-right space-x-2">

@@ -120,7 +120,7 @@ export default function WorkersPortal() {
               </div>
             ) : (
               <p className="text-sm text-gray-400">
-                No staff profile has been set up for your account yet \u2014 ask HR to create one.
+                No staff profile has been set up for your account yet — ask HR to create one.
               </p>
             )}
           </div>
@@ -185,7 +185,7 @@ export default function WorkersPortal() {
                 <tr key={l.id} className="border-t border-gray-100">
                   <td className="px-4 py-2">{l.type}</td>
                   <td className="px-4 py-2">
-                    {new Date(l.startDate).toLocaleDateString()} \u2192 {new Date(l.endDate).toLocaleDateString()}
+                    {new Date(l.startDate).toLocaleDateString()} → {new Date(l.endDate).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-2">
                     <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{l.status}</span>

@@ -116,6 +116,7 @@ model User {
   // Procurement
   purchaseRequestsMade     PurchaseRequest[] @relation("PurchaseRequestedBy")
   purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
+  jobPostings JobPosting[] @relation("JobPostingPostedBy")
 }
 
 // ─────────────────────────────────────────────
@@ -197,6 +198,7 @@ enum GroupType {
   SCHOOL
   TEACHERS
   ADMINS
+  ALUMNI
 }
 
 model Group {
@@ -739,4 +741,35 @@ model PurchaseRequest {
 
   @@index([itemId])
   @@index([requestedById])
+}
+
+// ─────────────────────────────────────────────
+// JOB CONNECTION
+// ─────────────────────────────────────────────
+// Any staff member or alumnus can post an opening; alumni (and admin, for
+// moderation) browse open postings; the poster or an admin can close or
+// remove their own listing.
+
+enum JobPostingStatus {
+  OPEN
+  CLOSED
+}
+
+model JobPosting {
+  id           String           @id @default(uuid())
+  title        String
+  company      String
+  location     String?
+  description  String
+  applyLink    String?
+  contactEmail String?
+  status       JobPostingStatus @default(OPEN)
+  postedById   String
+  postedBy     User             @relation("JobPostingPostedBy", fields: [postedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postedById])
+  @@index([status])
 }

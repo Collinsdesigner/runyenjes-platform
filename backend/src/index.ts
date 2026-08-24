@@ -26,6 +26,7 @@ import examinationsRoutes from './routes/examinations.routes';
 import storesRoutes from './routes/stores.routes';
 import alumniRoutes from './routes/alumni.routes';
 import procurementRoutes from './routes/procurement.routes';
+import jobRoutes from './routes/job.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
 
@@ -158,6 +159,7 @@ app.use('/examinations', examinationsRoutes);
 app.use('/stores', storesRoutes);
 app.use('/alumni', alumniRoutes);
 app.use('/procurement', procurementRoutes);
+app.use('/jobs', jobRoutes);
 
 /**
  * =========================

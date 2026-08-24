@@ -21,6 +21,7 @@ const STAFF_ROLES = [
   'EXAM_OFFICER',
   'STORES_OFFICER',
   'SUPPORT_STAFF',
+  'PROCUREMENT_OFFICER',
 ];
 
 export default function AdminStaff() {
@@ -118,7 +119,7 @@ export default function AdminStaff() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Staff</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Manage staff accounts. To change a role, use Users \u2014 this page focuses on staff records.
+            Manage staff accounts. To change a role, use Users — this page focuses on staff records.
           </p>
         </div>
 

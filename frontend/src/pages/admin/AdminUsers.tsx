@@ -20,6 +20,9 @@ const ALL_ROLES = [
   'HR_OFFICER',
   'EXAM_OFFICER',
   'STORES_OFFICER',
+  'SUPPORT_STAFF',
+  'PROCUREMENT_OFFICER',
+  'ALUMNI',
 ];
 
 // NOTE: creating a user with one of the 4 ERP roles below, and changing an
@@ -87,10 +90,9 @@ export default function AdminUsers() {
     }
   }
 
-  async function handleRoleChange(userId: string) {
+  async function handleRoleChange(userId: string, role: string) {
     setError('');
     setMessage('');
-    const role = roleEdits[userId];
     if (!role) return;
     try {
       await api(`/admin/users/${userId}/role`, { method: 'PATCH', token, body: { role } });
@@ -145,7 +147,7 @@ export default function AdminUsers() {
               value={newUserRole}
               onChange={(e) => setNewUserRole(e.target.value)}
             >
-              {ALL_ROLES.filter((r) => r !== 'STUDENT').map((r) => (
+              {ALL_ROLES.filter((r) => r !== 'STUDENT' && r !== 'ALUMNI').map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
@@ -213,7 +215,7 @@ export default function AdminUsers() {
                       </select>
                       <button
                         className="text-rgreen text-xs font-medium"
-                        onClick={() => handleRoleChange(u.id)}
+                        onClick={() => handleRoleChange(u.id, roleEdits[u.id] ?? u.role)}
                       >
                         Save
                       </button>

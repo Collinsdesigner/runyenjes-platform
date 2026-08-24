@@ -26,7 +26,7 @@ router.post('/student-login', async (req, res) => {
 
     if (
       !user ||
-      user.role !== 'STUDENT' ||
+      (user.role !== 'STUDENT' && user.role !== 'ALUMNI') ||
       user.admissionNumber !== admissionNumber
     ) {
       return res.status(401).json({
