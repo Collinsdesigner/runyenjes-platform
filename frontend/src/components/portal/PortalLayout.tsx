@@ -336,10 +336,10 @@ export default function PortalLayout({
     'Runyenjes';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
 
       {/* ================= SIDEBAR ================= */}
-      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col">
+      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col h-full">
 
         {/* Branding */}
         <div className="px-5 py-5 border-b border-gray-200">
@@ -427,10 +427,10 @@ export default function PortalLayout({
       </aside>
 
       {/* ================= MAIN AREA ================= */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col h-full">
 
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
+        <header className="h-16 shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
 
           <div className="min-w-0">
             <h1 className="font-semibold text-gray-900 truncate">
@@ -476,12 +476,23 @@ export default function PortalLayout({
               </span>
             </button>
 
+            {/* Sign out -- always visible here, even when the sidebar is hidden on small screens */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              🚪
+            </button>
+
           </div>
 
         </header>
 
         {/* Page */}
-        <main className="p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
 
