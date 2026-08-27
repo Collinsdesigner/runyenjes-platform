@@ -1,4 +1,23 @@
-import { useEffect, useState } from 'react';
+#!/usr/bin/env python3
+"""
+Rewrites JobBoard.tsx to give Admin real moderation power:
+  - Alumni: post + browse OPEN postings + manage own postings (unchanged).
+  - Non-admin staff (Teacher, Registrar, etc.): post + manage own postings.
+  - Admin: post + manage own postings, PLUS a full 'All Postings
+    (Moderation)' table showing every posting from every poster, any
+    status, with Close/Reopen/Delete on each row -- not just their own.
+
+USAGE (run from ~/runyenjes-platform/frontend):
+    python3 fix_job_board_admin_moderation.py
+
+Always overwrites JobBoard.tsx (safe to re-run).
+"""
+
+import os
+
+JOB_BOARD_PATH = os.path.join("src", "pages", "jobs", "JobBoard.tsx")
+
+JOB_BOARD_TSX = """import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -128,7 +147,7 @@ export default function JobBoard() {
             <h4 className="font-semibold text-gray-900">{p.title}</h4>
             <p className="text-sm text-gray-500">
               {p.company}
-              {p.location ? ` — ${p.location}` : ''}
+              {p.location ? ` \u2014 ${p.location}` : ''}
             </p>
           </div>
           <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{p.status}</span>
@@ -255,7 +274,7 @@ export default function JobBoard() {
                     <h4 className="font-semibold text-gray-900">{p.title}</h4>
                     <p className="text-sm text-gray-500">
                       {p.company}
-                      {p.location ? ` — ${p.location}` : ''}
+                      {p.location ? ` \u2014 ${p.location}` : ''}
                     </p>
                   </div>
                   <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{p.status}</span>
@@ -284,3 +303,15 @@ export default function JobBoard() {
     </PortalLayout>
   );
 }
+"""
+
+
+def main():
+    os.makedirs(os.path.dirname(JOB_BOARD_PATH), exist_ok=True)
+    with open(JOB_BOARD_PATH, "w", encoding="utf-8") as f:
+        f.write(JOB_BOARD_TSX)
+    print("REWROTE " + JOB_BOARD_PATH + " (Admin now gets full moderation over every posting)")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,26 @@
-import { useEffect, useState } from 'react';
+#!/usr/bin/env python3
+"""
+Restructures Home.tsx: for a logged-in user, the same feed is wrapped in
+PortalLayout (matching every other page, dropping the old top-bar nav
+which fully duplicated the sidebar). For a logged-out guest, the existing
+standalone page (top bar with Apply/Browser/About/Sign in) is unchanged,
+since guests have no portal/sidebar to fit into.
+
+All feed logic -- posting, likes, comments, guest name, image upload,
+delete -- is copied verbatim, unchanged. This is a structural change only.
+
+USAGE (run from ~/runyenjes-platform/frontend):
+    python3 fix_home_portal_consistency.py
+
+Always overwrites Home.tsx (safe to re-run; back up first if you've made
+manual edits to Home.tsx since the version this was built from).
+"""
+
+import os
+
+TARGET = os.path.join("src", "pages", "Home.tsx")
+
+NEW_HOME_TSX = """import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api, uploadImage } from '../api/client';
@@ -500,3 +522,20 @@ export default function Home() {
     </div>
   );
 }
+"""
+
+
+def main():
+    if not os.path.isdir("src"):
+        print("ERROR: 'src' not found. Run this from ~/runyenjes-platform/frontend.")
+        return
+    os.makedirs(os.path.dirname(TARGET), exist_ok=True)
+    with open(TARGET, "w", encoding="utf-8") as f:
+        f.write(NEW_HOME_TSX)
+    print("REWROTE " + TARGET)
+    print(" - Logged-in users: feed now wrapped in PortalLayout (consistent sidebar, no duplicate nav)")
+    print(" - Logged-out guests: unchanged standalone page")
+
+
+if __name__ == "__main__":
+    main()

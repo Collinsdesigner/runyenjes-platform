@@ -32,6 +32,7 @@ import AdminAdmissions from './pages/admin/AdminAdmissions';
 import AdminLibrary from './pages/admin/AdminLibrary';
 import AdminStudents from './pages/admin/AdminStudents';
 import AdminStaff from './pages/admin/AdminStaff';
+import AdminBulkImport from './pages/admin/AdminBulkImport';
 import AdminAcademic from './pages/admin/AdminAcademic';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
@@ -58,7 +59,10 @@ export default function App() {
   useEffect(() => {
     api('/settings')
       .then((settings) => {
-        if (settings?.primaryColor) {
+        const personalAccent = localStorage.getItem('runyenjes_personal_accent');
+        if (personalAccent) {
+          document.documentElement.style.setProperty('--color-primary', personalAccent);
+        } else if (settings?.primaryColor) {
           document.documentElement.style.setProperty('--color-primary', settings.primaryColor);
         }
         if (settings?.secondaryColor) {
@@ -97,6 +101,7 @@ export default function App() {
                 <Route path="/admin/library" element={<AdminLibrary />} />
                 <Route path="/admin/students" element={<AdminStudents />} />
                 <Route path="/admin/staff" element={<AdminStaff />} />
+                <Route path="/admin/bulk-import" element={<AdminBulkImport />} />
                 <Route path="/admin/academic" element={<AdminAcademic />} />
           <Route path="/browser" element={<Browser />} />
          <Route path="/profile" element={<Profile />} />

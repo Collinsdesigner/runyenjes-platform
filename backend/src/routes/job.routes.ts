@@ -41,8 +41,12 @@ router.get('/', requireAuth, async (req, res) => {
   const { status } = req.query as { status?: string };
   const isAdmin = req.user!.role === 'ADMIN';
 
+  // Admin sees every posting by default (for moderation), optionally
+  // filtered to a specific status. Alumni only ever see OPEN postings.
+  const where = isAdmin ? (status ? { status: status as any } : {}) : { status: 'OPEN' as const };
+
   const postings = await prisma.jobPosting.findMany({
-    where: isAdmin && status ? { status: status as any } : { status: 'OPEN' },
+    where,
     include: { postedBy: { select: { id: true, name: true, role: true } } },
     orderBy: { createdAt: 'desc' },
   });

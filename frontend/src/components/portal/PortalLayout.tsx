@@ -35,6 +35,7 @@ const commonSections: NavSection[] = [
   {
     title: 'Workspace',
     items: [
+      { label: 'Home Feed', path: '/', icon: '🏠' },
       { label: 'AI Assistant', path: '/ai', icon: '✦' },
       { label: 'Notebook', path: '/notebook', icon: '📝' },
       { label: 'Groups', path: '/groups', icon: '💬' },
@@ -157,6 +158,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Students', path: '/admin/students', icon: '🎓' },
         { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
+        { label: 'Mass Import', path: '/admin/bulk-import', icon: '📥' },
         { label: 'Alumni', path: '/admin/alumni', icon: '🎓' },
       ],
     },
@@ -286,7 +288,10 @@ export default function PortalLayout({
       .then((data) => {
         setSettings(data);
 
-        if (data?.primaryColor) {
+        const personalAccent = localStorage.getItem('runyenjes_personal_accent');
+        if (personalAccent) {
+          document.documentElement.style.setProperty('--color-primary', personalAccent);
+        } else if (data?.primaryColor) {
           document.documentElement.style.setProperty(
             '--color-primary',
             data.primaryColor

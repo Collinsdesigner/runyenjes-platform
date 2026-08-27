@@ -142,6 +142,42 @@ async function handleRemoveAvatar() {
   </button>
 )}
 
+
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <p className="text-sm font-medium text-gray-700 mb-2">My Accent Color</p>
+            <p className="text-xs text-gray-400 mb-3">
+              Personal preference, just for your own view -- doesn't change anyone else's.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { name: 'Institution Default', value: '' },
+                { name: 'Green', value: '#0B7A2B' },
+                { name: 'Blue', value: '#1D4ED8' },
+                { name: 'Purple', value: '#7C3AED' },
+                { name: 'Rose', value: '#E11D48' },
+                { name: 'Amber', value: '#D97706' },
+                { name: 'Teal', value: '#0D9488' },
+              ].map((swatch) => (
+                <button
+                  key={swatch.name}
+                  type="button"
+                  title={swatch.name}
+                  onClick={() => {
+                    if (swatch.value) {
+                      localStorage.setItem('runyenjes_personal_accent', swatch.value);
+                      document.documentElement.style.setProperty('--color-primary', swatch.value);
+                    } else {
+                      localStorage.removeItem('runyenjes_personal_accent');
+                      window.location.reload();
+                    }
+                  }}
+                  className="w-8 h-8 rounded-full border-2 border-white shadow ring-1 ring-gray-200"
+                  style={{ backgroundColor: swatch.value || '#9CA3AF' }}
+                />
+              ))}
+            </div>
+          </div>
+
           {error && <p className="text-xs text-rmaroon mt-2">{error}</p>}
           {success && <p className="text-xs text-green-700 mt-2">✔ {success}</p>}
         </div>

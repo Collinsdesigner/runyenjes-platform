@@ -148,7 +148,7 @@ export default function Login() {
 
         <button
           type="button"
-          onClick={() => navigate('/portal')}
+          onClick={() => navigate('/')}
           className="w-full text-center text-sm text-gray-500 mt-4 underline"
         >
           Continue to Home feed without logging in
