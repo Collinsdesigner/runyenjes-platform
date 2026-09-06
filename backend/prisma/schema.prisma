@@ -117,6 +117,9 @@ model User {
   purchaseRequestsMade     PurchaseRequest[] @relation("PurchaseRequestedBy")
   purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
   jobPostings JobPosting[] @relation("JobPostingPostedBy")
+  assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
+  assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
+  assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
 }
 
 // ─────────────────────────────────────────────
@@ -174,6 +177,8 @@ model Unit {
   createdAt           DateTime           @default(now())
   timetableEntries    TimetableEntry[]
   exams               Exam[]
+  assignments Assignment[]
+  aiConversations AIConversation[]
 }
 
 model Material {
@@ -396,6 +401,7 @@ model Term {
   timetableEntries    TimetableEntry[]
   invoices            Invoice[]
   exams               Exam[]
+  assignments         Assignment[]
 }
 
 model ContinuationCheckIn {
@@ -426,6 +432,8 @@ model AIConversation {
   id        String      @id @default(uuid())
   userId    String
   user      User        @relation(fields: [userId], references: [id])
+  unitId    String?
+  unit      Unit?       @relation(fields: [unitId], references: [id])
   title     String      @default("New chat")
   messages  AIMessage[]
   createdAt DateTime    @default(now())
@@ -772,4 +780,54 @@ model JobPosting {
 
   @@index([postedById])
   @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// ASSIGNMENTS
+// ─────────────────────────────────────────────
+// Lean v1: an Assignment belongs to a Unit + Term (same pattern as Exam).
+// A student submits text and/or a file/link; a Teacher or Admin grades it
+// with a score and optional feedback comment.
+
+model Assignment {
+  id          String   @id @default(uuid())
+  unitId      String
+  unit        Unit     @relation(fields: [unitId], references: [id])
+  termId      String
+  term        Term     @relation(fields: [termId], references: [id])
+  title       String
+  description String?
+  dueDate     DateTime?
+  maxScore    Decimal  @default(100)
+  createdById String
+  createdBy   User     @relation("AssignmentCreatedBy", fields: [createdById], references: [id])
+
+  submissions AssignmentSubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([unitId])
+  @@index([termId])
+}
+
+model AssignmentSubmission {
+  id           String    @id @default(uuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  studentId    String
+  student      User      @relation("AssignmentSubmittedBy", fields: [studentId], references: [id])
+  textAnswer   String?
+  fileUrl      String?
+  submittedAt  DateTime  @default(now())
+  score        Decimal?
+  feedback     String?
+  gradedById   String?
+  gradedBy     User?     @relation("AssignmentGradedBy", fields: [gradedById], references: [id])
+  gradedAt     DateTime?
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
 }

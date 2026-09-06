@@ -3,6 +3,41 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
+const QUICK_ACTIONS: Record<string, { action: string; label: string; icon: string }[]> = {
+  STUDENT: [
+    { action: 'student_deadlines', label: 'Summarize my upcoming deadlines', icon: '\ud83d\udcc5' },
+    { action: 'student_fees', label: 'Explain my fee balance', icon: '\ud83d\udcb0' },
+  ],
+  TEACHER: [
+    { action: 'teacher_class_performance', label: "Summarize my classes' performance", icon: '\ud83d\udcca' },
+  ],
+  REGISTRAR: [
+    { action: 'registrar_pending_applications', label: 'Summarize pending applications', icon: '\ud83d\udcdd' },
+  ],
+  ADMIN: [
+    { action: 'admin_stats_summary', label: 'Summarize institution stats', icon: '\ud83d\udcc8' },
+  ],
+  PROCUREMENT_OFFICER: [
+    { action: 'procurement_pending_requests', label: 'Summarize pending purchase requests', icon: '\ud83d\udcc4' },
+  ],
+  STORES_OFFICER: [
+    { action: 'stores_low_stock', label: "What's low on stock right now", icon: '\ud83d\udce6' },
+  ],
+  FINANCE_OFFICER: [
+    { action: 'finance_outstanding_invoices', label: 'Summarize outstanding invoices', icon: '\ud83d\udcb3' },
+  ],
+  HR_OFFICER: [
+    { action: 'hr_pending_leave', label: 'Summarize pending leave requests', icon: '\ud83d\udc65' },
+  ],
+  EXAM_OFFICER: [
+    { action: 'examofficer_results_summary', label: 'Summarize my exam results', icon: '\ud83d\udcca' },
+  ],
+  ALUMNI: [
+    { action: 'alumni_career_tips', label: 'Give me career advice', icon: '\ud83c\udf93' },
+  ],
+};
+
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -51,6 +86,20 @@ export default function AIAssistant() {
       setMessages(data.map((m: any) => ({ role: m.role, content: m.content })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load that conversation');
+    }
+  }
+
+  async function handleQuickAction(action: string, label: string) {
+    setError(null);
+    setMessages((prev) => [...prev, { role: 'user', content: label }]);
+    setSending(true);
+    try {
+      const data = await api('/ai/assist', { method: 'POST', token, body: { action } });
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not complete that request');
+    } finally {
+      setSending(false);
     }
   }
 
@@ -173,10 +222,28 @@ export default function AIAssistant() {
 
         <main className="flex-1 max-w-xl w-full mx-auto p-4 flex flex-col min-h-0">
           <div className="flex-1 space-y-3 overflow-y-auto mb-3">
-            {messages.length === 0 && (
-              <div className="text-center text-sm text-gray-400 mt-10">
-                Ask me anything about your coursework — explain a concept, summarize notes,
-                or help you study for an upcoming test.
+            {messages.length === 0 && !activeId && (
+              <div className="mt-6 space-y-4">
+                {(QUICK_ACTIONS[user.role] ?? []).length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-400 text-center">Quick actions for your role:</p>
+                    {(QUICK_ACTIONS[user.role] ?? []).map((qa) => (
+                      <button
+                        key={qa.action}
+                        onClick={() => handleQuickAction(qa.action, `${qa.icon} ${qa.label}`)}
+                        disabled={sending}
+                        className="w-full text-left bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:border-rgreen hover:shadow-sm transition disabled:opacity-50"
+                      >
+                        <span className="mr-2">{qa.icon}</span>
+                        {qa.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="text-center text-sm text-gray-400">
+                  Or ask me anything about your coursework — explain a concept, summarize notes,
+                  or help you study for an upcoming test.
+                </div>
               </div>
             )}
 

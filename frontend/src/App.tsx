@@ -12,6 +12,7 @@ import GroupChat from './pages/GroupChat';
 import Continuation from './pages/Continuation';
 import Library from './pages/Library';
 import LibraryUnits from './pages/LibraryUnits';
+import UnitTutor from './pages/UnitTutor';
 import Admin from './pages/Admin';
 import Browser from './pages/Browser';
 import Profile from './pages/Profile';
@@ -33,6 +34,8 @@ import AdminLibrary from './pages/admin/AdminLibrary';
 import AdminStudents from './pages/admin/AdminStudents';
 import AdminStaff from './pages/admin/AdminStaff';
 import AdminBulkImport from './pages/admin/AdminBulkImport';
+import TeacherAssignments from './pages/teacher/TeacherAssignments';
+import StudentAssignments from './pages/student/StudentAssignments';
 import AdminAcademic from './pages/admin/AdminAcademic';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
@@ -89,6 +92,7 @@ export default function App() {
           <Route path="/continuation" element={<Continuation />} />
           <Route path="/library" element={<Library />} />
           <Route path="/library/:programId" element={<LibraryUnits />} />
+          <Route path="/library/units/:unitId/tutor" element={<UnitTutor />} />
          <Route path="/admin" element={<AdminPortal />} />
                 <Route path="/alumni" element={<AlumniPortal />} />
                 <Route path="/admin/alumni" element={<AdminAlumni />} />
@@ -109,6 +113,8 @@ export default function App() {
          <Route path="/student" element={<StudentPortal />} />
          <Route path="/student/timetable" element={<StudentTimetable />} />
          <Route path="/teacher" element={<TeacherPortal />} />
+                <Route path="/teacher/assignments" element={<TeacherAssignments />} />
+                <Route path="/student/assignments" element={<StudentAssignments />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />
          <Route path="/registrar/students" element={<RegistrarStudents />} />

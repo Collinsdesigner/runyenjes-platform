@@ -4,6 +4,33 @@ import { requireAuth, requireRole } from '../middleware/auth';
 
 const router = Router();
 
+// ---------- Teacher or Student: my own units for the active term ----------
+// Teachers see units they're assigned to teach; Students see units
+// they're registered for.
+router.get('/units/mine', requireAuth, async (req, res) => {
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.json([]);
+
+  if (req.user!.role === 'TEACHER') {
+    const assignments = await prisma.unitLecturer.findMany({
+      where: { lecturerId: req.user!.userId, termId: term.id },
+      include: { unit: { include: { program: { include: { department: true } } } } },
+    });
+    return res.json(assignments.map((a) => a.unit));
+  }
+
+  if (req.user!.role === 'STUDENT') {
+    const registrations = await prisma.unitRegistration.findMany({
+      where: { studentId: req.user!.userId, termId: term.id, status: 'REGISTERED' },
+      include: { unit: { include: { program: { include: { department: true } } } } },
+    });
+    return res.json(registrations.map((r) => r.unit));
+  }
+
+  res.json([]);
+});
+
+
 // ============================================================
 // PROGRAMMES + UNITS
 // ============================================================

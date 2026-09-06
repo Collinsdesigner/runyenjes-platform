@@ -144,14 +144,30 @@ export default function LibraryUnits() {
             <div key={unit.id} className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium text-sm">{unit.name}</p>
-                {canManage && (
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={() => handleDeleteUnit(unit.id)}
-                    className="text-xs text-rmaroon underline"
+                    onClick={() => navigate(`/library/units/${unit.id}/tutor`, { state: { unitName: unit.name } })}
+                    className="text-xs text-rgreen underline"
                   >
-                    Delete
+                    🎓 AI Tutor
                   </button>
-                )}
+                  <button
+                    onClick={() =>
+                      navigate(`/library/units/${unit.id}/tutor?tab=quiz`, { state: { unitName: unit.name } })
+                    }
+                    className="text-xs text-rgreen underline"
+                  >
+                    📝 Quiz
+                  </button>
+                  {canManage && (
+                    <button
+                      onClick={() => handleDeleteUnit(unit.id)}
+                      className="text-xs text-rmaroon underline"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
 
               {unit.materials.length === 0 ? (
