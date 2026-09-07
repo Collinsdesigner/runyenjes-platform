@@ -117,6 +117,7 @@ model User {
   purchaseRequestsMade     PurchaseRequest[] @relation("PurchaseRequestedBy")
   purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
   jobPostings JobPosting[] @relation("JobPostingPostedBy")
+  announcementsPosted Announcement[] @relation("AnnouncementPostedBy")
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -780,6 +781,25 @@ model JobPosting {
 
   @@index([postedById])
   @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// ANNOUNCEMENTS
+// ─────────────────────────────────────────────
+// Posted by Registrar/Admin, visible platform-wide. Lean v1: no
+// audience targeting yet -- every logged-in user sees every announcement.
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  body        String
+  postedById  String
+  postedBy    User     @relation("AnnouncementPostedBy", fields: [postedById], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([postedById])
 }
 
 // ─────────────────────────────────────────────
