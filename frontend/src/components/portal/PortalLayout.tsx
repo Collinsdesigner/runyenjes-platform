@@ -38,6 +38,7 @@ const commonSections: NavSection[] = [
       { label: 'Home Feed', path: '/', icon: '🏠' },
       { label: 'AI Assistant', path: '/ai', icon: '✦' },
       { label: 'Notebook', path: '/notebook', icon: '📝' },
+      { label: 'Announcements', path: '/announcements', icon: '📢' },
       { label: 'Groups', path: '/groups', icon: '💬' },
     ],
   },

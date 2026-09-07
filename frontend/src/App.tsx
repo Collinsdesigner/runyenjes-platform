@@ -99,6 +99,7 @@ export default function App() {
                 <Route path="/admin/alumni" element={<AdminAlumni />} />
                 <Route path="/jobs" element={<JobBoard />} />
                 <Route path="/registrar/announcements" element={<Announcements />} />
+                <Route path="/announcements" element={<Announcements />} />
                 <Route path="/admin/communication" element={<Announcements />} />
                 <Route path="/workers" element={<WorkersPortal />} />
                 <Route path="/procurement" element={<ProcurementPortal />} />
