@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import AIAssistBox from '../../components/ai/AIAssistBox';
 
 interface AnnouncementItem {
   id: string;
@@ -114,6 +115,14 @@ export default function Announcements() {
               rows={3}
               value={body}
               onChange={(e) => setBody(e.target.value)}
+            />
+
+            <AIAssistBox
+              task="draft_announcement"
+              label="Ask AI to turn rough notes into an announcement"
+              getInput={() => body}
+              onApply={(result) => setBody(result)}
+              emptyMessage="Jot down rough bullet points first, then ask AI to draft it."
             />
             <button type="submit" className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg">
               Post Announcement

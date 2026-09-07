@@ -706,5 +706,52 @@ router.post('/assist', requireAuth, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
+// AI TEXT ASSIST: reusable free-text helper (no DB context needed)
+// ─────────────────────────────────────────────
+// Unlike the quick actions above (which pull the user's own DB records),
+// this takes whatever text the user typed and transforms it. Used by the
+// reusable <AIAssistBox> component wherever a textarea could use AI help
+// (Notebook, Announcements, and future tabs). Always a suggestion the
+// user reviews and applies themselves -- nothing is auto-saved here.
+
+const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: number }> = {
+  summarize: {
+    systemPrompt:
+      'Summarize the following text into a few short, clear bullet points. Keep only the key ideas, nothing else.',
+  },
+  improve: {
+    systemPrompt:
+      'Rewrite the following text to be clearer, more polished, and well-organized, while keeping the same meaning, facts, and tone. Do not add new information.',
+  },
+  expand: {
+    systemPrompt:
+      'Expand the following rough notes/draft into fuller, well-organized prose, staying faithful to the original intent. Do not invent facts not implied by the original.',
+  },
+  draft_announcement: {
+    systemPrompt:
+      'Turn the following rough bullet points into a clear, professional announcement for a TVET college community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
+  },
+};
+
+router.post('/text-assist', requireAuth, async (req, res) => {
+  const { task, input } = req.body;
+
+  const taskDef = TEXT_ASSIST_TASKS[task];
+  if (!taskDef) {
+    return res.status(400).json({ error: 'Unknown text-assist task' });
+  }
+  if (!input || !input.trim()) {
+    return res.status(400).json({ error: 'input is required' });
+  }
+
+  try {
+    const reply = await callGroq(taskDef.systemPrompt, input.trim(), taskDef.maxTokens || 600);
+    res.json({ reply });
+  } catch (err) {
+    handleGroqError(err, res);
+  }
+});
+
 export default router;
 

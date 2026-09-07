@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import AIAssistBox from '../../components/ai/AIAssistBox';
 
 interface NoteItem {
   id: string;
@@ -153,6 +154,14 @@ export default function Notebook() {
               rows={12}
               value={content}
               onChange={(e) => setContent(e.target.value)}
+            />
+
+            <AIAssistBox
+              task="improve"
+              label="Ask AI to clean up or summarize this note"
+              getInput={() => content}
+              onApply={(result) => setContent(result)}
+              emptyMessage="Write your note first, then ask AI."
             />
             <div className="flex items-center gap-3">
               <button
