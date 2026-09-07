@@ -118,6 +118,7 @@ model User {
   purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
   jobPostings JobPosting[] @relation("JobPostingPostedBy")
   announcementsPosted Announcement[] @relation("AnnouncementPostedBy")
+  notes Note[]
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -800,6 +801,25 @@ model Announcement {
   updatedAt   DateTime @updatedAt
 
   @@index([postedById])
+}
+
+// ─────────────────────────────────────────────
+// NOTEBOOK
+// ─────────────────────────────────────────────
+// Personal notes, private to the owning user. No sharing in v1 --
+// each user only ever sees their own notes.
+
+model Note {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String   @default("Untitled note")
+  content   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 // ─────────────────────────────────────────────
