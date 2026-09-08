@@ -713,6 +713,42 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
       return `Here is a summary of assessments across this teacher's units this term:\n${lines.join('\n')}\n\nSummarize trends and flag any students who may need extra support.`;
     },
   },
+
+  teacher_attendance_patterns: {
+    roles: ['TEACHER'],
+    systemPrompt:
+      'You help a TVET teacher spot attendance patterns across the units they teach. Flag students with frequent absences and any noticeable trends. Be concise.',
+    build: async (userId) => {
+      const term = await prisma.term.findFirst({ where: { isActive: true } });
+      if (!term) return 'No active academic term right now, so there is no attendance data to summarize.';
+
+      const myUnits = await prisma.unitLecturer.findMany({ where: { lecturerId: userId, termId: term.id } });
+      const unitIds = myUnits.map((u) => u.unitId);
+      if (unitIds.length === 0) return 'This teacher has no assigned units this term.';
+
+      const records = await prisma.attendanceRecord.findMany({
+        where: { unitId: { in: unitIds }, termId: term.id },
+        include: { student: { select: { name: true } } },
+      });
+      if (records.length === 0) return 'No attendance has been recorded yet for this teacher\'s units this term.';
+
+      const absenceCounts = new Map<string, number>();
+      const totalSessions = new Map<string, number>();
+      for (const r of records) {
+        const key = r.student.name;
+        totalSessions.set(key, (totalSessions.get(key) || 0) + 1);
+        if (r.status === 'ABSENT') absenceCounts.set(key, (absenceCounts.get(key) || 0) + 1);
+      }
+
+      const lines = Array.from(totalSessions.keys()).map((name) => {
+        const absences = absenceCounts.get(name) || 0;
+        const total = totalSessions.get(name) || 0;
+        return `- ${name}: absent ${absences} of ${total} recorded sessions`;
+      });
+
+      return `Here is attendance across this teacher's units this term:\n${lines.join('\n')}\n\nFlag students with frequent absences and any noticeable trends.`;
+    },
+  },
 };
 
 // ---------- Role-specific one-click AI assist actions ----------

@@ -291,4 +291,83 @@ router.get('/classes', requireAuth, requireRole('TEACHER'), async (req, res) => 
   res.json({ term: term.name, classes });
 });
 
+// ---------- Teacher: roster + existing attendance for a unit+date ----------
+router.get('/attendance/roster', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const { unitId, date } = req.query as { unitId?: string; date?: string };
+  if (!unitId || !date) {
+    return res.status(400).json({ error: 'unitId and date are required' });
+  }
+
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.status(400).json({ error: 'No active academic term right now' });
+
+  const assignment = await prisma.unitLecturer.findFirst({
+    where: { lecturerId: req.user!.userId, unitId, termId: term.id },
+  });
+  if (!assignment) {
+    return res.status(403).json({ error: 'You are not assigned to teach this unit this term' });
+  }
+
+  const dayStart = new Date(date);
+  dayStart.setHours(0, 0, 0, 0);
+
+  const registrations = await prisma.unitRegistration.findMany({
+    where: { unitId, termId: term.id, status: 'REGISTERED' },
+    include: { student: { select: { id: true, name: true, admissionNumber: true } } },
+  });
+
+  const existing = await prisma.attendanceRecord.findMany({
+    where: { unitId, date: dayStart },
+  });
+  const statusMap = new Map(existing.map((r) => [r.studentId, r.status]));
+
+  const roster = registrations.map((r) => ({
+    studentId: r.studentId,
+    name: r.student.name,
+    admissionNumber: r.student.admissionNumber,
+    status: statusMap.get(r.studentId) || null,
+  }));
+
+  res.json({ roster });
+});
+
+// ---------- Teacher: bulk-save attendance for a unit+date ----------
+router.post('/attendance', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const { unitId, date, records } = req.body;
+  if (!unitId || !date || !Array.isArray(records)) {
+    return res.status(400).json({ error: 'unitId, date and records[] are required' });
+  }
+
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.status(400).json({ error: 'No active academic term right now' });
+
+  const assignment = await prisma.unitLecturer.findFirst({
+    where: { lecturerId: req.user!.userId, unitId, termId: term.id },
+  });
+  if (!assignment) {
+    return res.status(403).json({ error: 'You are not assigned to teach this unit this term' });
+  }
+
+  const dayStart = new Date(date);
+  dayStart.setHours(0, 0, 0, 0);
+
+  for (const rec of records) {
+    if (!rec.studentId || !rec.status) continue;
+    await prisma.attendanceRecord.upsert({
+      where: { unitId_date_studentId: { unitId, date: dayStart, studentId: rec.studentId } },
+      update: { status: rec.status, recordedById: req.user!.userId },
+      create: {
+        unitId,
+        termId: term.id,
+        studentId: rec.studentId,
+        date: dayStart,
+        status: rec.status,
+        recordedById: req.user!.userId,
+      },
+    });
+  }
+
+  res.status(204).send();
+});
+
 export default router;

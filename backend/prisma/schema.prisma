@@ -119,6 +119,8 @@ model User {
   jobPostings JobPosting[] @relation("JobPostingPostedBy")
   announcementsPosted Announcement[] @relation("AnnouncementPostedBy")
   notes Note[]
+  attendanceAsStudent AttendanceRecord[] @relation("AttendanceStudent")
+  attendanceRecorded  AttendanceRecord[] @relation("AttendanceRecordedBy")
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -181,6 +183,7 @@ model Unit {
   exams               Exam[]
   assignments Assignment[]
   aiConversations AIConversation[]
+  attendanceRecords AttendanceRecord[]
 }
 
 model Material {
@@ -404,6 +407,7 @@ model Term {
   invoices            Invoice[]
   exams               Exam[]
   assignments         Assignment[]
+  attendanceRecords   AttendanceRecord[]
 }
 
 model ContinuationCheckIn {
@@ -820,6 +824,40 @@ model Note {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// ATTENDANCE
+// ─────────────────────────────────────────────
+// One record per student, per unit, per calendar date. Recorded by
+// whichever teacher takes attendance for that session.
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model AttendanceRecord {
+  id           String           @id @default(uuid())
+  unitId       String
+  unit         Unit             @relation(fields: [unitId], references: [id])
+  termId       String
+  term         Term             @relation(fields: [termId], references: [id])
+  studentId    String
+  student      User             @relation("AttendanceStudent", fields: [studentId], references: [id])
+  date         DateTime
+  status       AttendanceStatus @default(PRESENT)
+  recordedById String
+  recordedBy   User             @relation("AttendanceRecordedBy", fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([unitId, date, studentId])
+  @@index([unitId])
+  @@index([studentId])
 }
 
 // ─────────────────────────────────────────────
