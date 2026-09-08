@@ -237,4 +237,58 @@ router.get('/results', requireAuth, requireRole('TEACHER'), async (req, res) => 
   res.json({ term: term.name, exams: shaped });
 });
 
+// ---------- Teacher: my classes (programme/cohort rollup of my units) ----------
+router.get('/classes', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.json({ term: null, classes: [] });
+
+  const assignments = await prisma.unitLecturer.findMany({
+    where: { lecturerId: req.user!.userId, termId: term.id },
+    include: { unit: { include: { program: true } } },
+  });
+
+  if (assignments.length === 0) return res.json({ term: term.name, classes: [] });
+
+  const unitIds = assignments.map((a) => a.unitId);
+  const registrations = await prisma.unitRegistration.findMany({
+    where: { unitId: { in: unitIds }, termId: term.id, status: 'REGISTERED' },
+    select: { unitId: true, studentId: true },
+  });
+
+  const programMap = new Map<
+    string,
+    { programId: string; programName: string; programLevel: string | null; units: Set<string>; studentIds: Set<string> }
+  >();
+
+  for (const a of assignments) {
+    const key = a.unit.program.id;
+    if (!programMap.has(key)) {
+      programMap.set(key, {
+        programId: key,
+        programName: a.unit.program.name,
+        programLevel: a.unit.program.level,
+        units: new Set(),
+        studentIds: new Set(),
+      });
+    }
+    programMap.get(key)!.units.add(a.unit.name);
+  }
+
+  for (const r of registrations) {
+    const assignment = assignments.find((a) => a.unitId === r.unitId);
+    if (!assignment) continue;
+    programMap.get(assignment.unit.program.id)!.studentIds.add(r.studentId);
+  }
+
+  const classes = Array.from(programMap.values()).map((p) => ({
+    programId: p.programId,
+    programName: p.programName,
+    programLevel: p.programLevel,
+    units: Array.from(p.units),
+    studentCount: p.studentIds.size,
+  }));
+
+  res.json({ term: term.name, classes });
+});
+
 export default router;
