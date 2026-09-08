@@ -682,6 +682,37 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
       return `${details}\n\nGive this alumnus 3-4 practical, encouraging career development suggestions.`;
     },
   },
+
+  teacher_unit_results_summary: {
+    roles: ['TEACHER'],
+    systemPrompt:
+      'You help a TVET teacher understand exam/assessment results across the units they teach. Identify trends and flag students who may need extra support. Be concise.',
+    build: async (userId) => {
+      const term = await prisma.term.findFirst({ where: { isActive: true } });
+      if (!term) return 'No active academic term right now, so there is no results data to summarize.';
+
+      const myUnits = await prisma.unitLecturer.findMany({
+        where: { lecturerId: userId, termId: term.id },
+      });
+      const unitIds = myUnits.map((u) => u.unitId);
+      if (unitIds.length === 0) return 'This teacher has no assigned units this term.';
+
+      const exams = await prisma.exam.findMany({
+        where: { unitId: { in: unitIds }, termId: term.id },
+        include: { unit: true, results: { include: { student: { select: { name: true } } } } },
+      });
+      if (exams.length === 0) return 'No assessments recorded yet for this teacher\'s units this term.';
+
+      const lines = exams.map((e) => {
+        if (e.results.length === 0) return `- "${e.name}" (${e.unit.name}): no results recorded yet`;
+        const scores = e.results.map((r) => Number(r.score));
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        return `- "${e.name}" (${e.unit.name}): ${e.results.length} result(s), average ${avg.toFixed(1)}/${e.maxScore}`;
+      });
+
+      return `Here is a summary of assessments across this teacher's units this term:\n${lines.join('\n')}\n\nSummarize trends and flag any students who may need extra support.`;
+    },
+  },
 };
 
 // ---------- Role-specific one-click AI assist actions ----------

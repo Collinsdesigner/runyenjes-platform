@@ -84,4 +84,157 @@ router.get('/students', requireAuth, requireRole('TEACHER'), async (req, res) =>
   res.json({ term: term.name, students: Array.from(studentMap.values()) });
 });
 
+// ---------- Teacher: list assessments (exams) across my units this term ----------
+router.get('/assessments', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.json({ term: null, exams: [] });
+
+  const assignments = await prisma.unitLecturer.findMany({
+    where: { lecturerId: req.user!.userId, termId: term.id },
+  });
+  const unitIds = assignments.map((a) => a.unitId);
+  if (unitIds.length === 0) return res.json({ term: term.name, exams: [] });
+
+  const exams = await prisma.exam.findMany({
+    where: { unitId: { in: unitIds }, termId: term.id },
+    include: { unit: true, results: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const shaped = exams.map((e) => ({
+    id: e.id,
+    name: e.name,
+    unitId: e.unitId,
+    unitName: e.unit.name,
+    examDate: e.examDate,
+    maxScore: e.maxScore,
+    resultCount: e.results.length,
+  }));
+
+  res.json({ term: term.name, exams: shaped });
+});
+
+// ---------- Teacher: create an assessment (exam) for one of my units ----------
+router.post('/assessments', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const { unitId, name, examDate, maxScore } = req.body;
+  if (!unitId || !name) {
+    return res.status(400).json({ error: 'unitId and name are required' });
+  }
+
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.status(400).json({ error: 'No active academic term right now' });
+
+  const assignment = await prisma.unitLecturer.findFirst({
+    where: { lecturerId: req.user!.userId, unitId, termId: term.id },
+  });
+  if (!assignment) {
+    return res.status(403).json({ error: 'You are not assigned to teach this unit this term' });
+  }
+
+  const exam = await prisma.exam.create({
+    data: {
+      unitId,
+      termId: term.id,
+      name,
+      examDate: examDate ? new Date(examDate) : null,
+      maxScore: maxScore || 100,
+      createdById: req.user!.userId,
+    },
+  });
+
+  res.status(201).json(exam);
+});
+
+// ---------- Teacher: roster for one of my exams, with any existing result ----------
+router.get('/assessments/:examId/roster', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const { examId } = req.params;
+
+  const exam = await prisma.exam.findUnique({ where: { id: examId } });
+  if (!exam) return res.status(404).json({ error: 'Assessment not found' });
+
+  const assignment = await prisma.unitLecturer.findFirst({
+    where: { lecturerId: req.user!.userId, unitId: exam.unitId, termId: exam.termId },
+  });
+  if (!assignment) {
+    return res.status(403).json({ error: 'You do not teach the unit for this assessment' });
+  }
+
+  const registrations = await prisma.unitRegistration.findMany({
+    where: { unitId: exam.unitId, termId: exam.termId, status: 'REGISTERED' },
+    include: { student: { select: { id: true, name: true, admissionNumber: true } } },
+  });
+
+  const results = await prisma.examResult.findMany({ where: { examId } });
+  const resultMap = new Map(results.map((r) => [r.studentId, r]));
+
+  const roster = registrations.map((r) => ({
+    studentId: r.studentId,
+    name: r.student.name,
+    admissionNumber: r.student.admissionNumber,
+    score: resultMap.get(r.studentId)?.score ?? null,
+    remarks: resultMap.get(r.studentId)?.remarks ?? null,
+  }));
+
+  res.json({ examName: exam.name, maxScore: exam.maxScore, roster });
+});
+
+// ---------- Teacher: record/update a result for one student on one of my exams ----------
+router.post('/assessments/:examId/results', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const { examId } = req.params;
+  const { studentId, score, remarks } = req.body;
+
+  if (!studentId || score === undefined || score === null) {
+    return res.status(400).json({ error: 'studentId and score are required' });
+  }
+
+  const exam = await prisma.exam.findUnique({ where: { id: examId } });
+  if (!exam) return res.status(404).json({ error: 'Assessment not found' });
+
+  const assignment = await prisma.unitLecturer.findFirst({
+    where: { lecturerId: req.user!.userId, unitId: exam.unitId, termId: exam.termId },
+  });
+  if (!assignment) {
+    return res.status(403).json({ error: 'You do not teach the unit for this assessment' });
+  }
+
+  const result = await prisma.examResult.upsert({
+    where: { examId_studentId: { examId, studentId } },
+    update: { score, remarks: remarks || null, recordedById: req.user!.userId },
+    create: { examId, studentId, score, remarks: remarks || null, recordedById: req.user!.userId },
+  });
+
+  res.json(result);
+});
+
+// ---------- Teacher: read-only results overview across my units this term ----------
+router.get('/results', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.json({ term: null, exams: [] });
+
+  const assignments = await prisma.unitLecturer.findMany({
+    where: { lecturerId: req.user!.userId, termId: term.id },
+  });
+  const unitIds = assignments.map((a) => a.unitId);
+  if (unitIds.length === 0) return res.json({ term: term.name, exams: [] });
+
+  const exams = await prisma.exam.findMany({
+    where: { unitId: { in: unitIds }, termId: term.id },
+    include: {
+      unit: true,
+      results: { include: { student: { select: { name: true } } } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const shaped = exams.map((e) => ({
+    id: e.id,
+    name: e.name,
+    unitName: e.unit.name,
+    maxScore: e.maxScore,
+    results: e.results.map((r) => ({ studentName: r.student.name, score: r.score, remarks: r.remarks })),
+  }));
+
+  res.json({ term: term.name, exams: shaped });
+});
+
 export default router;

@@ -39,6 +39,8 @@ import AdminBulkImport from './pages/admin/AdminBulkImport';
 import TeacherAssignments from './pages/teacher/TeacherAssignments';
 import TeacherUnits from './pages/teacher/TeacherUnits';
 import TeacherStudents from './pages/teacher/TeacherStudents';
+import TeacherAssessments from './pages/teacher/TeacherAssessments';
+import TeacherResults from './pages/teacher/TeacherResults';
 import StudentAssignments from './pages/student/StudentAssignments';
 import AdminAcademic from './pages/admin/AdminAcademic';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
@@ -124,6 +126,8 @@ export default function App() {
                 <Route path="/teacher/assignments" element={<TeacherAssignments />} />
                 <Route path="/teacher/units" element={<TeacherUnits />} />
                 <Route path="/teacher/students" element={<TeacherStudents />} />
+                <Route path="/teacher/assessments" element={<TeacherAssessments />} />
+                <Route path="/teacher/results" element={<TeacherResults />} />
                 <Route path="/student/assignments" element={<StudentAssignments />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />
