@@ -55,7 +55,7 @@ async function callGroq(systemPrompt: string, userMessage: string, maxTokens = 1
   }
 
   const data: any = await response.json();
-  return data.choices?.[0]?.message?.content ?? 'Sorry, I could not generate a response.';
+  return data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
 }
 
 function handleGroqError(err: unknown, res: any) {
