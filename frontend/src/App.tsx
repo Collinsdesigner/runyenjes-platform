@@ -49,6 +49,7 @@ import StudentAcademics from './pages/student/StudentAcademics';
 import StudentFees from './pages/student/StudentFees';
 import StudentResults from './pages/student/StudentResults';
 import AdminAcademic from './pages/admin/AdminAcademic';
+import AdminFinance from './pages/admin/AdminFinance';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
 import RegistrarProgrammes from './pages/registrar/RegistrarProgrammes';
@@ -125,6 +126,7 @@ export default function App() {
                 <Route path="/admin/staff" element={<AdminStaff />} />
                 <Route path="/admin/bulk-import" element={<AdminBulkImport />} />
                 <Route path="/admin/academic" element={<AdminAcademic />} />
+                <Route path="/admin/finance" element={<AdminFinance />} />
           <Route path="/browser" element={<Browser />} />
          <Route path="/profile" element={<Profile />} />
          <Route path="/portal" element={<PortalRedirect />} />
