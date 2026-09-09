@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import AIAssistBox from '../../components/ai/AIAssistBox';
 
 interface Overview {
   students: number;
@@ -25,6 +26,10 @@ export default function Reports() {
   const [aiReply, setAiReply] = useState('');
   const [aiError, setAiError] = useState('');
 
+  const [notes, setNotes] = useState('');
+  const [notesSaving, setNotesSaving] = useState(false);
+  const [notesMessage, setNotesMessage] = useState('');
+
   useEffect(() => {
     if (!token) return;
     setLoading(true);
@@ -33,6 +38,26 @@ export default function Reports() {
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load reports'))
       .finally(() => setLoading(false));
   }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    api('/reports/notes', { token })
+      .then((data) => setNotes(data.content || ''))
+      .catch(() => {});
+  }, [token]);
+
+  async function handleSaveNotes() {
+    setNotesSaving(true);
+    setNotesMessage('');
+    try {
+      await api('/reports/notes', { method: 'PUT', token, body: { content: notes } });
+      setNotesMessage('Notes saved');
+    } catch (err) {
+      setNotesMessage(err instanceof Error ? err.message : 'Could not save notes');
+    } finally {
+      setNotesSaving(false);
+    }
+  }
 
   async function handleAskAI() {
     setAiLoading(true);
@@ -79,6 +104,35 @@ export default function Reports() {
         )}
 
         {loading && <p className="text-sm text-gray-400">Loading...</p>}
+
+        <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900">Report Notes</h3>
+            {notesMessage && <span className="text-xs text-gray-500">{notesMessage}</span>}
+          </div>
+          <textarea
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            placeholder="Write your own commentary on this term's figures..."
+            rows={5}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+          <AIAssistBox
+            task="improve"
+            label="Ask AI to polish these notes"
+            getInput={() => notes}
+            onApply={(result) => setNotes(result)}
+            emptyMessage="Write your notes first, then ask AI to polish them."
+          />
+          <button
+            type="button"
+            onClick={handleSaveNotes}
+            disabled={notesSaving}
+            className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
+          >
+            {notesSaving ? 'Saving...' : 'Save Notes'}
+          </button>
+        </div>
 
         {data && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

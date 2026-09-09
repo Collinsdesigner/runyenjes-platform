@@ -41,4 +41,30 @@ router.get('/overview', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (r
   });
 });
 
+// ---------- Get the shared report notes ----------
+router.get('/notes', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req, res) => {
+  const note = await prisma.reportNote.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1, content: '' },
+  });
+  res.json({ content: note.content, updatedAt: note.updatedAt });
+});
+
+// ---------- Update the shared report notes ----------
+router.put('/notes', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req, res) => {
+  const { content } = req.body;
+  if (content === undefined) {
+    return res.status(400).json({ error: 'content is required' });
+  }
+
+  const note = await prisma.reportNote.upsert({
+    where: { id: 1 },
+    update: { content, updatedById: req.user!.userId },
+    create: { id: 1, content, updatedById: req.user!.userId },
+  });
+
+  res.json({ content: note.content, updatedAt: note.updatedAt });
+});
+
 export default router;

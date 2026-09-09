@@ -121,6 +121,7 @@ model User {
   notes Note[]
   attendanceAsStudent AttendanceRecord[] @relation("AttendanceStudent")
   attendanceRecorded  AttendanceRecord[] @relation("AttendanceRecordedBy")
+  reportNotesUpdated ReportNote[]
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -858,6 +859,20 @@ model AttendanceRecord {
   @@unique([unitId, date, studentId])
   @@index([unitId])
   @@index([studentId])
+}
+
+// ─────────────────────────────────────────────
+// REPORT NOTES
+// ─────────────────────────────────────────────
+// Single shared note (like SiteSettings) that Registrar/Admin can write
+// and revise, shown alongside the auto-generated Reports stats/AI summary.
+
+model ReportNote {
+  id          Int      @id @default(1)
+  content     String   @default("")
+  updatedById String?
+  updatedBy   User?    @relation(fields: [updatedById], references: [id])
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 // ─────────────────────────────────────────────
