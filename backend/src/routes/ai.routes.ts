@@ -852,6 +852,11 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
     systemPrompt:
       'Turn the following rough bullet points into a clear, professional announcement for a TVET college community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
   },
+  suggest_document_title: {
+    systemPrompt:
+      'Given a file name, suggest a short, professional document title suitable for a student\'s academic record (for example, "transcript_2026_final.pdf" becomes "Academic Transcript 2026"). Respond with ONLY the suggested title, nothing else -- no quotes, no explanation.',
+    maxTokens: 30,
+  },
 };
 
 router.post('/text-assist', requireAuth, async (req, res) => {

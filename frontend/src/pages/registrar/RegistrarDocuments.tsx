@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api, uploadStudentDocument } from '../../api/client';
+import AIAssistBox from '../../components/ai/AIAssistBox';
 import { useAuth } from '../../context/AuthContext';
 
 interface StudentRow {
@@ -168,6 +169,16 @@ export default function RegistrarDocuments() {
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="text-sm"
               />
+
+              {file && (
+                <AIAssistBox
+                  task="suggest_document_title"
+                  label="Suggest title from filename"
+                  getInput={() => file.name}
+                  onApply={(result) => setTitle(result)}
+                  emptyMessage="Choose a file first."
+                />
+              )}
               <button
                 type="button"
                 onClick={handleUpload}

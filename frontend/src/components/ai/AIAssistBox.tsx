@@ -3,7 +3,7 @@ import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
 interface AIAssistBoxProps {
-  task: 'summarize' | 'improve' | 'expand' | 'draft_announcement';
+  task: 'summarize' | 'improve' | 'expand' | 'draft_announcement' | 'suggest_document_title';
   getInput: () => string;
   onApply: (result: string) => void;
   label?: string;
