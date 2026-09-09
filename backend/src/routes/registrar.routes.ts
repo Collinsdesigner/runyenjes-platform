@@ -259,4 +259,38 @@ router.get(
   }
 );
 
+/**
+ * Students actually enrolled (real Enrollment records) in a given programme.
+ * More accurate than the flat Student Records list, which derives "programme"
+ * from an admitted Application rather than the Enrollment table itself.
+ */
+router.get(
+  '/programmes/:programId/students',
+  requireAuth,
+  requireRole('REGISTRAR', 'ADMIN'),
+  async (req, res) => {
+    const { programId } = req.params;
+
+    const enrollments = await prisma.enrollment.findMany({
+      where: { programId },
+      include: {
+        student: {
+          select: { id: true, name: true, email: true, admissionNumber: true, status: true },
+        },
+      },
+      orderBy: { enrolledAt: 'desc' },
+    });
+
+    const result = enrollments.map((e) => ({
+      studentId: e.studentId,
+      name: e.student.name,
+      email: e.student.email,
+      admissionNumber: e.student.admissionNumber,
+      status: e.status,
+    }));
+
+    res.json(result);
+  }
+);
+
 export default router;
