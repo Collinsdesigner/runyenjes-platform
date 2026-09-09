@@ -122,6 +122,8 @@ model User {
   attendanceAsStudent AttendanceRecord[] @relation("AttendanceStudent")
   attendanceRecorded  AttendanceRecord[] @relation("AttendanceRecordedBy")
   reportNotesUpdated ReportNote[]
+  documentsOwned    StudentDocument[] @relation("StudentDocuments")
+  documentsUploaded StudentDocument[] @relation("DocumentUploadedBy")
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -873,6 +875,29 @@ model ReportNote {
   updatedById String?
   updatedBy   User?    @relation(fields: [updatedById], references: [id])
   updatedAt   DateTime @default(now()) @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// STUDENT DOCUMENTS
+// ─────────────────────────────────────────────
+// Issued by Registrar/Admin against a student (transcripts, ID scans,
+// certificates, etc.). Stored via Cloudinary resource_type 'auto' --
+// no image transforms, since these are often PDFs/DOCX, not photos.
+
+model StudentDocument {
+  id           String   @id @default(uuid())
+  studentId    String
+  student      User     @relation("StudentDocuments", fields: [studentId], references: [id])
+  title        String
+  fileUrl      String
+  filePublicId String
+  resourceType String   @default("auto")
+  uploadedById String
+  uploadedBy   User     @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
 }
 
 // ─────────────────────────────────────────────

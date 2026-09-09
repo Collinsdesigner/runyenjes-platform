@@ -58,4 +58,43 @@ export async function deleteImage(publicId: string): Promise<void> {
   });
 }
 
+// Generic document upload (PDF, DOCX, images, etc.) -- unlike uploadImage,
+// this does NOT force resource_type 'image' or apply resize transforms,
+// since a resized/re-encoded PDF would be corrupted.
+export async function uploadDocument(
+  file: Express.Multer.File,
+  folder: string
+): Promise<UploadedImage> {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: 'auto',
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+
+        if (!result) {
+          return reject(new Error('Cloudinary upload failed.'));
+        }
+
+        resolve({
+          secureUrl: result.secure_url,
+          publicId: result.public_id,
+        });
+      }
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+}
+
+export async function deleteDocument(publicId: string): Promise<void> {
+  await cloudinary.uploader.destroy(publicId, {
+    resource_type: 'auto',
+  });
+}
+
 export default cloudinary;

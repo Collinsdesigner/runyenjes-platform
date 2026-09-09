@@ -55,6 +55,7 @@ import RegistrarStudents from './pages/registrar/RegistrarStudents';
 import RegistrarProgrammes from './pages/registrar/RegistrarProgrammes';
 import RegistrarStudentAcademic from './pages/registrar/RegistrarStudentAcademic';
 import RegistrarAcademicRecords from './pages/registrar/RegistrarAcademicRecords';
+import RegistrarDocuments from './pages/registrar/RegistrarDocuments';
 import AIAssistant from './pages/AIAssistant';
 import RegistrarTimetable from './pages/registrar/RegistrarTimetable';
 import StudentTimetable from './pages/portal/StudentTimetable';
@@ -150,6 +151,7 @@ export default function App() {
          <Route path="/registrar/students" element={<RegistrarStudents />} />
          <Route path="/registrar/students/:studentId/academic" element={<RegistrarStudentAcademic />} />
                 <Route path="/registrar/academic" element={<RegistrarAcademicRecords />} />
+                <Route path="/registrar/documents" element={<RegistrarDocuments />} />
           <Route path="/registrar/programmes" element={<RegistrarProgrammes />} />
          <Route path="/ai" element={<AIAssistant />} />
 

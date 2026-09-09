@@ -115,6 +115,44 @@ export async function uploadInstitutionLogo(
 }
 
 // ------------------------------------------------------------
+// Upload a student document
+// ------------------------------------------------------------
+export async function uploadStudentDocument(
+  studentId: string,
+  file: File,
+  title: string,
+  token: string | null
+): Promise<{ id: string; fileUrl: string; filePublicId: string; title: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('title', title);
+
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_URL}/documents/students/${studentId}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (res.status === 401) {
+    handleUnauthorized();
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || 'Document upload failed');
+  }
+
+  return data;
+}
+
+// ------------------------------------------------------------
 // Standard API client
 // ------------------------------------------------------------
 export async function api(
