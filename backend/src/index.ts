@@ -31,6 +31,7 @@ import announcementsRoutes from './routes/announcements.routes';
 import notesRoutes from './routes/notes.routes';
 import assignmentsRoutes from './routes/assignments.routes';
 import teacherRoutes from './routes/teacher.routes';
+import studentRoutes from './routes/student.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
 
@@ -168,6 +169,7 @@ app.use('/announcements', announcementsRoutes);
 app.use('/notes', notesRoutes);
 app.use('/assignments', assignmentsRoutes);
 app.use('/teacher', teacherRoutes);
+app.use('/student', studentRoutes);
 
 /**
  * =========================

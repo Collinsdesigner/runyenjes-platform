@@ -44,6 +44,9 @@ import TeacherAttendance from './pages/teacher/TeacherAttendance';
 import TeacherAssessments from './pages/teacher/TeacherAssessments';
 import TeacherResults from './pages/teacher/TeacherResults';
 import StudentAssignments from './pages/student/StudentAssignments';
+import StudentAcademics from './pages/student/StudentAcademics';
+import StudentFees from './pages/student/StudentFees';
+import StudentResults from './pages/student/StudentResults';
 import AdminAcademic from './pages/admin/AdminAcademic';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
@@ -133,6 +136,9 @@ export default function App() {
                 <Route path="/teacher/assessments" element={<TeacherAssessments />} />
                 <Route path="/teacher/results" element={<TeacherResults />} />
                 <Route path="/student/assignments" element={<StudentAssignments />} />
+                <Route path="/student/academics" element={<StudentAcademics />} />
+                <Route path="/student/fees" element={<StudentFees />} />
+                <Route path="/student/results" element={<StudentResults />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />
          <Route path="/registrar/students" element={<RegistrarStudents />} />

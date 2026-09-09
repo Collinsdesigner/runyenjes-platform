@@ -749,6 +749,26 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
       return `Here is attendance across this teacher's units this term:\n${lines.join('\n')}\n\nFlag students with frequent absences and any noticeable trends.`;
     },
   },
+
+  student_results_summary: {
+    roles: ['STUDENT'],
+    systemPrompt:
+      'You help a TVET student understand their own exam results. Be encouraging, clear, and specific about strengths and areas to improve.',
+    build: async (userId) => {
+      const results = await prisma.examResult.findMany({
+        where: { studentId: userId },
+        include: { exam: { include: { unit: true } } },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (results.length === 0) return 'This student has no recorded exam results yet.';
+
+      const lines = results.map(
+        (r) => `- ${r.exam.name} (${r.exam.unit.name}): ${r.score}/${r.exam.maxScore}`
+      );
+
+      return `Here are this student's exam results:\n${lines.join('\n')}\n\nSummarize their performance, highlight strengths, and suggest 1-2 areas to focus on.`;
+    },
+  },
 };
 
 // ---------- Role-specific one-click AI assist actions ----------
