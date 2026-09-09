@@ -769,6 +769,39 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
       return `Here are this student's exam results:\n${lines.join('\n')}\n\nSummarize their performance, highlight strengths, and suggest 1-2 areas to focus on.`;
     },
   },
+
+  institution_reports_summary: {
+    roles: ['REGISTRAR', 'ADMIN'],
+    systemPrompt:
+      'You help TVET college leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
+    build: async () => {
+      const [students, staffCounts, departments, programmes, units, admissionsByStatus, outstandingInvoices] = await Promise.all([
+        prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
+        prisma.user.groupBy({
+          by: ['role'],
+          where: { status: 'ACTIVE', role: { notIn: ['STUDENT', 'ALUMNI'] } },
+          _count: { role: true },
+        }),
+        prisma.department.count(),
+        prisma.program.count(),
+        prisma.unit.count(),
+        prisma.application.groupBy({ by: ['status'], _count: { status: true } }),
+        prisma.invoice.findMany({
+          where: { status: { in: ['PENDING', 'PARTIALLY_PAID', 'OVERDUE'] } },
+          include: { payments: true },
+        }),
+      ]);
+
+      const staffLines = staffCounts.map((s) => `${s.role}: ${s._count.role}`).join(', ');
+      const admissionLines = admissionsByStatus.map((a) => `${a.status}: ${a._count.status}`).join(', ');
+      const outstandingBalance = outstandingInvoices.reduce((sum, inv) => {
+        const paid = inv.payments.reduce((s, p) => s + Number(p.amount), 0);
+        return sum + (Number(inv.amount) - paid);
+      }, 0);
+
+      return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
+    },
+  },
 };
 
 // ---------- Role-specific one-click AI assist actions ----------
