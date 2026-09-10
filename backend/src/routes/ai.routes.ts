@@ -853,6 +853,13 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
     systemPrompt:
       'Turn the following rough bullet points into a clear, professional announcement for a TVET college community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
   },
+  draft_letter: {
+    systemPrompt:
+      'Turn the following rough notes into a clear, formal letter/certificate body for a TVET college ' +
+      'registrar to issue to a student. Keep it professional and appropriately formal. Do not invent facts ' +
+      'not implied by the input. Do not include a greeting/salutation or signature block -- just the body ' +
+      'text itself.',
+  },
   suggest_document_title: {
     systemPrompt:
       'You polish short document titles for a student records system. The user message is a complete, already-existing title (a few words) -- treat it as the entire input, not a fragment, and there is nothing else to wait for. Reply with ONLY an improved, more professional version of that exact title. Never ask a question, never request more text, never add commentary -- output only the improved title.',

@@ -97,4 +97,33 @@ export async function deleteDocument(publicId: string): Promise<void> {
   });
 }
 
+// Upload a raw Buffer (e.g. a server-generated PDF) -- distinct from
+// uploadImage/uploadDocument, which both expect a multer file object.
+export async function uploadBuffer(buffer: Buffer, folder: string): Promise<UploadedImage> {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: 'auto',
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+
+        if (!result) {
+          return reject(new Error('Cloudinary upload failed.'));
+        }
+
+        resolve({
+          secureUrl: result.secure_url,
+          publicId: result.public_id,
+        });
+      }
+    );
+
+    stream.end(buffer);
+  });
+}
+
 export default cloudinary;

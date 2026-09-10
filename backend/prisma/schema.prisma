@@ -124,6 +124,8 @@ model User {
   reportNotesUpdated ReportNote[]
   documentsOwned    StudentDocument[] @relation("StudentDocuments")
   documentsUploaded StudentDocument[] @relation("DocumentUploadedBy")
+  lettersReceived IssuedLetter[] @relation("LetterRecipient")
+  lettersIssued   IssuedLetter[] @relation("LetterIssuedBy")
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
@@ -894,6 +896,29 @@ model StudentDocument {
   resourceType String   @default("auto")
   uploadedById String
   uploadedBy   User     @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+}
+
+// ─────────────────────────────────────────────
+// LETTERS & CERTIFICATES
+// ─────────────────────────────────────────────
+// A real PDF is generated server-side (pdfkit) and stored via
+// Cloudinary, same pattern as StudentDocument.
+
+model IssuedLetter {
+  id           String   @id @default(uuid())
+  studentId    String
+  student      User     @relation("LetterRecipient", fields: [studentId], references: [id])
+  type         String
+  title        String
+  bodyText     String
+  fileUrl      String
+  filePublicId String
+  issuedById   String
+  issuedBy     User     @relation("LetterIssuedBy", fields: [issuedById], references: [id])
 
   createdAt DateTime @default(now())
 
