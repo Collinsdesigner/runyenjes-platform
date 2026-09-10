@@ -42,6 +42,7 @@ async function callGroq(systemPrompt: string, userMessage: string, maxTokens = 1
       ],
       temperature: 0.6,
       max_tokens: maxTokens,
+      reasoning_effort: 'low',
     }),
   });
 
