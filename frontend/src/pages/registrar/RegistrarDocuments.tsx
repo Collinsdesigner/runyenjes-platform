@@ -182,7 +182,7 @@ export default function RegistrarDocuments() {
 
               {title && (
                 <AIAssistBox
-                  task="improve"
+                  task="suggest_document_title"
                   label="Ask AI to polish this title"
                   getInput={() => title}
                   onApply={(result) => setTitle(result)}

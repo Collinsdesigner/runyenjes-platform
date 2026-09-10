@@ -855,8 +855,8 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
   },
   suggest_document_title: {
     systemPrompt:
-      'Given a file name, suggest a short, professional document title suitable for a student\'s academic record (for example, "transcript_2026_final.pdf" becomes "Academic Transcript 2026"). Respond with ONLY the suggested title, nothing else -- no quotes, no explanation.',
-    maxTokens: 30,
+      'You polish short document titles for a student records system. The user message is a complete, already-existing title (a few words) -- treat it as the entire input, not a fragment, and there is nothing else to wait for. Reply with ONLY an improved, more professional version of that exact title. Never ask a question, never request more text, never add commentary -- output only the improved title.',
+    maxTokens: 200,
   },
 };
 
