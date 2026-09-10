@@ -19,6 +19,12 @@ interface DocumentRow {
   uploadedBy: { name: string };
 }
 
+function titleFromFilename(filename: string): string {
+  const base = filename.replace(/\.[^/.]+$/, '');
+  const spaced = base.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return spaced.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+
 export default function RegistrarDocuments() {
   const { token } = useAuth();
 
@@ -166,17 +172,21 @@ export default function RegistrarDocuments() {
               <input
                 type="file"
                 accept="image/*,.pdf,.doc,.docx"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const chosen = e.target.files?.[0] || null;
+                  setFile(chosen);
+                  if (chosen && !title.trim()) setTitle(titleFromFilename(chosen.name));
+                }}
                 className="text-sm"
               />
 
-              {file && (
+              {title && (
                 <AIAssistBox
-                  task="suggest_document_title"
-                  label="Suggest title from filename"
-                  getInput={() => file.name}
+                  task="improve"
+                  label="Ask AI to polish this title"
+                  getInput={() => title}
                   onApply={(result) => setTitle(result)}
-                  emptyMessage="Choose a file first."
+                  emptyMessage="Type or auto-fill a title first."
                 />
               )}
               <button
