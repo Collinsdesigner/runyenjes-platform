@@ -1803,4 +1803,111 @@ router.delete(
 );
 
 
+// Bulk-create timetable entries (e.g. from an AI-generated draft, or
+// several manual grid edits at once). Reuses the exact same conflict
+// rules as the single-entry POST above, extended to also catch
+// conflicts between entries within this same batch.
+router.post(
+  '/timetable/entries/bulk',
+  requireAuth,
+  requireRole('REGISTRAR', 'ADMIN'),
+  async (req, res) => {
+    const { entries } = req.body;
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      return res.status(400).json({ error: 'entries[] is required' });
+    }
+
+    const term = await prisma.term.findFirst({ where: { isActive: true } });
+    if (!term) return res.status(400).json({ error: 'No active academic term' });
+
+    const existingEntries = await prisma.timetableEntry.findMany({ where: { termId: term.id } });
+
+    type ConflictCheckable = {
+      unitId: string;
+      lecturerId: string | null;
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      room: string | null;
+    };
+
+    const accepted: ConflictCheckable[] = existingEntries.map((e) => ({
+      unitId: e.unitId,
+      lecturerId: e.lecturerId,
+      dayOfWeek: e.dayOfWeek,
+      startTime: e.startTime,
+      endTime: e.endTime,
+      room: e.room,
+    }));
+
+    const created: any[] = [];
+    const skipped: any[] = [];
+
+    for (const raw of entries) {
+      const { unitId, lecturerId, dayOfWeek, startTime, endTime, room, notes } = raw;
+
+      if (!unitId || dayOfWeek === undefined || !startTime || !endTime) {
+        skipped.push({ ...raw, reason: 'Missing required fields' });
+        continue;
+      }
+      if (typeof dayOfWeek !== 'number' || dayOfWeek < 1 || dayOfWeek > 7) {
+        skipped.push({ ...raw, reason: 'Invalid day of week' });
+        continue;
+      }
+      if (startTime >= endTime) {
+        skipped.push({ ...raw, reason: 'End time must be later than start time' });
+        continue;
+      }
+
+      const overlapping = accepted.filter(
+        (e) => e.dayOfWeek === dayOfWeek && e.startTime < endTime && e.endTime > startTime
+      );
+
+      if (overlapping.some((e) => e.unitId === unitId)) {
+        skipped.push({ ...raw, reason: 'This unit is already scheduled during this time' });
+        continue;
+      }
+      if (lecturerId && overlapping.some((e) => e.lecturerId === lecturerId)) {
+        skipped.push({ ...raw, reason: 'This lecturer is already teaching another unit during this time' });
+        continue;
+      }
+      if (room && overlapping.some((e) => e.room && e.room.trim().toLowerCase() === String(room).trim().toLowerCase())) {
+        skipped.push({ ...raw, reason: 'This room is already occupied during this time' });
+        continue;
+      }
+
+      const entry = await prisma.timetableEntry.create({
+        data: {
+          termId: term.id,
+          unitId,
+          lecturerId: lecturerId || null,
+          dayOfWeek,
+          startTime,
+          endTime,
+          room: room || null,
+          notes: notes || null,
+        },
+        include: {
+          unit: { include: { program: true } },
+          lecturer: { select: { id: true, name: true, email: true, departmentId: true } },
+          term: true,
+        },
+      });
+
+      accepted.push({
+        unitId: entry.unitId,
+        lecturerId: entry.lecturerId,
+        dayOfWeek: entry.dayOfWeek,
+        startTime: entry.startTime,
+        endTime: entry.endTime,
+        room: entry.room,
+      });
+      created.push(entry);
+    }
+
+    res.status(201).json({ created, skipped });
+  }
+);
+
 export default router;

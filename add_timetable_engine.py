@@ -1,4 +1,270 @@
-import { useEffect, useMemo, useState } from 'react';
+#!/usr/bin/env python3
+"""
+Upgrades the Timetable from single-entry-only to a full weekly engine:
+  1. ai.routes.ts        -> new POST /ai/timetable-suggestion (AI draft,
+                             not saved -- registrar reviews before saving)
+  2. academic.routes.ts  -> new POST /academic/timetable/entries/bulk
+                             (reuses the SAME conflict logic as the
+                             existing single-entry POST, extended to also
+                             catch conflicts within the same batch)
+  3. RegistrarTimetable.tsx -> full rewrite: adds a weekly grid view,
+                             AI-generate + review-before-save flow,
+                             keeps the existing single-entry form and
+                             list view exactly as they were.
+
+No schema change, no migration needed.
+Safe to re-run: checks whether already applied first.
+"""
+import os
+
+HOME = os.path.expanduser("~")
+ROOT = os.path.join(HOME, "runyenjes-platform")
+
+AI_ROUTES_PATH = os.path.join(ROOT, "backend", "src", "routes", "ai.routes.ts")
+ACADEMIC_ROUTES_PATH = os.path.join(ROOT, "backend", "src", "routes", "academic.routes.ts")
+TIMETABLE_PAGE_PATH = os.path.join(ROOT, "frontend", "src", "pages", "registrar", "RegistrarTimetable.tsx")
+
+
+def already_applied(path, marker):
+    if not os.path.exists(path):
+        return False
+    with open(path, "r", encoding="utf-8") as f:
+        return marker in f.read()
+
+
+def replace_once(path, old, new, label):
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    count = content.count(old)
+    if count == 0:
+        raise SystemExit(f"[FAIL] Anchor not found for '{label}' in {path}\n"
+                          f"       Looked for:\n{old!r}")
+    if count > 1:
+        raise SystemExit(f"[FAIL] Anchor for '{label}' appears {count} times in {path} "
+                          f"(expected exactly once) -- refusing to guess which one.")
+
+    content = content.replace(old, new)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"[OK] {label} -> {path}")
+
+
+# ------------------------------------------------------------------
+# 1. ai.routes.ts -- new AI timetable suggestion endpoint
+# ------------------------------------------------------------------
+if already_applied(AI_ROUTES_PATH, "timetable-suggestion"):
+    print(f"[SKIP] timetable-suggestion route already present -> {AI_ROUTES_PATH}")
+else:
+    anchor = (
+        "// ─────────────────────────────────────────────\n"
+        "// AI ASSIST: role-specific one-click quick actions\n"
+        "// ─────────────────────────────────────────────\n"
+    )
+    new_block = '''// ---------- AI Timetable Suggestion: draft schedule for a programme's unscheduled units ----------
+// Returns a DRAFT only -- nothing is saved here. The registrar reviews
+// and edits in the grid, then explicitly saves via the bulk endpoint.
+router.post(
+  '/timetable-suggestion',
+  requireAuth,
+  requireRole('REGISTRAR', 'ADMIN'),
+  async (req, res) => {
+    const { programId } = req.body;
+    if (!programId) return res.status(400).json({ error: 'programId is required' });
+
+    const term = await prisma.term.findFirst({ where: { isActive: true } });
+    if (!term) return res.status(400).json({ error: 'No active academic term' });
+
+    const program = await prisma.program.findUnique({ where: { id: programId }, include: { units: true } });
+    if (!program) return res.status(404).json({ error: 'Programme not found' });
+
+    const existingEntries = await prisma.timetableEntry.findMany({ where: { termId: term.id } });
+    const programUnitIds = new Set(program.units.map((u) => u.id));
+    const scheduledUnitIds = new Set(existingEntries.filter((e) => programUnitIds.has(e.unitId)).map((e) => e.unitId));
+    const unitsNeeding = program.units.filter((u) => !scheduledUnitIds.has(u.id));
+
+    if (unitsNeeding.length === 0) {
+      return res.json({ entries: [], message: 'Every unit in this programme already has a timetable entry this term.' });
+    }
+
+    const assignments = await prisma.unitLecturer.findMany({
+      where: { unitId: { in: unitsNeeding.map((u) => u.id) }, termId: term.id },
+      include: { lecturer: { select: { id: true, name: true } } },
+    });
+    const lecturerByUnit = new Map(assignments.map((a) => [a.unitId, a.lecturer]));
+
+    const unitList = unitsNeeding
+      .map((u) => {
+        const lecturer = lecturerByUnit.get(u.id);
+        return `- unitId: ${u.id}, name: "${u.name}"${
+          lecturer ? `, lecturer name: ${lecturer.name}, lecturerId: ${lecturer.id}` : ', lecturer: unassigned'
+        }`;
+      })
+      .join('\\n');
+
+    const busySlots =
+      existingEntries
+        .map(
+          (e) =>
+            `day ${e.dayOfWeek} ${e.startTime}-${e.endTime}${e.room ? ` room ${e.room}` : ''}${
+              e.lecturerId ? ` lecturerId ${e.lecturerId}` : ''
+            }`
+        )
+        .join('\\n') || 'none';
+
+    const prompt = `Programme: ${program.name}
+Units needing a timetable slot this term:
+${unitList}
+
+Already-occupied slots this term across the whole institution (avoid overlapping these on the same lecturer/room/day/time):
+${busySlots}
+
+Propose a Monday-Saturday (dayOfWeek 1-6), 08:00-17:00 class schedule for each unit listed above. Use the exact lecturerId given for each unit if one is listed, otherwise use null. Respond with ONLY valid JSON, no markdown, in exactly this shape:
+{"entries": [{"unitId": "...", "lecturerId": "..." or null, "dayOfWeek": 1, "startTime": "08:00", "endTime": "10:00", "room": "..."}]}`;
+
+    try {
+      const reply = await callGroq(
+        'You create conflict-free weekly class timetables for a TVET college. Respond with ONLY valid JSON, nothing else.',
+        prompt,
+        1800
+      );
+      const cleaned = reply.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      res.json(parsed);
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        return res.status(502).json({ error: 'The AI returned an unexpected format. Please try again.' });
+      }
+      handleGroqError(err, res);
+    }
+  }
+);
+
+''' + anchor
+    replace_once(AI_ROUTES_PATH, anchor, new_block, "ai.routes.ts timetable-suggestion route")
+
+# ------------------------------------------------------------------
+# 2. academic.routes.ts -- bulk save endpoint
+# ------------------------------------------------------------------
+if already_applied(ACADEMIC_ROUTES_PATH, "/timetable/entries/bulk"):
+    print(f"[SKIP] bulk endpoint already present -> {ACADEMIC_ROUTES_PATH}")
+else:
+    anchor = "export default router;\n"
+    new_block = '''// Bulk-create timetable entries (e.g. from an AI-generated draft, or
+// several manual grid edits at once). Reuses the exact same conflict
+// rules as the single-entry POST above, extended to also catch
+// conflicts between entries within this same batch.
+router.post(
+  '/timetable/entries/bulk',
+  requireAuth,
+  requireRole('REGISTRAR', 'ADMIN'),
+  async (req, res) => {
+    const { entries } = req.body;
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      return res.status(400).json({ error: 'entries[] is required' });
+    }
+
+    const term = await prisma.term.findFirst({ where: { isActive: true } });
+    if (!term) return res.status(400).json({ error: 'No active academic term' });
+
+    const existingEntries = await prisma.timetableEntry.findMany({ where: { termId: term.id } });
+
+    type ConflictCheckable = {
+      unitId: string;
+      lecturerId: string | null;
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      room: string | null;
+    };
+
+    const accepted: ConflictCheckable[] = existingEntries.map((e) => ({
+      unitId: e.unitId,
+      lecturerId: e.lecturerId,
+      dayOfWeek: e.dayOfWeek,
+      startTime: e.startTime,
+      endTime: e.endTime,
+      room: e.room,
+    }));
+
+    const created: any[] = [];
+    const skipped: any[] = [];
+
+    for (const raw of entries) {
+      const { unitId, lecturerId, dayOfWeek, startTime, endTime, room, notes } = raw;
+
+      if (!unitId || dayOfWeek === undefined || !startTime || !endTime) {
+        skipped.push({ ...raw, reason: 'Missing required fields' });
+        continue;
+      }
+      if (typeof dayOfWeek !== 'number' || dayOfWeek < 1 || dayOfWeek > 7) {
+        skipped.push({ ...raw, reason: 'Invalid day of week' });
+        continue;
+      }
+      if (startTime >= endTime) {
+        skipped.push({ ...raw, reason: 'End time must be later than start time' });
+        continue;
+      }
+
+      const overlapping = accepted.filter(
+        (e) => e.dayOfWeek === dayOfWeek && e.startTime < endTime && e.endTime > startTime
+      );
+
+      if (overlapping.some((e) => e.unitId === unitId)) {
+        skipped.push({ ...raw, reason: 'This unit is already scheduled during this time' });
+        continue;
+      }
+      if (lecturerId && overlapping.some((e) => e.lecturerId === lecturerId)) {
+        skipped.push({ ...raw, reason: 'This lecturer is already teaching another unit during this time' });
+        continue;
+      }
+      if (room && overlapping.some((e) => e.room && e.room.trim().toLowerCase() === String(room).trim().toLowerCase())) {
+        skipped.push({ ...raw, reason: 'This room is already occupied during this time' });
+        continue;
+      }
+
+      const entry = await prisma.timetableEntry.create({
+        data: {
+          termId: term.id,
+          unitId,
+          lecturerId: lecturerId || null,
+          dayOfWeek,
+          startTime,
+          endTime,
+          room: room || null,
+          notes: notes || null,
+        },
+        include: {
+          unit: { include: { program: true } },
+          lecturer: { select: { id: true, name: true, email: true, departmentId: true } },
+          term: true,
+        },
+      });
+
+      accepted.push({
+        unitId: entry.unitId,
+        lecturerId: entry.lecturerId,
+        dayOfWeek: entry.dayOfWeek,
+        startTime: entry.startTime,
+        endTime: entry.endTime,
+        room: entry.room,
+      });
+      created.push(entry);
+    }
+
+    res.status(201).json({ created, skipped });
+  }
+);
+
+export default router;
+'''
+    replace_once(ACADEMIC_ROUTES_PATH, anchor, new_block, "academic.routes.ts bulk timetable endpoint")
+
+# ------------------------------------------------------------------
+# 3. RegistrarTimetable.tsx -- full rewrite
+# ------------------------------------------------------------------
+timetable_page_content = """import { useEffect, useMemo, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -864,3 +1130,10 @@ export default function RegistrarTimetable() {
     </PortalLayout>
   );
 }
+"""
+
+with open(TIMETABLE_PAGE_PATH, "w", encoding="utf-8") as f:
+    f.write(timetable_page_content)
+print(f"[OK] Rewrote {TIMETABLE_PAGE_PATH} (grid view + AI generate + list view preserved)")
+
+print("\nDone. Next: npx tsc --noEmit in both backend/ and frontend/ (no migration needed -- no schema change).")
