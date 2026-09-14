@@ -418,82 +418,172 @@ students should do. Respond with ONLY valid JSON in exactly this shape:
   }
 );
 
-// ---------- AI Timetable Suggestion: draft schedule for a programme's unscheduled units ----------
+// ---------- Shared helper: draft a schedule for ONE programme's unscheduled ----------
+// units, given a running list of slots already busy (from the DB plus
+// anything drafted earlier in the same batch, so sibling programmes in a
+// department-wide generation don't collide with each other).
+type BusySlot = {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  room: string | null;
+  lecturerId: string | null;
+};
+
+async function generateDraftForProgramme(
+  programId: string,
+  termId: string,
+  busySlots: BusySlot[]
+): Promise<{ programId: string; programName: string; entries: any[]; message?: string }> {
+  const program = await prisma.program.findUnique({ where: { id: programId }, include: { units: true } });
+  if (!program) {
+    return { programId, programName: 'Unknown programme', entries: [], message: 'Programme not found' };
+  }
+
+  const existingForProgram = await prisma.timetableEntry.findMany({
+    where: { termId, unitId: { in: program.units.map((u) => u.id) } },
+  });
+  const scheduledUnitIds = new Set(existingForProgram.map((e) => e.unitId));
+  const unitsNeeding = program.units.filter((u) => !scheduledUnitIds.has(u.id));
+
+  if (unitsNeeding.length === 0) {
+    return {
+      programId,
+      programName: program.name,
+      entries: [],
+      message: 'Every unit in this programme already has a timetable entry this term.',
+    };
+  }
+
+  const assignments = await prisma.unitLecturer.findMany({
+    where: { unitId: { in: unitsNeeding.map((u) => u.id) }, termId },
+    include: { lecturer: { select: { id: true, name: true } } },
+  });
+  const lecturerByUnit = new Map(assignments.map((a) => [a.unitId, a.lecturer]));
+
+  const unitList = unitsNeeding
+    .map((u) => {
+      const lecturer = lecturerByUnit.get(u.id);
+      return `- unitId: ${u.id}, name: "${u.name}"${
+        lecturer ? `, lecturer name: ${lecturer.name}, lecturerId: ${lecturer.id}` : ', lecturer: unassigned'
+      }`;
+    })
+    .join('\n');
+
+  const busyText =
+    busySlots
+      .map(
+        (e) =>
+          `day ${e.dayOfWeek} ${e.startTime}-${e.endTime}${e.room ? ` room ${e.room}` : ''}${
+            e.lecturerId ? ` lecturerId ${e.lecturerId}` : ''
+          }`
+      )
+      .join('\n') || 'none';
+
+  const prompt = `Programme: ${program.name}
+Units needing a timetable slot this term:
+${unitList}
+
+Already-occupied slots this term across the whole institution (avoid overlapping these on the same lecturer/room/day/time):
+${busyText}
+
+Propose a Monday-Saturday (dayOfWeek 1-6), 08:00-17:00 class schedule for each unit listed above. Use the exact lecturerId given for each unit if one is listed, otherwise use null. Respond with ONLY valid JSON, no markdown, in exactly this shape:
+{"entries": [{"unitId": "...", "lecturerId": "..." or null, "dayOfWeek": 1, "startTime": "08:00", "endTime": "10:00", "room": "..."}]}`;
+
+  try {
+    const reply = await callGroq(
+      'You create conflict-free weekly class timetables for a TVET college. Respond with ONLY valid JSON, nothing else.',
+      prompt,
+      1800
+    );
+    const cleaned = reply.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return { programId, programName: program.name, entries: parsed.entries || [] };
+  } catch (err) {
+    return {
+      programId,
+      programName: program.name,
+      entries: [],
+      message: err instanceof SyntaxError ? 'The AI returned an unexpected format for this programme.' : 'AI generation failed for this programme.',
+    };
+  }
+}
+
+// ---------- AI Timetable Suggestion: single programme OR a whole department ----------
 // Returns a DRAFT only -- nothing is saved here. The registrar reviews
 // and edits in the grid, then explicitly saves via the bulk endpoint.
+// Department mode loops every programme in the department SEQUENTIALLY,
+// carrying forward each programme's drafted slots into the next
+// programme's prompt, so two programmes sharing a lecturer/room in the
+// same batch don't collide with each other either.
 router.post(
   '/timetable-suggestion',
   requireAuth,
   requireRole('REGISTRAR', 'ADMIN'),
   async (req, res) => {
-    const { programId } = req.body;
-    if (!programId) return res.status(400).json({ error: 'programId is required' });
+    const { programId, departmentId } = req.body;
+    if (!programId && !departmentId) {
+      return res.status(400).json({ error: 'programId or departmentId is required' });
+    }
 
     const term = await prisma.term.findFirst({ where: { isActive: true } });
     if (!term) return res.status(400).json({ error: 'No active academic term' });
 
-    const program = await prisma.program.findUnique({ where: { id: programId }, include: { units: true } });
-    if (!program) return res.status(404).json({ error: 'Programme not found' });
-
     const existingEntries = await prisma.timetableEntry.findMany({ where: { termId: term.id } });
-    const programUnitIds = new Set(program.units.map((u) => u.id));
-    const scheduledUnitIds = new Set(existingEntries.filter((e) => programUnitIds.has(e.unitId)).map((e) => e.unitId));
-    const unitsNeeding = program.units.filter((u) => !scheduledUnitIds.has(u.id));
+    const busySlots: BusySlot[] = existingEntries.map((e) => ({
+      dayOfWeek: e.dayOfWeek,
+      startTime: e.startTime,
+      endTime: e.endTime,
+      room: e.room,
+      lecturerId: e.lecturerId,
+    }));
 
-    if (unitsNeeding.length === 0) {
-      return res.json({ entries: [], message: 'Every unit in this programme already has a timetable entry this term.' });
+    if (programId) {
+      const result = await generateDraftForProgramme(programId, term.id, busySlots);
+      return res.json({
+        entries: result.entries.map((e: any) => ({ ...e, programName: result.programName })),
+        message: result.message,
+      });
     }
 
-    const assignments = await prisma.unitLecturer.findMany({
-      where: { unitId: { in: unitsNeeding.map((u) => u.id) }, termId: term.id },
-      include: { lecturer: { select: { id: true, name: true } } },
-    });
-    const lecturerByUnit = new Map(assignments.map((a) => [a.unitId, a.lecturer]));
+    // Department mode: every programme in the department, one at a time.
+    const programmes = await prisma.program.findMany({ where: { departmentId }, select: { id: true } });
+    if (programmes.length === 0) {
+      return res.json({ entries: [], message: 'This department has no programmes.' });
+    }
 
-    const unitList = unitsNeeding
-      .map((u) => {
-        const lecturer = lecturerByUnit.get(u.id);
-        return `- unitId: ${u.id}, name: "${u.name}"${
-          lecturer ? `, lecturer name: ${lecturer.name}, lecturerId: ${lecturer.id}` : ', lecturer: unassigned'
-        }`;
-      })
-      .join('\n');
+    const allEntries: any[] = [];
+    const perProgrammeMessages: string[] = [];
 
-    const busySlots =
-      existingEntries
-        .map(
-          (e) =>
-            `day ${e.dayOfWeek} ${e.startTime}-${e.endTime}${e.room ? ` room ${e.room}` : ''}${
-              e.lecturerId ? ` lecturerId ${e.lecturerId}` : ''
-            }`
-        )
-        .join('\n') || 'none';
+    for (const p of programmes) {
+      const result = await generateDraftForProgramme(p.id, term.id, busySlots);
 
-    const prompt = `Programme: ${program.name}
-Units needing a timetable slot this term:
-${unitList}
-
-Already-occupied slots this term across the whole institution (avoid overlapping these on the same lecturer/room/day/time):
-${busySlots}
-
-Propose a Monday-Saturday (dayOfWeek 1-6), 08:00-17:00 class schedule for each unit listed above. Use the exact lecturerId given for each unit if one is listed, otherwise use null. Respond with ONLY valid JSON, no markdown, in exactly this shape:
-{"entries": [{"unitId": "...", "lecturerId": "..." or null, "dayOfWeek": 1, "startTime": "08:00", "endTime": "10:00", "room": "..."}]}`;
-
-    try {
-      const reply = await callGroq(
-        'You create conflict-free weekly class timetables for a TVET college. Respond with ONLY valid JSON, nothing else.',
-        prompt,
-        1800
-      );
-      const cleaned = reply.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(cleaned);
-      res.json(parsed);
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        return res.status(502).json({ error: 'The AI returned an unexpected format. Please try again.' });
+      for (const e of result.entries) {
+        allEntries.push({ ...e, programName: result.programName });
+        // Carry this newly-drafted slot forward so the NEXT programme's
+        // prompt in this loop knows not to collide with it.
+        busySlots.push({
+          dayOfWeek: e.dayOfWeek,
+          startTime: e.startTime,
+          endTime: e.endTime,
+          room: e.room || null,
+          lecturerId: e.lecturerId || null,
+        });
       }
-      handleGroqError(err, res);
+
+      if (result.message) {
+        perProgrammeMessages.push(`${result.programName}: ${result.message}`);
+      }
     }
+
+    res.json({
+      entries: allEntries,
+      message: allEntries.length === 0
+        ? 'No units needed scheduling across this department.'
+        : perProgrammeMessages.length > 0
+          ? `Generated ${allEntries.length} entries. Notes: ${perProgrammeMessages.join('; ')}`
+          : undefined,
+    });
   }
 );
 

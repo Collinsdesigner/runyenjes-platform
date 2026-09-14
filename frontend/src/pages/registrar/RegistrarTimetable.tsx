@@ -56,6 +56,7 @@ interface OptionsResponse {
 interface DraftEntry {
   unitId: string;
   unitName: string;
+  programName?: string;
   lecturerId: string | null;
   dayOfWeek: number;
   startTime: string;
@@ -108,7 +109,9 @@ export default function RegistrarTimetable() {
   const [message, setMessage] = useState('');
 
   // AI generation
+  const [genMode, setGenMode] = useState<'programme' | 'department'>('programme');
   const [genProgramme, setGenProgramme] = useState('');
+  const [genDepartment, setGenDepartment] = useState('');
   const [generating, setGenerating] = useState(false);
   const [draft, setDraft] = useState<DraftEntry[] | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -255,8 +258,12 @@ export default function RegistrarTimetable() {
   }
 
   async function handleGenerate() {
-    if (!genProgramme) {
+    if (genMode === 'programme' && !genProgramme) {
       setGenMessage('Select a programme first.');
+      return;
+    }
+    if (genMode === 'department' && !genDepartment) {
+      setGenMessage('Select a department first.');
       return;
     }
     setGenerating(true);
@@ -266,10 +273,13 @@ export default function RegistrarTimetable() {
       const data = await api('/ai/timetable-suggestion', {
         method: 'POST',
         token,
-        body: { programId: genProgramme },
+        body:
+          genMode === 'programme'
+            ? { programId: genProgramme }
+            : { departmentId: genDepartment },
       });
+      if (data.message) setGenMessage(data.message);
       if (!data.entries || data.entries.length === 0) {
-        setGenMessage(data.message || 'No units need scheduling for this programme right now.');
         return;
       }
       const unitNameOf = (id: string) => options.units.find((u) => u.id === id)?.name || id;
@@ -277,6 +287,7 @@ export default function RegistrarTimetable() {
         data.entries.map((e: any) => ({
           unitId: e.unitId,
           unitName: unitNameOf(e.unitId),
+          programName: e.programName,
           lecturerId: e.lecturerId || null,
           dayOfWeek: e.dayOfWeek,
           startTime: e.startTime,
@@ -413,26 +424,59 @@ export default function RegistrarTimetable() {
             Pick a programme -- AI proposes slots for every unit that doesn't have a timetable entry yet this term.
             Nothing is saved until you review and confirm below.
           </p>
-          <div className="flex flex-wrap gap-2 items-center">
-            <select
-              value={genProgramme}
-              onChange={(e) => setGenProgramme(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
+            <button
+              type="button"
+              onClick={() => setGenMode('programme')}
+              className={`px-3 py-1.5 text-xs rounded-md ${genMode === 'programme' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
             >
-              <option value="">Select programme</option>
-              {options.programmes.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}{p.level ? ` — Level ${p.level}` : ''}
-                </option>
-              ))}
-            </select>
+              By Programme
+            </button>
+            <button
+              type="button"
+              onClick={() => setGenMode('department')}
+              className={`px-3 py-1.5 text-xs rounded-md ${genMode === 'department' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
+            >
+              By Department (faster for bulk setup)
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2 items-center">
+            {genMode === 'programme' ? (
+              <select
+                value={genProgramme}
+                onChange={(e) => setGenProgramme(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="">Select programme</option>
+                {options.programmes.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}{p.level ? ` — Level ${p.level}` : ''}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                value={genDepartment}
+                onChange={(e) => setGenDepartment(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              >
+                <option value="">Select department</option>
+                {Array.from(new Set(options.programmes.map((p) => p.departmentId)))
+                  .map((deptId) => options.programmes.find((p) => p.departmentId === deptId)?.department)
+                  .filter((d): d is { id: string; name: string } => !!d)
+                  .map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+              </select>
+            )}
             <button
               type="button"
               onClick={handleGenerate}
               disabled={generating}
               className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
             >
-              {generating ? 'Generating...' : 'Generate Draft'}
+              {generating ? (genMode === 'department' ? 'Generating (this may take a while)...' : 'Generating...') : 'Generate Draft'}
             </button>
           </div>
 
@@ -445,6 +489,7 @@ export default function RegistrarTimetable() {
               <table className="w-full text-xs">
                 <thead className="bg-gray-50 text-left text-gray-500">
                   <tr>
+                    {genMode === 'department' && <th className="px-3 py-2">Programme</th>}
                     <th className="px-3 py-2">Unit</th>
                     <th className="px-3 py-2">Lecturer</th>
                     <th className="px-3 py-2">Day</th>
@@ -457,6 +502,9 @@ export default function RegistrarTimetable() {
                 <tbody className="divide-y divide-gray-100">
                   {draft.map((d, i) => (
                     <tr key={`${d.unitId}-${i}`}>
+                      {genMode === 'department' && (
+                        <td className="px-3 py-2 text-gray-500">{d.programName || '—'}</td>
+                      )}
                       <td className="px-3 py-2 font-medium text-gray-800">{d.unitName}</td>
                       <td className="px-3 py-2">
                         <select
