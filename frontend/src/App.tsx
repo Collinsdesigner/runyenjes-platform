@@ -48,6 +48,7 @@ import StudentAssignments from './pages/student/StudentAssignments';
 import StudentAcademics from './pages/student/StudentAcademics';
 import StudentFees from './pages/student/StudentFees';
 import StudentResults from './pages/student/StudentResults';
+import StudentRecords from './pages/student/StudentRecords';
 import AdminAcademic from './pages/admin/AdminAcademic';
 import AdminFinance from './pages/admin/AdminFinance';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
@@ -147,6 +148,7 @@ export default function App() {
                 <Route path="/student/academics" element={<StudentAcademics />} />
                 <Route path="/student/fees" element={<StudentFees />} />
                 <Route path="/student/results" element={<StudentResults />} />
+                <Route path="/student/records" element={<StudentRecords />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />
          <Route path="/registrar/students" element={<RegistrarStudents />} />

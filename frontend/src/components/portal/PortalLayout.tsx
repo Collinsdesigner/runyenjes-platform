@@ -76,6 +76,7 @@ const roleSections: Record<string, NavSection[]> = {
       title: 'Student Services',
       items: [
         { label: 'Fees & Payments', path: '/student/fees', icon: '💰' },
+        { label: 'My Documents & Letters', path: '/student/records', icon: '📄' },
       ],
     },
   ],
