@@ -972,6 +972,69 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
       return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
     },
   },
+  teacher_early_warning_summary: {
+    roles: ['TEACHER'],
+    systemPrompt:
+      'You help a TVET teacher decide how to support students flagged as at-risk across attendance, ' +
+      'assignments, and results. Be concise, practical, and encouraging -- suggest concrete next steps ' +
+      '(e.g. who to check in with first, what kind of support each pattern suggests).',
+    build: async (userId) => {
+      const term = await prisma.term.findFirst({ where: { isActive: true } });
+      if (!term) return 'No active academic term right now, so there is no early-warning data to summarize.';
+
+      const assignments = await prisma.unitLecturer.findMany({ where: { lecturerId: userId, termId: term.id } });
+      const unitIds = assignments.map((a) => a.unitId);
+      if (unitIds.length === 0) return 'This teacher has no assigned units this term.';
+
+      const registrations = await prisma.unitRegistration.findMany({
+        where: { unitId: { in: unitIds }, termId: term.id, status: 'REGISTERED' },
+        include: { student: { select: { id: true, name: true } } },
+      });
+      const studentMap = new Map<string, string>();
+      for (const r of registrations) studentMap.set(r.studentId, r.student.name);
+      const studentIds = Array.from(studentMap.keys());
+      if (studentIds.length === 0) return 'No students registered in this teacher\'s units this term.';
+
+      const [attendanceRecords, assignmentsIssued, examResults] = await Promise.all([
+        prisma.attendanceRecord.findMany({ where: { unitId: { in: unitIds }, termId: term.id, studentId: { in: studentIds } } }),
+        prisma.assignment.findMany({ where: { unitId: { in: unitIds }, termId: term.id } }),
+        prisma.examResult.findMany({
+          where: { studentId: { in: studentIds } },
+          include: { exam: { select: { unitId: true, maxScore: true } } },
+        }),
+      ]);
+      const assignmentIds = assignmentsIssued.map((a) => a.id);
+      const submissions = assignmentIds.length
+        ? await prisma.assignmentSubmission.findMany({ where: { assignmentId: { in: assignmentIds }, studentId: { in: studentIds } } })
+        : [];
+
+      const flagged: string[] = [];
+      for (const studentId of studentIds) {
+        const name = studentMap.get(studentId)!;
+        const myAttendance = attendanceRecords.filter((a) => a.studentId === studentId);
+        const absences = myAttendance.filter((a) => a.status === 'ABSENT').length;
+        const totalSessions = myAttendance.length;
+        const absenceRate = totalSessions > 0 ? absences / totalSessions : 0;
+        const mySubmittedIds = new Set(submissions.filter((s) => s.studentId === studentId).map((s) => s.assignmentId));
+        const missingAssignments = assignmentsIssued.filter((a) => !mySubmittedIds.has(a.id)).length;
+        const myResults = examResults.filter((r) => r.studentId === studentId && unitIds.includes(r.exam.unitId));
+        const avgPercent = myResults.length
+          ? myResults.reduce((sum, r) => sum + (Number(r.score) / Number(r.exam.maxScore)) * 100, 0) / myResults.length
+          : null;
+
+        const reasons: string[] = [];
+        if (totalSessions >= 3 && absenceRate > 0.3) reasons.push(`absent ${absences}/${totalSessions} sessions`);
+        if (missingAssignments >= 2) reasons.push(`${missingAssignments} assignments missing`);
+        if (avgPercent !== null && avgPercent < 50) reasons.push(`average score ${avgPercent.toFixed(0)}%`);
+
+        if (reasons.length > 0) flagged.push(`- ${name}: ${reasons.join(', ')}`);
+      }
+
+      if (flagged.length === 0) return 'No students are currently flagged as at-risk across this teacher\'s units. Everything looks fine.';
+
+      return `Students flagged as at-risk across this teacher's units this term:\n${flagged.join('\n')}\n\nSuggest concrete next steps, prioritizing who needs attention first.`;
+    },
+  },
 };
 
 // ---------- Role-specific one-click AI assist actions ----------

@@ -370,4 +370,99 @@ router.post('/attendance', requireAuth, requireRole('TEACHER'), async (req, res)
   res.status(204).send();
 });
 
+// ---------- Teacher: early warning -- students at risk across my units ----------
+// Cross-references Attendance, Assignments, and Results to flag students
+// who need attention. Real computed numbers, not an AI guess.
+router.get('/early-warning', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const term = await prisma.term.findFirst({ where: { isActive: true } });
+  if (!term) return res.json({ term: null, students: [], totalStudents: 0 });
+
+  const assignments = await prisma.unitLecturer.findMany({
+    where: { lecturerId: req.user!.userId, termId: term.id },
+  });
+  const unitIds = assignments.map((a) => a.unitId);
+  if (unitIds.length === 0) return res.json({ term: term.name, students: [], totalStudents: 0 });
+
+  const registrations = await prisma.unitRegistration.findMany({
+    where: { unitId: { in: unitIds }, termId: term.id, status: 'REGISTERED' },
+    include: { student: { select: { id: true, name: true, admissionNumber: true } } },
+  });
+
+  const studentMap = new Map<string, { studentId: string; name: string; admissionNumber: string | null }>();
+  for (const r of registrations) {
+    if (!studentMap.has(r.studentId)) {
+      studentMap.set(r.studentId, {
+        studentId: r.studentId,
+        name: r.student.name,
+        admissionNumber: r.student.admissionNumber,
+      });
+    }
+  }
+  const studentIds = Array.from(studentMap.keys());
+
+  const [attendanceRecords, assignmentsIssued, examResults] = await Promise.all([
+    prisma.attendanceRecord.findMany({
+      where: { unitId: { in: unitIds }, termId: term.id, studentId: { in: studentIds } },
+    }),
+    prisma.assignment.findMany({ where: { unitId: { in: unitIds }, termId: term.id } }),
+    prisma.examResult.findMany({
+      where: { studentId: { in: studentIds } },
+      include: { exam: { select: { unitId: true, maxScore: true } } },
+    }),
+  ]);
+
+  const assignmentIds = assignmentsIssued.map((a) => a.id);
+  const submissions = assignmentIds.length
+    ? await prisma.assignmentSubmission.findMany({
+        where: { assignmentId: { in: assignmentIds }, studentId: { in: studentIds } },
+      })
+    : [];
+
+  const allResults = studentIds.map((studentId) => {
+    const info = studentMap.get(studentId)!;
+
+    const myAttendance = attendanceRecords.filter((a) => a.studentId === studentId);
+    const absences = myAttendance.filter((a) => a.status === 'ABSENT').length;
+    const totalSessions = myAttendance.length;
+    const absenceRate = totalSessions > 0 ? absences / totalSessions : 0;
+
+    const mySubmittedIds = new Set(
+      submissions.filter((s) => s.studentId === studentId).map((s) => s.assignmentId)
+    );
+    const missingAssignments = assignmentsIssued.filter((a) => !mySubmittedIds.has(a.id)).length;
+
+    const myResults = examResults.filter((r) => r.studentId === studentId && unitIds.includes(r.exam.unitId));
+    const averageScorePercent = myResults.length
+      ? myResults.reduce((sum, r) => sum + (Number(r.score) / Number(r.exam.maxScore)) * 100, 0) / myResults.length
+      : null;
+
+    const reasons: string[] = [];
+    if (totalSessions >= 3 && absenceRate > 0.3) {
+      reasons.push(`Absent ${absences} of ${totalSessions} recorded sessions`);
+    }
+    if (missingAssignments >= 2) {
+      reasons.push(`${missingAssignments} assignment(s) not submitted`);
+    }
+    if (averageScorePercent !== null && averageScorePercent < 50) {
+      reasons.push(`Average score ${averageScorePercent.toFixed(0)}%`);
+    }
+
+    return {
+      studentId,
+      name: info.name,
+      admissionNumber: info.admissionNumber,
+      absences,
+      totalSessions,
+      missingAssignments,
+      averageScorePercent,
+      atRisk: reasons.length > 0,
+      reasons,
+    };
+  });
+
+  const atRisk = allResults.filter((r) => r.atRisk).sort((a, b) => b.reasons.length - a.reasons.length);
+
+  res.json({ term: term.name, students: atRisk, totalStudents: allResults.length });
+});
+
 export default router;

@@ -43,6 +43,7 @@ import TeacherClasses from './pages/teacher/TeacherClasses';
 import TeacherStudents from './pages/teacher/TeacherStudents';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
 import TeacherContentGenerator from './pages/teacher/TeacherContentGenerator';
+import TeacherEarlyWarning from './pages/teacher/TeacherEarlyWarning';
 import TeacherAssessments from './pages/teacher/TeacherAssessments';
 import TeacherResults from './pages/teacher/TeacherResults';
 import StudentAssignments from './pages/student/StudentAssignments';
@@ -144,6 +145,7 @@ export default function App() {
                 <Route path="/teacher/students" element={<TeacherStudents />} />
                 <Route path="/teacher/attendance" element={<TeacherAttendance />} />
                 <Route path="/teacher/content-generator" element={<TeacherContentGenerator />} />
+                <Route path="/teacher/early-warning" element={<TeacherEarlyWarning />} />
                 <Route path="/teacher/assessments" element={<TeacherAssessments />} />
                 <Route path="/teacher/results" element={<TeacherResults />} />
                 <Route path="/student/assignments" element={<StudentAssignments />} />
