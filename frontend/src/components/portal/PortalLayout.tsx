@@ -99,6 +99,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Assessments', path: '/teacher/assessments', icon: '▣' },
         { label: 'Results', path: '/teacher/results', icon: '📊' },
         { label: 'Learning Materials', path: '/library', icon: '📚' },
+        { label: 'AI Content Generator', path: '/teacher/content-generator', icon: '✨' },
       ],
     },
   ],
