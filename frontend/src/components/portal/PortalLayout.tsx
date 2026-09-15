@@ -125,6 +125,7 @@ const roleSections: Record<string, NavSection[]> = {
       items: [
         { label: 'Academic Records', path: '/registrar/academic', icon: '📚' },
         { label: 'Programmes & Departments', path: '/registrar/programmes', icon: '🏛️' },
+        { label: 'Manage Academic Structure', path: '/registrar/structure', icon: '🛠' },
         { label: 'Timetable', path: '/registrar/timetable', icon: '▦' },
       ],
     },
