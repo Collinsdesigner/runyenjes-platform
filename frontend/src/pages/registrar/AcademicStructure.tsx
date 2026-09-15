@@ -35,6 +35,9 @@ export default function AcademicStructure() {
   const [newProgramme, setNewProgramme] = useState('');
   const [newLevel, setNewLevel] = useState('');
   const [newUnit, setNewUnit] = useState('');
+  const [bulkUnitText, setBulkUnitText] = useState('');
+  const [bulkSubmitting, setBulkSubmitting] = useState(false);
+  const [bulkResultMessage, setBulkResultMessage] = useState('');
 
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [selectedProgramme, setSelectedProgramme] = useState<string | null>(null);
@@ -111,6 +114,40 @@ export default function AcademicStructure() {
       await loadStructure();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not create unit');
+    }
+  }
+
+  async function bulkCreateUnits() {
+    if (!selectedProgramme || !bulkUnitText.trim()) return;
+
+    const unitNames = bulkUnitText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (unitNames.length === 0) return;
+
+    setBulkSubmitting(true);
+    setBulkResultMessage('');
+    setError('');
+
+    try {
+      const result = await api(`/academic/programmes/${selectedProgramme}/units/bulk`, {
+        method: 'POST',
+        token,
+        body: { unitNames },
+      });
+
+      setBulkResultMessage(
+        `${result.created} unit${result.created === 1 ? '' : 's'} added.` +
+          (result.skipped.length > 0 ? ` ${result.skipped.length} skipped (already existed): ${result.skipped.join(', ')}` : '')
+      );
+      setBulkUnitText('');
+      await loadStructure();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not bulk-add units');
+    } finally {
+      setBulkSubmitting(false);
     }
   }
 
@@ -297,6 +334,32 @@ export default function AcademicStructure() {
                     >
                       Add
                     </button>
+                  </div>
+                )}
+
+                {programme && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      Bulk add units (one per line)
+                    </label>
+                    <textarea
+                      value={bulkUnitText}
+                      onChange={(e) => setBulkUnitText(e.target.value)}
+                      placeholder={'Communication Skills\nEntrepreneurship\nICT Skills'}
+                      rows={5}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={bulkCreateUnits}
+                      disabled={bulkSubmitting}
+                      className="mt-2 bg-rgreen text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50"
+                    >
+                      {bulkSubmitting ? 'Adding...' : 'Bulk Add Units'}
+                    </button>
+                    {bulkResultMessage && (
+                      <p className="text-xs text-gray-500 mt-2">{bulkResultMessage}</p>
+                    )}
                   </div>
                 )}
               </div>

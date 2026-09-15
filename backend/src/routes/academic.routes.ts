@@ -1910,4 +1910,50 @@ router.post(
   }
 );
 
+// ---------- Bulk-create units for a programme (one name per line) ----------
+// Generic import capability -- the unit NAMES come entirely from the
+// caller (whatever curriculum this institution uses), nothing is
+// hardcoded here. Dedupes against existing units and within the same
+// paste, case-insensitively, so re-running a paste is safe.
+router.post(
+  '/programmes/:programId/units/bulk',
+  requireAuth,
+  requireRole('REGISTRAR', 'ADMIN'),
+  async (req, res) => {
+    const { programId } = req.params;
+    const { unitNames } = req.body;
+
+    if (!Array.isArray(unitNames) || unitNames.length === 0) {
+      return res.status(400).json({ error: 'unitNames[] is required' });
+    }
+
+    const program = await prisma.program.findUnique({ where: { id: programId } });
+    if (!program) return res.status(404).json({ error: 'Programme not found' });
+
+    const existing = await prisma.unit.findMany({ where: { programId }, select: { name: true } });
+    const existingLower = new Set(existing.map((u) => u.name.trim().toLowerCase()));
+
+    const toCreate: string[] = [];
+    const skipped: string[] = [];
+
+    for (const raw of unitNames) {
+      const name = String(raw).trim();
+      if (!name) continue;
+
+      const lower = name.toLowerCase();
+      if (existingLower.has(lower) || toCreate.some((n) => n.toLowerCase() === lower)) {
+        skipped.push(name);
+        continue;
+      }
+      toCreate.push(name);
+    }
+
+    const created = await prisma.$transaction(
+      toCreate.map((name) => prisma.unit.create({ data: { programId, name } }))
+    );
+
+    res.status(201).json({ created: created.length, skipped });
+  }
+);
+
 export default router;
