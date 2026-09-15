@@ -56,6 +56,7 @@ import AdminFinance from './pages/admin/AdminFinance';
 import RegistrarPortal from './pages/portal/RegistrarPortal';
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
 import RegistrarProgrammes from './pages/registrar/RegistrarProgrammes';
+import AcademicStructure from './pages/registrar/AcademicStructure';
 import RegistrarStudentAcademic from './pages/registrar/RegistrarStudentAcademic';
 import RegistrarAcademicRecords from './pages/registrar/RegistrarAcademicRecords';
 import RegistrarDocuments from './pages/registrar/RegistrarDocuments';
@@ -161,6 +162,7 @@ export default function App() {
                 <Route path="/registrar/documents" element={<RegistrarDocuments />} />
                 <Route path="/registrar/letters" element={<RegistrarLetters />} />
           <Route path="/registrar/programmes" element={<RegistrarProgrammes />} />
+                <Route path="/registrar/structure" element={<AcademicStructure />} />
          <Route path="/ai" element={<AIAssistant />} />
 
                 <Route path="/registrar/timetable" element={<RegistrarTimetable />} />
