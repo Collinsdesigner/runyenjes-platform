@@ -288,6 +288,7 @@ export default function PortalLayout({
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [isDark, setIsDark] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
@@ -357,8 +358,30 @@ export default function PortalLayout({
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden dark:bg-gray-950">
 
+      {/* Mobile nav backdrop */}
+      {mobileNavOpen && (
+        <div
+          onClick={() => setMobileNavOpen(false)}
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+        />
+      )}
+
       {/* ================= SIDEBAR ================= */}
-      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col h-full dark:bg-gray-900 dark:border-gray-700">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-64 flex flex-col h-full bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-gray-700 transform transition-transform duration-200 md:static md:translate-x-0 ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+
+        {/* Close button, mobile/narrow-window only */}
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(false)}
+          className="md:hidden absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
 
         {/* Branding */}
         <div className="px-5 py-5 border-b border-gray-200 dark:border-gray-700">
@@ -408,6 +431,7 @@ export default function PortalLayout({
                   <NavLink
                     key={item.path}
                     to={item.path}
+                    onClick={() => setMobileNavOpen(false)}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
                         isActive
@@ -451,14 +475,25 @@ export default function PortalLayout({
         {/* Top bar */}
         <header className="h-16 shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 dark:bg-gray-900 dark:border-gray-700">
 
-          <div className="min-w-0">
-            <h1 className="font-semibold text-gray-900 truncate dark:text-gray-100">
-              {title}
-            </h1>
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="md:hidden w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
 
-            <p className="text-xs text-gray-500 truncate dark:text-gray-400">
-              Welcome, {user.name}
-            </p>
+            <div className="min-w-0">
+              <h1 className="font-semibold text-gray-900 truncate dark:text-gray-100">
+                {title}
+              </h1>
+
+              <p className="text-xs text-gray-500 truncate dark:text-gray-400">
+                Welcome, {user.name}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
