@@ -106,19 +106,19 @@ export default function LibraryUnits() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate('/library')} className="text-sm text-gray-500 underline">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
+        <button onClick={() => navigate('/library')} className="text-sm text-gray-500 underline dark:text-gray-400">
           ← Library
         </button>
       </header>
 
       <main className="max-w-md mx-auto p-4 space-y-3">
-        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>}
 
         {canManage && (
-          <form onSubmit={handleAddUnit} className="bg-white rounded-lg shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">
+          <form onSubmit={handleAddUnit} className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
+            <p className="text-xs text-gray-500 mb-1 dark:text-gray-400">
               Add a new unit (a topic name, not a link — e.g. "Networking Fundamentals")
             </p>
             <div className="flex gap-2">
@@ -126,7 +126,7 @@ export default function LibraryUnits() {
                 value={newUnitName}
                 onChange={(e) => setNewUnitName(e.target.value)}
                 placeholder="New unit name…"
-                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <button type="submit" className="bg-rgreen text-white text-sm px-3 py-2 rounded-md">
                 Add unit
@@ -136,12 +136,12 @@ export default function LibraryUnits() {
         )}
 
         {loading ? (
-          <p className="text-sm text-gray-400 text-center">Loading…</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading…</p>
         ) : units.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center">No units added yet.</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">No units added yet.</p>
         ) : (
           units.map((unit) => (
-            <div key={unit.id} className="bg-white rounded-lg shadow p-4">
+            <div key={unit.id} className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium text-sm">{unit.name}</p>
                 <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ export default function LibraryUnits() {
               </div>
 
               {unit.materials.length === 0 ? (
-                <p className="text-xs text-gray-400 mb-2">No materials yet.</p>
+                <p className="text-xs text-gray-400 mb-2 dark:text-gray-500">No materials yet.</p>
               ) : (
                 <ul className="space-y-1 mb-2">
                   {unit.materials.map((m) => (
@@ -184,7 +184,7 @@ export default function LibraryUnits() {
                       >
                         {m.type}
                       </a>{' '}
-                      <span className="text-xs text-gray-400">— {m.uploader.name}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">— {m.uploader.name}</span>
                     </li>
                   ))}
                 </ul>
@@ -201,7 +201,7 @@ export default function LibraryUnits() {
                         [unit.id]: { ...prev[unit.id], url: e.target.value, type: prev[unit.id]?.type ?? '' },
                       }))
                     }
-                    className="flex-1 border border-gray-200 rounded-md px-2 py-1 text-xs"
+                    className="flex-1 border border-gray-200 rounded-md px-2 py-1 text-xs dark:border-gray-700"
                   />
                   <select
                     value={materialDrafts[unit.id]?.type ?? ''}
@@ -211,7 +211,7 @@ export default function LibraryUnits() {
                         [unit.id]: { ...prev[unit.id], type: e.target.value, url: prev[unit.id]?.url ?? '' },
                       }))
                     }
-                    className="w-28 border border-gray-200 rounded-md px-2 py-1 text-xs bg-white"
+                    className="w-28 border border-gray-200 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-700 dark:bg-gray-900"
                   >
                     <option value="">Type…</option>
                     <option value="pdf">PDF</option>

@@ -120,12 +120,12 @@ export default function Browser() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col dark:bg-gray-950">
       {/* Single slim row: home link + navigation controls + address bar, no separate title header */}
-      <div className="bg-white border-b border-gray-200 px-3 py-2 flex items-center gap-2 shrink-0">
+      <div className="bg-white border-b border-gray-200 px-3 py-2 flex items-center gap-2 shrink-0 dark:bg-gray-900 dark:border-gray-700">
         <button
           onClick={() => navigate('/')}
-          className="text-sm text-gray-500 underline whitespace-nowrap"
+          className="text-sm text-gray-500 underline whitespace-nowrap dark:text-gray-400"
           title="Back to Home"
         >
           ← Home
@@ -134,7 +134,7 @@ export default function Browser() {
         <button
           onClick={goBack}
           disabled={historyIndex <= 0}
-          className="text-gray-500 disabled:text-gray-300 px-1"
+          className="text-gray-500 disabled:text-gray-300 px-1 dark:text-gray-400"
           title="Back"
         >
           ←
@@ -142,12 +142,12 @@ export default function Browser() {
         <button
           onClick={goForward}
           disabled={historyIndex >= history.length - 1}
-          className="text-gray-500 disabled:text-gray-300 px-1"
+          className="text-gray-500 disabled:text-gray-300 px-1 dark:text-gray-400"
           title="Forward"
         >
           →
         </button>
-        <button onClick={refresh} disabled={!currentUrl} className="text-gray-500 disabled:text-gray-300 px-1" title="Refresh">
+        <button onClick={refresh} disabled={!currentUrl} className="text-gray-500 disabled:text-gray-300 px-1 dark:text-gray-400" title="Refresh">
           ⟳
         </button>
         <form
@@ -161,7 +161,7 @@ export default function Browser() {
             value={addressInput}
             onChange={(e) => setAddressInput(e.target.value)}
             placeholder="Search or type a web address…"
-            className="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm"
+            className="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm dark:border-gray-600"
           />
           <button type="submit" className="bg-rgreen text-white text-sm px-3 py-1.5 rounded-md">
             Go
@@ -172,7 +172,7 @@ export default function Browser() {
             href={currentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-500 underline whitespace-nowrap"
+            className="text-xs text-gray-500 underline whitespace-nowrap dark:text-gray-400"
           >
             New tab
           </a>
@@ -193,7 +193,7 @@ export default function Browser() {
           <select
             value={saveProgramId}
             onChange={(e) => setSaveProgramId(e.target.value)}
-            className="border border-gray-300 rounded-md px-2 py-1 text-xs bg-white"
+            className="border border-gray-300 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-600 dark:bg-gray-900"
           >
             <option value="">Choose a class…</option>
             {departments.map((dept) => (
@@ -211,7 +211,7 @@ export default function Browser() {
             value={saveUnitId}
             onChange={(e) => setSaveUnitId(e.target.value)}
             disabled={!saveProgramId}
-            className="border border-gray-300 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50"
+            className="border border-gray-300 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50 dark:border-gray-600 dark:bg-gray-900"
           >
             <option value="">Choose a unit…</option>
             {units.map((u) => (
@@ -227,14 +227,14 @@ export default function Browser() {
           >
             Save this page
           </button>
-          {saveStatus && <span className="text-xs text-gray-700">{saveStatus}</span>}
+          {saveStatus && <span className="text-xs text-gray-700 dark:text-gray-300">{saveStatus}</span>}
         </div>
       )}
 
       {/* The actual browser frame — takes up all remaining height */}
-      <div className="flex-1 relative bg-white min-h-0">
+      <div className="flex-1 relative bg-white min-h-0 dark:bg-gray-900">
         {!currentUrl ? (
-          <div className="h-full flex items-center justify-center text-sm text-gray-400 p-8 text-center">
+          <div className="h-full flex items-center justify-center text-sm text-gray-400 p-8 text-center dark:text-gray-500">
             Type a search term or web address above to get started.
             <br />
             <span className="text-xs">

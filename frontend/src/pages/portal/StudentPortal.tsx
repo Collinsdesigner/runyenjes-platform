@@ -98,11 +98,11 @@ export default function StudentPortal() {
       <div className="space-y-6">
 
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Student Dashboard
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Your academic and college workspace.
           </p>
         </div>
@@ -117,13 +117,13 @@ export default function StudentPortal() {
           ].map(([title, description]) => (
             <div
               key={title}
-              className="bg-white border border-gray-200 rounded-lg p-5"
+              className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700"
             >
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 {title}
               </h3>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                 {description}
               </p>
             </div>
@@ -131,14 +131,14 @@ export default function StudentPortal() {
 
         </div>
 
-        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
 
-          <div className="px-5 py-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
               My Timetable
             </h3>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
               {timetable.term
                 ? `Current term: ${timetable.term.name}`
                 : 'Current academic timetable'}
@@ -146,23 +146,23 @@ export default function StudentPortal() {
           </div>
 
           {timetableError && (
-            <div className="m-5 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+            <div className="m-5 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">
               {timetableError}
             </div>
           )}
 
           {loadingTimetable ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               Loading your timetable...
             </div>
           ) : timetable.entries.length === 0 ? (
             <div className="p-8 text-center">
 
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-700 font-medium dark:text-gray-300">
                 No timetable entries available.
               </p>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                 Your timetable will appear here once classes have
                 been scheduled for your registered units.
               </p>
@@ -175,7 +175,7 @@ export default function StudentPortal() {
                 <div key={day.value}>
 
                   <div className="flex items-center gap-3 mb-3">
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">
                       {day.label}
                     </h4>
 
@@ -183,7 +183,7 @@ export default function StudentPortal() {
                   </div>
 
                   {day.entries.length === 0 ? (
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">
                       No classes scheduled.
                     </p>
                   ) : (
@@ -192,23 +192,23 @@ export default function StudentPortal() {
                       {day.entries.map((entry) => (
                         <div
                           key={entry.id}
-                          className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+                          className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                         >
 
                           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
 
                             <div>
 
-                              <h5 className="font-semibold text-gray-900">
+                              <h5 className="font-semibold text-gray-900 dark:text-gray-100">
                                 {entry.unit.name}
                               </h5>
 
-                              <p className="text-sm text-gray-600 mt-1">
+                              <p className="text-sm text-gray-600 mt-1 dark:text-gray-400">
                                 {entry.startTime} – {entry.endTime}
                               </p>
 
                               {entry.lecturer && (
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                                   Lecturer: {entry.lecturer.name}
                                 </p>
                               )}
@@ -218,13 +218,13 @@ export default function StudentPortal() {
                             <div className="text-left md:text-right">
 
                               {entry.room && (
-                                <p className="text-sm font-medium text-gray-700">
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Room: {entry.room}
                                 </p>
                               )}
 
                               {entry.notes && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                                   {entry.notes}
                                 </p>
                               )}

@@ -115,7 +115,7 @@ export default function Continuation() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -128,23 +128,23 @@ export default function Continuation() {
   return (
     <PortalLayout title="Term Continuation">
       <div className="max-w-3xl mx-auto space-y-4">
-        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>}
 
         {/* Admin/Founder: open a new term */}
         {user.role === 'ADMIN' ? (
-          <form onSubmit={handleOpenTerm} className="bg-white rounded-lg shadow p-4 space-y-2">
+          <form onSubmit={handleOpenTerm} className="bg-white rounded-lg shadow p-4 space-y-2 dark:bg-gray-900">
             <p className="text-sm font-medium">Open a new term</p>
             <input
               value={newTermName}
               onChange={(e) => setNewTermName(e.target.value)}
               placeholder="e.g. Term 3 2026"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
             />
             <input
               type="date"
               value={newTermStart}
               onChange={(e) => setNewTermStart(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
             />
             <button
               type="submit"
@@ -156,12 +156,12 @@ export default function Continuation() {
         ) : null}
 
         {loading ? (
-          <p className="text-sm text-gray-400 text-center">Loading…</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading…</p>
         ) : !activeTerm ? (
-          <p className="text-sm text-gray-400 text-center">No active term is open right now.</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">No active term is open right now.</p>
         ) : isStaffReviewer ? (
           // Registrar/Admin/Founder view — roster with manual confirm option
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
             <p className="font-medium text-sm mb-3">
               {activeTerm.name} — continuation status
             </p>
@@ -170,17 +170,17 @@ export default function Continuation() {
                 <div key={r.id} className="flex items-center justify-between text-sm">
                   <div>
                     <p className="font-medium">{r.name}</p>
-                    <p className="text-xs text-gray-400">{r.admissionNumber}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{r.admissionNumber}</p>
                   </div>
                   {r.status === 'CONFIRMED' ? (
-                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-700">
+                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-700 dark:text-green-300">
                       CONFIRMED
                     </span>
                   ) : (
                     <button
                       disabled={confirmingForId === r.id}
                       onClick={() => handleConfirmFor(r.id)}
-                      className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-500 hover:bg-rgreen hover:text-white disabled:opacity-50"
+                      className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-500 hover:bg-rgreen hover:text-white disabled:opacity-50 dark:bg-gray-800 dark:text-gray-400"
                       title="Confirm on their behalf (e.g. reported in person)"
                     >
                       {confirmingForId === r.id ? 'Confirming…' : 'PENDING — Confirm'}
@@ -192,16 +192,16 @@ export default function Continuation() {
           </div>
         ) : (
           // Student view — confirm button
-          <div className="bg-white rounded-lg shadow p-4 text-center">
+          <div className="bg-white rounded-lg shadow p-4 text-center dark:bg-gray-900">
             <p className="text-sm font-medium mb-1">{activeTerm.name}</p>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 mb-4 dark:text-gray-400">
               Confirm you're continuing your studies this term.
             </p>
             {myStatus === 'CONFIRMED' ? (
-              <p className="text-sm text-green-700 font-medium">✔ You're confirmed for this term</p>
+              <p className="text-sm text-green-700 font-medium dark:text-green-300">✔ You're confirmed for this term</p>
             ) : (
               <form onSubmit={handleConfirm} className="space-y-2">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Type your admission number to confirm — this is your official continuation
                   record for the term.
                 </p>
@@ -210,7 +210,7 @@ export default function Continuation() {
                   onChange={(e) => setConfirmInput(e.target.value)}
                   placeholder="e.g. RTVC/2026/00001"
                   required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-center"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-center dark:border-gray-600"
                 />
                 <button
                   type="submit"

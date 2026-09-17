@@ -85,8 +85,8 @@ export default function Announcements() {
     <PortalLayout title="Announcements">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Announcements</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Announcements</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             {canPost
               ? 'Post an announcement for everyone on the platform to see.'
               : 'Announcements from the Registrar and Administration.'}
@@ -94,23 +94,23 @@ export default function Announcements() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
         {canPost && (
-          <form onSubmit={handlePost} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-            <h3 className="font-semibold text-gray-900">Post an Announcement</h3>
+          <form onSubmit={handlePost} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Post an Announcement</h3>
             <input
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Announcement body"
               rows={3}
               value={body}
@@ -130,29 +130,29 @@ export default function Announcements() {
           </form>
         )}
 
-        {loading && <p className="text-sm text-gray-400">Loading...</p>}
+        {loading && <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>}
 
         <div className="space-y-3">
           {!loading && announcements.length === 0 && (
-            <p className="text-sm text-gray-400">No announcements yet.</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">No announcements yet.</p>
           )}
           {announcements.map((a) => (
-            <div key={a.id} className="bg-white border border-gray-200 rounded-lg p-4">
+            <div key={a.id} className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
               <div className="flex items-start justify-between">
-                <h4 className="font-semibold text-gray-900">{a.title}</h4>
-                <span className="text-xs text-gray-400">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{a.title}</h4>
+                <span className="text-xs text-gray-400 dark:text-gray-500">
                   {new Date(a.createdAt).toLocaleDateString()}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">{a.body}</p>
+              <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap dark:text-gray-400">{a.body}</p>
               {a.postedBy && (
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-gray-400 mt-2 dark:text-gray-500">
                   Posted by {a.postedBy.name} ({a.postedBy.role})
                 </p>
               )}
               {(isAdmin || a.postedById === user?.id) && (
                 <button
-                  className="text-red-600 text-xs font-medium mt-2"
+                  className="text-red-600 text-xs font-medium mt-2 dark:text-red-400"
                   onClick={() => handleDelete(a.id)}
                 >
                   Delete

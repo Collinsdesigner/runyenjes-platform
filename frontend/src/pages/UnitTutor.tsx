@@ -92,16 +92,16 @@ export default function UnitTutor() {
   const score = questions.reduce((sum, q, i) => (answers[i] === q.correctOptionId ? sum + 1 : sum), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="text-sm text-gray-500 underline">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
+        <button onClick={() => navigate(-1)} className="text-sm text-gray-500 underline dark:text-gray-400">
           ← Back
         </button>
         <h1 className="font-bold text-rgreen text-sm truncate max-w-[60%]">{unitName}</h1>
       </header>
 
       <div className="max-w-md mx-auto px-4 pt-3">
-        <div className="flex rounded-md overflow-hidden border border-gray-200">
+        <div className="flex rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={() => setTab('tutor')}
@@ -121,13 +121,13 @@ export default function UnitTutor() {
 
       {tab === 'tutor' ? (
         <main className="max-w-md mx-auto p-4 flex flex-col" style={{ minHeight: 'calc(100vh - 140px)' }}>
-          <p className="text-xs text-gray-400 mb-3">
+          <p className="text-xs text-gray-400 mb-3 dark:text-gray-500">
             Ask anything about {unitName}. Answers draw on general subject knowledge plus the materials on file for this unit.
           </p>
 
           <div className="flex-1 space-y-3 mb-3">
             {messages.length === 0 && (
-              <p className="text-sm text-gray-400 text-center mt-8">Ask your first question below.</p>
+              <p className="text-sm text-gray-400 text-center mt-8 dark:text-gray-500">Ask your first question below.</p>
             )}
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -140,7 +140,7 @@ export default function UnitTutor() {
                 </div>
               </div>
             ))}
-            {sending && <p className="text-xs text-gray-400">Thinking…</p>}
+            {sending && <p className="text-xs text-gray-400 dark:text-gray-500">Thinking…</p>}
             <div ref={bottomRef} />
           </div>
 
@@ -151,7 +151,7 @@ export default function UnitTutor() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a question…"
-              className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm bg-white"
+              className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
               disabled={sending}
             />
             <button
@@ -165,11 +165,11 @@ export default function UnitTutor() {
         </main>
       ) : (
         <main className="max-w-md mx-auto p-4 space-y-3">
-          {quizError && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{quizError}</div>}
+          {quizError && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{quizError}</div>}
 
           {questions.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-6 text-center">
-              <p className="text-sm text-gray-500 mb-4">
+            <div className="bg-white rounded-lg shadow p-6 text-center dark:bg-gray-900">
+              <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
                 Generate a 5-question practice quiz on {unitName}.
               </p>
               <button
@@ -183,8 +183,8 @@ export default function UnitTutor() {
           ) : (
             <>
               {questions.map((q, i) => (
-                <div key={i} className="bg-white rounded-lg shadow p-4">
-                  <p className="text-sm font-medium text-gray-900 mb-2">
+                <div key={i} className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
+                  <p className="text-sm font-medium text-gray-900 mb-2 dark:text-gray-100">
                     {i + 1}. {q.prompt}
                   </p>
                   <div className="space-y-1">
@@ -214,7 +214,7 @@ export default function UnitTutor() {
                     })}
                   </div>
                   {submitted && (
-                    <p className="text-xs text-gray-500 mt-2">{q.explanation}</p>
+                    <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">{q.explanation}</p>
                   )}
                 </div>
               ))}
@@ -228,8 +228,8 @@ export default function UnitTutor() {
                   Submit Quiz
                 </button>
               ) : (
-                <div className="bg-white rounded-lg shadow p-4 text-center space-y-3">
-                  <p className="font-semibold text-gray-900">
+                <div className="bg-white rounded-lg shadow p-4 text-center space-y-3 dark:bg-gray-900">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">
                     Score: {score} / {questions.length}
                   </p>
                   <button

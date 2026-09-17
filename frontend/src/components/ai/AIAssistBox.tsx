@@ -54,7 +54,7 @@ export default function AIAssistBox({ task, getInput, onApply, label, emptyMessa
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 space-y-2">
+    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 space-y-2 dark:border-gray-700 dark:bg-gray-950">
       <button
         type="button"
         onClick={handleAsk}
@@ -64,18 +64,18 @@ export default function AIAssistBox({ task, getInput, onApply, label, emptyMessa
         {loading ? 'Thinking...' : `✦ ${label || 'Ask AI'}`}
       </button>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
 
       {result && (
         <div className="space-y-2">
-          <p className="text-sm text-gray-700 whitespace-pre-wrap bg-white border border-gray-200 rounded-lg p-3">
+          <p className="text-sm text-gray-700 whitespace-pre-wrap bg-white border border-gray-200 rounded-lg p-3 dark:text-gray-300 dark:bg-gray-900 dark:border-gray-700">
             {result}
           </p>
           <div className="space-x-3">
             <button type="button" onClick={handleApply} className="text-xs font-medium text-rgreen">
               Use this
             </button>
-            <button type="button" onClick={() => setResult('')} className="text-xs font-medium text-gray-500">
+            <button type="button" onClick={() => setResult('')} className="text-xs font-medium text-gray-500 dark:text-gray-400">
               Discard
             </button>
           </div>

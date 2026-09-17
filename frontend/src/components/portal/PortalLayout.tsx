@@ -287,6 +287,20 @@ export default function PortalLayout({
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  function toggleDarkMode() {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    try {
+      localStorage.setItem('runyenjes_dark_mode', String(next));
+    } catch (e) {}
+  }
 
   useEffect(() => {
     api('/settings')
@@ -341,20 +355,20 @@ export default function PortalLayout({
     'Runyenjes';
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen bg-gray-50 flex overflow-hidden dark:bg-gray-950">
 
       {/* ================= SIDEBAR ================= */}
-      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col h-full">
+      <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col h-full dark:bg-gray-900 dark:border-gray-700">
 
         {/* Branding */}
-        <div className="px-5 py-5 border-b border-gray-200">
+        <div className="px-5 py-5 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
 
             {settings?.logoUrl ? (
               <img
                 src={settings.logoUrl}
                 alt={institutionName}
-                className="w-10 h-10 rounded-md object-contain border border-gray-100"
+                className="w-10 h-10 rounded-md object-contain border border-gray-100 dark:border-gray-800"
               />
             ) : (
               <div className="w-10 h-10 rounded-md bg-rgreen text-white flex items-center justify-center font-bold">
@@ -367,14 +381,14 @@ export default function PortalLayout({
                 {shortName}
               </div>
 
-              <div className="text-xs text-gray-500 leading-tight">
+              <div className="text-xs text-gray-500 leading-tight dark:text-gray-400">
                 {institutionName}
               </div>
             </div>
 
           </div>
 
-          <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
             {user.role} PORTAL
           </div>
         </div>
@@ -385,7 +399,7 @@ export default function PortalLayout({
           {sections.map((section) => (
             <div key={section.title} className="mb-5">
 
-              <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+              <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                 {section.title}
               </div>
 
@@ -419,11 +433,11 @@ export default function PortalLayout({
         </nav>
 
         {/* Sign out */}
-        <div className="p-3 border-t border-gray-200">
+        <div className="p-3 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition"
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition dark:text-gray-400 dark:hover:bg-gray-700"
           >
             🚪 Sign out
           </button>
@@ -435,24 +449,35 @@ export default function PortalLayout({
       <div className="flex-1 min-w-0 flex flex-col h-full">
 
         {/* Top bar */}
-        <header className="h-16 shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
+        <header className="h-16 shrink-0 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 dark:bg-gray-900 dark:border-gray-700">
 
           <div className="min-w-0">
-            <h1 className="font-semibold text-gray-900 truncate">
+            <h1 className="font-semibold text-gray-900 truncate dark:text-gray-100">
               {title}
             </h1>
 
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-xs text-gray-500 truncate dark:text-gray-400">
               Welcome, {user.name}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
 
+            {/* Dark mode toggle */}
+            <button
+              type="button"
+              onClick={toggleDarkMode}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition dark:text-gray-400 dark:hover:bg-gray-700"
+              aria-label="Toggle dark mode"
+              title="Toggle dark mode"
+            >
+              {isDark ? '☀️' : '🌙'}
+            </button>
+
             {/* Notifications */}
             <button
               type="button"
-              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition dark:text-gray-400 dark:hover:bg-gray-700"
               aria-label="Notifications"
             >
               🔔
@@ -471,12 +496,12 @@ export default function PortalLayout({
                   className="w-9 h-9 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
+                <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-400">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
               )}
 
-              <span className="hidden sm:block text-sm font-medium text-gray-700">
+              <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {user.name}
               </span>
             </button>
@@ -485,7 +510,7 @@ export default function PortalLayout({
             <button
               type="button"
               onClick={handleLogout}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition dark:text-gray-400 dark:hover:bg-gray-700"
               aria-label="Sign out"
               title="Sign out"
             >

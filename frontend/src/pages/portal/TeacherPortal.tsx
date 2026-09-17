@@ -5,10 +5,10 @@ export default function TeacherPortal() {
     <PortalLayout title="Teacher Dashboard">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Teacher Dashboard
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Your teaching and academic workspace.
           </p>
         </div>
@@ -22,10 +22,10 @@ export default function TeacherPortal() {
           ].map(([title, description]) => (
             <div
               key={title}
-              className="bg-white border border-gray-200 rounded-lg p-5"
+              className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700"
             >
-              <h3 className="font-semibold text-gray-900">{title}</h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+              <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                 {description}
               </p>
             </div>

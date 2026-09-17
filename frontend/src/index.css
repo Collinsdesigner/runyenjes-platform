@@ -6,6 +6,19 @@ html, body, #root {
   height: 100%;
 }
 
+/* Dark mode fallback -- applied the instant the 'dark' class is on
+   <html> (see index.html's inline script), so there's a sane base
+   background/text color even before per-component dark: classes
+   take over. */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #030712;
+  color: #f3f4f6;
+}
+
 /* Default brand colors — overridden at runtime from Admin Settings
    via JS (document.documentElement.style.setProperty), so every
    existing Tailwind class using these stays in sync automatically. */

@@ -237,26 +237,26 @@ export default function Home() {
   const feedContent = (
     <>
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>
+        <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>
       )}
 
       {/* New post composer — Facebook style */}
       {user ? (
-        <form onSubmit={handleCreatePost} className="bg-white rounded-xl shadow p-4">
+        <form onSubmit={handleCreatePost} className="bg-white rounded-xl shadow p-4 dark:bg-gray-900">
           <div className="flex gap-3">
             <Avatar name={user.name} avatarUrl={user.avatarUrl} />
             <textarea
               value={newPost}
               onChange={(e) => setNewPost(e.target.value)}
               placeholder={`What's on your mind, ${user.name.split(' ')[0]}?`}
-              className="flex-1 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm resize-none bg-gray-50 focus:outline-none focus:ring-2 focus:ring-rgreen"
+              className="flex-1 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm resize-none bg-gray-50 focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-700 dark:bg-gray-950"
               rows={2}
             />
           </div>
 
           {newMediaUrl && (
             <div className="mt-2 relative">
-              <img src={newMediaUrl} alt="Preview" className="w-full max-h-64 object-contain bg-gray-100 rounded-lg" />
+              <img src={newMediaUrl} alt="Preview" className="w-full max-h-64 object-contain bg-gray-100 rounded-lg dark:bg-gray-800" />
               <button
                 type="button"
                 onClick={() => {
@@ -270,8 +270,8 @@ export default function Home() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <label className="text-xs text-gray-500 hover:text-rgreen flex items-center gap-1 cursor-pointer">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <label className="text-xs text-gray-500 hover:text-rgreen flex items-center gap-1 cursor-pointer dark:text-gray-400">
               <input
                 type="file"
                 accept="image/*"
@@ -291,7 +291,7 @@ export default function Home() {
           </div>
         </form>
       ) : (
-        <div className="bg-white rounded-xl shadow p-4 text-sm text-gray-600">
+        <div className="bg-white rounded-xl shadow p-4 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-400">
           <div className="text-center mb-3">
             <button
               onClick={() => navigate('/login')}
@@ -303,7 +303,7 @@ export default function Home() {
           </div>
 
           <div className="border-t pt-3">
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-gray-500 mb-2 dark:text-gray-400">
               Commenting and liking as:
             </p>
 
@@ -314,7 +314,7 @@ export default function Home() {
                 localStorage.setItem('rtvcGuestName', e.target.value);
               }}
               placeholder="Your name"
-              className="w-full border border-gray-200 rounded-full px-4 py-2 text-sm"
+              className="w-full border border-gray-200 rounded-full px-4 py-2 text-sm dark:border-gray-700"
             />
           </div>
         </div>
@@ -322,23 +322,23 @@ export default function Home() {
 
       {/* Feed */}
       {loading ? (
-        <p className="text-center text-gray-400 text-sm">Loading feed…</p>
+        <p className="text-center text-gray-400 text-sm dark:text-gray-500">Loading feed…</p>
       ) : posts.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm">No posts yet — be the first!</p>
+        <p className="text-center text-gray-400 text-sm dark:text-gray-500">No posts yet — be the first!</p>
       ) : (
         posts.map((post) => {
           const authorName = post.author?.name ?? 'Unknown';
           const commentsOpen = openComments[post.id];
           const canDelete = user && (post.authorId === user.id || ['ADMIN'].includes(user.role));
           return (
-            <div key={post.id} className="bg-white rounded-xl shadow overflow-hidden">
+            <div key={post.id} className="bg-white rounded-xl shadow overflow-hidden dark:bg-gray-900">
               <div className="p-4 pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar name={authorName} avatarUrl={post.author?.avatarUrl} />
                     <div>
                       <p className="font-semibold text-sm leading-tight">{authorName}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
                         {post.author?.role && `${post.author.role} · `}
                         {relativeTime(post.createdAt)}
                       </p>
@@ -347,21 +347,21 @@ export default function Home() {
                   {canDelete && (
                     <button
                       onClick={() => handleDeletePost(post.id)}
-                      className="text-xs text-gray-400 hover:text-rmaroon"
+                      className="text-xs text-gray-400 hover:text-rmaroon dark:text-gray-500"
                       title="Delete post"
                     >
                       Delete
                     </button>
                   )}
                 </div>
-                <p className="text-sm text-gray-800 whitespace-pre-wrap mt-3">{post.content}</p>
+                <p className="text-sm text-gray-800 whitespace-pre-wrap mt-3 dark:text-gray-200">{post.content}</p>
               </div>
 
               {post.mediaUrl && (
                 <img
                   src={post.mediaUrl}
                   alt=""
-                  className="w-full max-h-[32rem] object-contain bg-gray-100"
+                  className="w-full max-h-[32rem] object-contain bg-gray-100 dark:bg-gray-800"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     img.replaceWith(
@@ -376,7 +376,7 @@ export default function Home() {
 
               {/* Like / comment counts */}
               {(post.likeCount > 0 || post.comments.length > 0) && (
-                <div className="px-4 pt-2 flex items-center justify-between text-xs text-gray-400">
+                <div className="px-4 pt-2 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
                   <span>
                     {post.likeCount > 0 && `❤ ${post.likeCount}`}
                   </span>
@@ -388,7 +388,7 @@ export default function Home() {
               )}
 
               {/* Action bar */}
-              <div className="flex border-t border-gray-100 mt-2 text-sm">
+              <div className="flex border-t border-gray-100 mt-2 text-sm dark:border-gray-800">
                 <button
                   onClick={() => handleToggleLike(post.id)}
                   className={`flex-1 py-2 flex items-center justify-center gap-1.5 font-medium hover:bg-gray-50 ${
@@ -399,7 +399,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setOpenComments((p) => ({ ...p, [post.id]: !p[post.id] }))}
-                  className="flex-1 py-2 flex items-center justify-center gap-1.5 font-medium text-gray-500 hover:bg-gray-50 border-l border-gray-100"
+                  className="flex-1 py-2 flex items-center justify-center gap-1.5 font-medium text-gray-500 hover:bg-gray-50 border-l border-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:border-gray-800"
                 >
                   💬 Comment
                 </button>
@@ -407,25 +407,25 @@ export default function Home() {
 
               {/* Comments (collapsible) */}
               {commentsOpen && (
-                <div className="bg-gray-50 px-4 py-3 space-y-3">
+                <div className="bg-gray-50 px-4 py-3 space-y-3 dark:bg-gray-950">
                   {post.comments.map((c) => {
                     const cName = c.author?.name ?? c.authorNamePublic ?? 'Guest';
                     return (
                       <div key={c.id} className="flex gap-2">
                         <Avatar name={cName} avatarUrl={c.author?.avatarUrl} />
-                        <div className="bg-white rounded-2xl px-3 py-2 flex-1">
+                        <div className="bg-white rounded-2xl px-3 py-2 flex-1 dark:bg-gray-900">
                           <div className="flex items-center justify-between">
                             <p className="text-xs font-semibold">{cName}</p>
                             {user && (c.authorId === user.id || ['ADMIN'].includes(user.role)) && (
                               <button
                                 onClick={() => handleDeleteComment(post.id, c.id)}
-                                className="text-[10px] text-gray-400 hover:text-rmaroon"
+                                className="text-[10px] text-gray-400 hover:text-rmaroon dark:text-gray-500"
                               >
                                 Delete
                               </button>
                             )}
                           </div>
-                          <p className="text-sm text-gray-700">{c.content}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">{c.content}</p>
                         </div>
                       </div>
                     );
@@ -440,7 +440,7 @@ export default function Home() {
                       }
                       onKeyDown={(e) => e.key === 'Enter' && handleReply(post.id)}
                       placeholder="Write a comment…"
-                      className="flex-1 border border-gray-200 rounded-full px-3 py-1.5 text-sm bg-white"
+                      className="flex-1 border border-gray-200 rounded-full px-3 py-1.5 text-sm bg-white dark:border-gray-700 dark:bg-gray-900"
                     />
                     <button
                       onClick={() => handleReply(post.id)}
@@ -471,14 +471,14 @@ export default function Home() {
 
   // Logged-out guest: standalone public page, no sidebar to fit into.
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">Runyenjes Home</h1>
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/apply')} className="text-sm text-gray-600 underline">
+          <button onClick={() => navigate('/apply')} className="text-sm text-gray-600 underline dark:text-gray-400">
             Apply
           </button>
-          <button onClick={() => navigate('/browser')} className="text-sm text-gray-600 underline">
+          <button onClick={() => navigate('/browser')} className="text-sm text-gray-600 underline dark:text-gray-400">
             Browser
           </button>
           <button

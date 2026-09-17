@@ -64,8 +64,8 @@ export default function TeacherResults() {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Results</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Results</h2>
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
               {term ? `Results across your units this term (${term}).` : 'No active academic term right now.'}
             </p>
           </div>
@@ -79,38 +79,38 @@ export default function TeacherResults() {
           </button>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{aiError}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{aiError}</div>}
         {aiReply && (
-          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap">
+          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap dark:bg-green-950 dark:border-green-800 dark:text-gray-200">
             {aiReply}
           </div>
         )}
 
         {loading ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             Loading results...
           </div>
         ) : exams.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             No assessments recorded yet for your units this term.
           </div>
         ) : (
           <div className="space-y-4">
             {exams.map((e) => (
-              <div key={e.id} className="bg-white border border-gray-200 rounded-lg">
-                <div className="p-4 border-b border-gray-200">
-                  <div className="font-semibold text-gray-900">{e.name}</div>
-                  <div className="text-xs text-gray-500">{e.unitName} · out of {e.maxScore}</div>
+              <div key={e.id} className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">{e.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">{e.unitName} · out of {e.maxScore}</div>
                 </div>
                 {e.results.length === 0 ? (
-                  <p className="text-sm text-gray-400 p-4">No results recorded yet.</p>
+                  <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No results recorded yet.</p>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
                     {e.results.map((r, i) => (
                       <div key={i} className="px-4 py-2 flex items-center justify-between text-sm">
-                        <span className="text-gray-800">{r.studentName}</span>
-                        <span className="text-gray-500">{r.score}/{e.maxScore}</span>
+                        <span className="text-gray-800 dark:text-gray-200">{r.studentName}</span>
+                        <span className="text-gray-500 dark:text-gray-400">{r.score}/{e.maxScore}</span>
                       </div>
                     ))}
                   </div>

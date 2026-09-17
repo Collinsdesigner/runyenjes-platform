@@ -99,8 +99,8 @@ export default function Notebook() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Notebook</h2>
-            <p className="text-sm text-gray-500 mt-1">Personal notes, visible only to you.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Notebook</h2>
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Personal notes, visible only to you.</p>
           </div>
           <button
             type="button"
@@ -112,16 +112,16 @@ export default function Notebook() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <section className="bg-white border border-gray-200 rounded-lg lg:col-span-1">
-            <div className="p-4 border-b border-gray-200 font-semibold text-gray-900">Your Notes</div>
-            <div className="divide-y divide-gray-100 max-h-[28rem] overflow-y-auto">
-              {loading && <p className="text-sm text-gray-400 p-4">Loading...</p>}
+          <section className="bg-white border border-gray-200 rounded-lg lg:col-span-1 dark:bg-gray-900 dark:border-gray-700">
+            <div className="p-4 border-b border-gray-200 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">Your Notes</div>
+            <div className="divide-y divide-gray-100 max-h-[28rem] overflow-y-auto dark:divide-gray-800">
+              {loading && <p className="text-sm text-gray-400 p-4 dark:text-gray-500">Loading...</p>}
               {!loading && notes.length === 0 && (
-                <p className="text-sm text-gray-400 p-4">No notes yet.</p>
+                <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No notes yet.</p>
               )}
               {notes.map((n) => (
                 <button
@@ -132,8 +132,8 @@ export default function Notebook() {
                     selectedId === n.id ? 'bg-green-50 border-l-4 border-rgreen' : ''
                   }`}
                 >
-                  <div className="font-medium text-gray-900 truncate">{n.title}</div>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="font-medium text-gray-900 truncate dark:text-gray-100">{n.title}</div>
+                  <div className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                     {new Date(n.updatedAt).toLocaleString()}
                   </div>
                 </button>
@@ -141,15 +141,15 @@ export default function Notebook() {
             </div>
           </section>
 
-          <section className="bg-white border border-gray-200 rounded-lg lg:col-span-2 p-5 space-y-3">
+          <section className="bg-white border border-gray-200 rounded-lg lg:col-span-2 p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
             <input
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium dark:border-gray-600"
               placeholder="Note title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Write your note here..."
               rows={12}
               value={content}
@@ -176,7 +176,7 @@ export default function Notebook() {
                 <button
                   type="button"
                   onClick={() => handleDelete(selectedId)}
-                  className="text-red-600 text-sm font-medium"
+                  className="text-red-600 text-sm font-medium dark:text-red-400"
                 >
                   Delete Note
                 </button>

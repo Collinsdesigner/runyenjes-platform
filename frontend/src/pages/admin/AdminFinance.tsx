@@ -116,8 +116,8 @@ export default function AdminFinance() {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Finance</h2>
-            <p className="text-sm text-gray-500 mt-1">Institution-wide invoice oversight.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Finance</h2>
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Institution-wide invoice oversight.</p>
           </div>
           <button
             type="button"
@@ -129,18 +129,18 @@ export default function AdminFinance() {
           </button>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>}
-        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{aiError}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>}
+        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{aiError}</div>}
         {aiReply && (
-          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap">
+          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap dark:bg-green-950 dark:border-green-800 dark:text-gray-200">
             {aiReply}
           </div>
         )}
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5">
-          <div className="text-xs text-gray-500">Total Outstanding Balance</div>
-          <div className="text-2xl font-bold text-gray-900 mt-1">KES {totalOutstanding}</div>
+        <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+          <div className="text-xs text-gray-500 dark:text-gray-400">Total Outstanding Balance</div>
+          <div className="text-2xl font-bold text-gray-900 mt-1 dark:text-gray-100">KES {totalOutstanding}</div>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -159,45 +159,45 @@ export default function AdminFinance() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>
         ) : filtered.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             No invoices match this filter.
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-800">
             {filtered.map((inv) => (
               <div key={inv.id} className="px-5 py-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-medium text-gray-900 truncate">
+                    <div className="font-medium text-gray-900 truncate dark:text-gray-100">
                       {inv.student.name} — {inv.description}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                       {inv.student.admissionNumber || 'No admission number'} · {inv.term.name}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-sm text-gray-800">Balance: KES {balanceOf(inv)}</div>
-                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{inv.status}</span>
+                    <div className="text-sm text-gray-800 dark:text-gray-200">Balance: KES {balanceOf(inv)}</div>
+                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full dark:bg-gray-800">{inv.status}</span>
                   </div>
                 </div>
 
                 {inv.status !== 'PAID' && inv.status !== 'CANCELLED' && (
                   <div className="mt-3">
                     {openInvoiceId === inv.id ? (
-                      <div className="border-t border-gray-100 pt-3 flex flex-wrap gap-2 items-center">
+                      <div className="border-t border-gray-100 pt-3 flex flex-wrap gap-2 items-center dark:border-gray-800">
                         <input
                           type="number"
                           value={paymentAmount}
                           onChange={(e) => setPaymentAmount(e.target.value)}
                           placeholder="Amount"
-                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-28"
+                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-28 dark:border-gray-600"
                         />
                         <select
                           value={paymentMethod}
                           onChange={(e) => setPaymentMethod(e.target.value)}
-                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:border-gray-600"
                         >
                           {METHODS.map((m) => (
                             <option key={m} value={m}>{m}</option>
@@ -207,7 +207,7 @@ export default function AdminFinance() {
                           value={paymentReference}
                           onChange={(e) => setPaymentReference(e.target.value)}
                           placeholder="Reference (optional)"
-                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:border-gray-600"
                         />
                         <button
                           type="button"
@@ -219,7 +219,7 @@ export default function AdminFinance() {
                         <button
                           type="button"
                           onClick={() => setOpenInvoiceId(null)}
-                          className="text-xs text-gray-500"
+                          className="text-xs text-gray-500 dark:text-gray-400"
                         >
                           Cancel
                         </button>

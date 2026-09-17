@@ -17,8 +17,8 @@ export default function ExaminationsPortal() {
     <PortalLayout title="Examinations Dashboard">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Examinations Dashboard</h2>
-          <p className="text-sm text-gray-500 mt-1">Exams, CATs and results workspace.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Examinations Dashboard</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Exams, CATs and results workspace.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -27,13 +27,13 @@ export default function ExaminationsPortal() {
               key={card.title}
               type="button"
               onClick={card.action}
-              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-rgreen hover:shadow-sm transition"
+              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-rgreen hover:shadow-sm transition dark:bg-gray-900 dark:border-gray-700"
             >
               <div className="flex items-start gap-4">
                 <div className="text-2xl">{card.icon}</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{card.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{card.description}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{card.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{card.description}</p>
                   <p className="text-sm text-rgreen font-medium mt-3">Open →</p>
                 </div>
               </div>

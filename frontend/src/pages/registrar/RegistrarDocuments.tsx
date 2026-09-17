@@ -104,20 +104,20 @@ export default function RegistrarDocuments() {
     <PortalLayout title="Student Documents">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Student Documents</h2>
-          <p className="text-sm text-gray-500 mt-1">Search a student, then upload or manage their documents.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Student Documents</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Search a student, then upload or manage their documents.</p>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>}
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5 flex gap-2">
+        <div className="bg-white border border-gray-200 rounded-lg p-5 flex gap-2 dark:bg-gray-900 dark:border-gray-700">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search by name, email, or admission number"
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
           />
           <button
             type="button"
@@ -129,16 +129,16 @@ export default function RegistrarDocuments() {
         </div>
 
         {results.length > 0 && !selectedStudent && (
-          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-800">
             {results.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => selectStudent(s)}
-                className="w-full text-left px-5 py-3 hover:bg-gray-50 text-sm"
+                className="w-full text-left px-5 py-3 hover:bg-gray-50 text-sm dark:hover:bg-gray-800"
               >
-                <span className="font-medium text-gray-900">{s.name}</span>{' '}
-                <span className="text-xs text-gray-400">
+                <span className="font-medium text-gray-900 dark:text-gray-100">{s.name}</span>{' '}
+                <span className="text-xs text-gray-400 dark:text-gray-500">
                   {s.admissionNumber || 'No admission number'} · {s.email}
                 </span>
               </button>
@@ -149,25 +149,25 @@ export default function RegistrarDocuments() {
         {selectedStudent && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 Managing documents for <span className="font-semibold">{selectedStudent.name}</span>
               </div>
               <button
                 type="button"
                 onClick={() => { setSelectedStudent(null); setDocuments([]); }}
-                className="text-xs text-gray-500"
+                className="text-xs text-gray-500 dark:text-gray-400"
               >
                 Change student
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-              <h3 className="font-semibold text-gray-900">Upload Document</h3>
+            <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Upload Document</h3>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Title (e.g. "Transcript 2026")'
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               />
               <input
                 type="file"
@@ -199,14 +199,14 @@ export default function RegistrarDocuments() {
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-4 border-b border-gray-200 font-semibold text-gray-900">Documents</div>
+            <div className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+              <div className="p-4 border-b border-gray-200 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">Documents</div>
               {docsLoading ? (
-                <p className="text-sm text-gray-400 p-4">Loading...</p>
+                <p className="text-sm text-gray-400 p-4 dark:text-gray-500">Loading...</p>
               ) : documents.length === 0 ? (
-                <p className="text-sm text-gray-400 p-4">No documents uploaded yet.</p>
+                <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No documents uploaded yet.</p>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
                   {documents.map((d) => (
                     <div key={d.id} className="px-5 py-3 flex items-center justify-between gap-3">
                       <div>
@@ -218,14 +218,14 @@ export default function RegistrarDocuments() {
                         >
                           {d.title}
                         </a>
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                           Uploaded by {d.uploadedBy.name} · {new Date(d.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleDelete(d.id)}
-                        className="text-xs font-medium text-red-600"
+                        className="text-xs font-medium text-red-600 dark:text-red-400"
                       >
                         Delete
                       </button>

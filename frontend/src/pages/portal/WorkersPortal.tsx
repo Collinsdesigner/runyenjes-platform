@@ -83,54 +83,54 @@ export default function WorkersPortal() {
     <PortalLayout title="My Work">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Work</h2>
-          <p className="text-sm text-gray-500 mt-1">Your staff profile and leave requests.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Work</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Your staff profile and leave requests.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        {loading && <p className="text-sm text-gray-400">Loading...</p>}
+        {loading && <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>}
 
         {!loading && (
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="font-semibold text-gray-900 mb-3">My Staff Profile</h3>
+          <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 mb-3 dark:text-gray-100">My Staff Profile</h3>
             {profile ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500">Employee #</p>
+                  <p className="text-gray-500 dark:text-gray-400">Employee #</p>
                   <p className="font-medium">{profile.employeeNumber || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Position</p>
+                  <p className="text-gray-500 dark:text-gray-400">Position</p>
                   <p className="font-medium">{profile.position || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Employment</p>
+                  <p className="text-gray-500 dark:text-gray-400">Employment</p>
                   <p className="font-medium">{profile.employmentType}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Status</p>
+                  <p className="text-gray-500 dark:text-gray-400">Status</p>
                   <p className="font-medium">{profile.status}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-400 dark:text-gray-500">
                 No staff profile has been set up for your account yet — ask HR to create one.
               </p>
             )}
           </div>
         )}
 
-        <form onSubmit={handleRequestLeave} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">Request Leave</h3>
+        <form onSubmit={handleRequestLeave} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">Request Leave</h3>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <select
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               value={leaveType}
               onChange={(e) => setLeaveType(e.target.value)}
             >
@@ -142,19 +142,19 @@ export default function WorkersPortal() {
               <option value="OTHER">Other</option>
             </select>
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Reason (optional)"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -165,12 +165,12 @@ export default function WorkersPortal() {
           </button>
         </form>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">
             My Leave Requests
           </div>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Type</th>
                 <th className="px-4 py-2">Dates</th>
@@ -179,16 +179,16 @@ export default function WorkersPortal() {
             </thead>
             <tbody>
               {leaveRequests.length === 0 && (
-                <tr><td colSpan={3} className="px-4 py-6 text-center text-gray-400">No leave requests yet</td></tr>
+                <tr><td colSpan={3} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No leave requests yet</td></tr>
               )}
               {leaveRequests.map((l) => (
-                <tr key={l.id} className="border-t border-gray-100">
+                <tr key={l.id} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-4 py-2">{l.type}</td>
                   <td className="px-4 py-2">
                     {new Date(l.startDate).toLocaleDateString()} → {new Date(l.endDate).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{l.status}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{l.status}</span>
                   </td>
                 </tr>
               ))}

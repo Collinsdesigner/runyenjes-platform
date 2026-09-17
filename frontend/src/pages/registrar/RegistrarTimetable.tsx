@@ -367,16 +367,16 @@ export default function RegistrarTimetable() {
 
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Timetable Management
             </h1>
 
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 mt-1 dark:text-gray-400">
               Create and manage the academic timetable.
             </p>
           </div>
 
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1 dark:bg-gray-800">
             <button
               type="button"
               onClick={() => setView('grid')}
@@ -395,8 +395,8 @@ export default function RegistrarTimetable() {
         </div>
 
         {options.activeTerm && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-            <div className="text-sm text-green-700">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 dark:bg-green-950 dark:border-green-800">
+            <div className="text-sm text-green-700 dark:text-green-300">
               Active Academic Term
             </div>
             <div className="font-semibold text-green-900">
@@ -406,25 +406,25 @@ export default function RegistrarTimetable() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
             {error}
           </div>
         )}
 
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-4">
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-4 dark:bg-green-950 dark:border-green-800 dark:text-green-300">
             {message}
           </div>
         )}
 
         {/* ============ AI GENERATE ============ */}
-        <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-          <h2 className="font-semibold text-gray-900">✦ AI: Generate Draft Schedule</h2>
-          <p className="text-sm text-gray-500">
+        <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-900 dark:text-gray-100">✦ AI: Generate Draft Schedule</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Pick a programme -- AI proposes slots for every unit that doesn't have a timetable entry yet this term.
             Nothing is saved until you review and confirm below.
           </p>
-          <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
+          <div className="flex bg-gray-100 rounded-lg p-1 w-fit dark:bg-gray-800">
             <button
               type="button"
               onClick={() => setGenMode('programme')}
@@ -446,7 +446,7 @@ export default function RegistrarTimetable() {
               <select
                 value={genProgramme}
                 onChange={(e) => setGenProgramme(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               >
                 <option value="">Select programme</option>
                 {options.programmes.map((p) => (
@@ -459,7 +459,7 @@ export default function RegistrarTimetable() {
               <select
                 value={genDepartment}
                 onChange={(e) => setGenDepartment(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               >
                 <option value="">Select department</option>
                 {Array.from(new Set(options.programmes.map((p) => p.departmentId)))
@@ -481,13 +481,13 @@ export default function RegistrarTimetable() {
           </div>
 
           {genMessage && (
-            <p className="text-sm text-gray-600">{genMessage}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{genMessage}</p>
           )}
 
           {draft && draft.length > 0 && (
-            <div className="border border-gray-200 rounded-lg overflow-x-auto mt-3">
+            <div className="border border-gray-200 rounded-lg overflow-x-auto mt-3 dark:border-gray-700">
               <table className="w-full text-xs">
-                <thead className="bg-gray-50 text-left text-gray-500">
+                <thead className="bg-gray-50 text-left text-gray-500 dark:bg-gray-950 dark:text-gray-400">
                   <tr>
                     {genMode === 'department' && <th className="px-3 py-2">Programme</th>}
                     <th className="px-3 py-2">Unit</th>
@@ -499,18 +499,18 @@ export default function RegistrarTimetable() {
                     <th className="px-3 py-2"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {draft.map((d, i) => (
                     <tr key={`${d.unitId}-${i}`}>
                       {genMode === 'department' && (
-                        <td className="px-3 py-2 text-gray-500">{d.programName || '—'}</td>
+                        <td className="px-3 py-2 text-gray-500 dark:text-gray-400">{d.programName || '—'}</td>
                       )}
-                      <td className="px-3 py-2 font-medium text-gray-800">{d.unitName}</td>
+                      <td className="px-3 py-2 font-medium text-gray-800 dark:text-gray-200">{d.unitName}</td>
                       <td className="px-3 py-2">
                         <select
                           value={d.lecturerId || ''}
                           onChange={(e) => updateDraftRow(i, { lecturerId: e.target.value || null })}
-                          className="border border-gray-300 rounded px-2 py-1 text-xs"
+                          className="border border-gray-300 rounded px-2 py-1 text-xs dark:border-gray-600"
                         >
                           <option value="">Unassigned</option>
                           {options.lecturers.map((l) => (
@@ -522,7 +522,7 @@ export default function RegistrarTimetable() {
                         <select
                           value={d.dayOfWeek}
                           onChange={(e) => updateDraftRow(i, { dayOfWeek: Number(e.target.value) })}
-                          className="border border-gray-300 rounded px-2 py-1 text-xs"
+                          className="border border-gray-300 rounded px-2 py-1 text-xs dark:border-gray-600"
                         >
                           {days.map((day) => (
                             <option key={day.value} value={day.value}>{day.label}</option>
@@ -534,7 +534,7 @@ export default function RegistrarTimetable() {
                           type="time"
                           value={d.startTime}
                           onChange={(e) => updateDraftRow(i, { startTime: e.target.value })}
-                          className="border border-gray-300 rounded px-2 py-1 text-xs w-24"
+                          className="border border-gray-300 rounded px-2 py-1 text-xs w-24 dark:border-gray-600"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -542,7 +542,7 @@ export default function RegistrarTimetable() {
                           type="time"
                           value={d.endTime}
                           onChange={(e) => updateDraftRow(i, { endTime: e.target.value })}
-                          className="border border-gray-300 rounded px-2 py-1 text-xs w-24"
+                          className="border border-gray-300 rounded px-2 py-1 text-xs w-24 dark:border-gray-600"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -550,11 +550,11 @@ export default function RegistrarTimetable() {
                           value={d.room}
                           onChange={(e) => updateDraftRow(i, { room: e.target.value })}
                           placeholder="Room"
-                          className="border border-gray-300 rounded px-2 py-1 text-xs w-20"
+                          className="border border-gray-300 rounded px-2 py-1 text-xs w-20 dark:border-gray-600"
                         />
                       </td>
                       <td className="px-3 py-2">
-                        <button type="button" onClick={() => removeDraftRow(i)} className="text-red-600 text-xs">
+                        <button type="button" onClick={() => removeDraftRow(i)} className="text-red-600 text-xs dark:text-red-400">
                           Remove
                         </button>
                       </td>
@@ -562,7 +562,7 @@ export default function RegistrarTimetable() {
                   ))}
                 </tbody>
               </table>
-              <div className="p-3 border-t border-gray-200">
+              <div className="p-3 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={handleSaveDraft}
@@ -577,27 +577,27 @@ export default function RegistrarTimetable() {
         </section>
 
         {/* ============ MANUAL SINGLE ENTRY ============ */}
-        <section className="bg-white border border-gray-200 rounded-xl p-6">
-          <h2 className="font-semibold text-gray-900 mb-5">
+        <section className="bg-white border border-gray-200 rounded-xl p-6 dark:bg-gray-900 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-900 mb-5 dark:text-gray-100">
             Create Timetable Entry
           </h2>
 
           {loading ? (
-            <div className="text-gray-500">
+            <div className="text-gray-500 dark:text-gray-400">
               Loading programmes, units and lecturers...
             </div>
           ) : (
             <div className="grid gap-5 md:grid-cols-2">
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Programme
                 </label>
 
                 <select
                   value={selectedProgramme}
                   onChange={(e) => changeProgramme(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 >
                   <option value="">Select programme</option>
                   {options.programmes.map((programme) => (
@@ -618,7 +618,7 @@ export default function RegistrarTimetable() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Unit *
                 </label>
 
@@ -628,7 +628,7 @@ export default function RegistrarTimetable() {
                     setSelectedUnit(e.target.value)
                   }
                   disabled={!selectedProgramme || filteredUnits.length === 0}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 disabled:bg-gray-100 dark:border-gray-600"
                 >
                   <option value="">
                     {!selectedProgramme
@@ -650,14 +650,14 @@ export default function RegistrarTimetable() {
                 </select>
 
                 {!filteredUnits.length && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                     No units found for this selection.
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Lecturer
                 </label>
 
@@ -666,7 +666,7 @@ export default function RegistrarTimetable() {
                   onChange={(e) =>
                     setSelectedLecturer(e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 >
                   <option value="">
                     Select lecturer
@@ -693,7 +693,7 @@ export default function RegistrarTimetable() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Day *
                 </label>
 
@@ -702,7 +702,7 @@ export default function RegistrarTimetable() {
                   onChange={(e) =>
                     setDayOfWeek(e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 >
                   {days.map((day) => (
                     <option
@@ -716,7 +716,7 @@ export default function RegistrarTimetable() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Start Time *
                 </label>
 
@@ -726,12 +726,12 @@ export default function RegistrarTimetable() {
                   onChange={(e) =>
                     setStartTime(e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   End Time *
                 </label>
 
@@ -741,12 +741,12 @@ export default function RegistrarTimetable() {
                   onChange={(e) =>
                     setEndTime(e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Room
                 </label>
 
@@ -756,12 +756,12 @@ export default function RegistrarTimetable() {
                     setRoom(e.target.value)
                   }
                   placeholder="e.g. Lab 1"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Notes
                 </label>
 
@@ -771,7 +771,7 @@ export default function RegistrarTimetable() {
                     setNotes(e.target.value)
                   }
                   placeholder="Optional"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-600"
                 />
               </div>
 
@@ -793,17 +793,17 @@ export default function RegistrarTimetable() {
 
         {/* ============ GRID VIEW ============ */}
         {view === 'grid' && (
-          <section className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="font-semibold text-gray-900">Weekly Grid</h2>
+          <section className="bg-white border border-gray-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-semibold text-gray-900 dark:text-gray-100">Weekly Grid</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr>
-                    <th className="border border-gray-100 bg-gray-50 px-2 py-2 w-16"></th>
+                    <th className="border border-gray-100 bg-gray-50 px-2 py-2 w-16 dark:border-gray-800 dark:bg-gray-950"></th>
                     {days.map((d) => (
-                      <th key={d.value} className="border border-gray-100 bg-gray-50 px-2 py-2 text-left">
+                      <th key={d.value} className="border border-gray-100 bg-gray-50 px-2 py-2 text-left dark:border-gray-800 dark:bg-gray-950">
                         {d.label}
                       </th>
                     ))}
@@ -812,7 +812,7 @@ export default function RegistrarTimetable() {
                 <tbody>
                   {GRID_HOURS.map((hour) => (
                     <tr key={hour}>
-                      <td className="border border-gray-100 px-2 py-2 text-gray-400 align-top">
+                      <td className="border border-gray-100 px-2 py-2 text-gray-400 align-top dark:border-gray-800 dark:text-gray-500">
                         {hourLabel(hour)}
                       </td>
                       {days.map((d) => {
@@ -821,17 +821,17 @@ export default function RegistrarTimetable() {
                           return e.dayOfWeek === d.value && startHour === hour;
                         });
                         return (
-                          <td key={d.value} className="border border-gray-100 px-2 py-2 align-top min-w-[140px]">
+                          <td key={d.value} className="border border-gray-100 px-2 py-2 align-top min-w-[140px] dark:border-gray-800">
                             {cellEntries.map((e) => (
-                              <div key={e.id} className="bg-green-50 border border-green-200 rounded-lg p-2 mb-1">
-                                <div className="font-medium text-gray-900">{e.unit.name}</div>
-                                <div className="text-gray-500">{e.startTime}–{e.endTime}</div>
-                                <div className="text-gray-500">{e.lecturer?.name || 'Unassigned'}</div>
-                                {e.room && <div className="text-gray-400">{e.room}</div>}
+                              <div key={e.id} className="bg-green-50 border border-green-200 rounded-lg p-2 mb-1 dark:bg-green-950 dark:border-green-800">
+                                <div className="font-medium text-gray-900 dark:text-gray-100">{e.unit.name}</div>
+                                <div className="text-gray-500 dark:text-gray-400">{e.startTime}–{e.endTime}</div>
+                                <div className="text-gray-500 dark:text-gray-400">{e.lecturer?.name || 'Unassigned'}</div>
+                                {e.room && <div className="text-gray-400 dark:text-gray-500">{e.room}</div>}
                                 <button
                                   type="button"
                                   onClick={() => deleteEntry(e.id)}
-                                  className="text-red-600 mt-1"
+                                  className="text-red-600 mt-1 dark:text-red-400"
                                 >
                                   Delete
                                 </button>
@@ -850,21 +850,21 @@ export default function RegistrarTimetable() {
 
         {/* ============ LIST VIEW ============ */}
         {view === 'list' && (
-          <section className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="font-semibold text-gray-900">
+          <section className="bg-white border border-gray-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-semibold text-gray-900 dark:text-gray-100">
                 Current Timetable
               </h2>
             </div>
 
             {entries.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 No timetable entries have been created yet.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-950">
                     <tr>
                       <th className="text-left px-4 py-3">Day</th>
                       <th className="text-left px-4 py-3">Time</th>
@@ -876,7 +876,7 @@ export default function RegistrarTimetable() {
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                     {entries.map((entry) => (
                       <tr key={entry.id}>
                         <td className="px-4 py-3">
@@ -888,14 +888,14 @@ export default function RegistrarTimetable() {
                         <td className="px-4 py-3">
                           {entry.unit.name}
                           {entry.unit.code && (
-                            <div className="text-xs text-gray-500">{entry.unit.code}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{entry.unit.code}</div>
                           )}
                         </td>
                         <td className="px-4 py-3">{entry.unit.program?.name ?? '—'}</td>
                         <td className="px-4 py-3">{entry.lecturer?.name ?? 'Not assigned'}</td>
                         <td className="px-4 py-3">{entry.room ?? '—'}</td>
                         <td className="px-4 py-3">
-                          <button onClick={() => deleteEntry(entry.id)} className="text-red-600 hover:underline">
+                          <button onClick={() => deleteEntry(entry.id)} className="text-red-600 hover:underline dark:text-red-400">
                             Delete
                           </button>
                         </td>

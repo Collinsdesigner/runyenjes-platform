@@ -102,22 +102,22 @@ export default function AdminBulkImport() {
     <PortalLayout title="Mass Import">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Mass Import</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Mass Import</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Bulk-add existing students (launch day / migrating records) into a programme.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
 
         {result && (
-          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-            <h3 className="font-semibold text-gray-900">Import Result</h3>
-            <p className="text-sm text-green-700">{result.createdCount} student(s) created.</p>
+          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Import Result</h3>
+            <p className="text-sm text-green-700 dark:text-green-300">{result.createdCount} student(s) created.</p>
             {result.created.length > 0 && (
-              <ul className="text-xs text-gray-500 list-disc list-inside">
+              <ul className="text-xs text-gray-500 list-disc list-inside dark:text-gray-400">
                 {result.created.map((c) => (
                   <li key={c}>{c}</li>
                 ))}
@@ -126,7 +126,7 @@ export default function AdminBulkImport() {
             {result.skippedCount > 0 && (
               <>
                 <p className="text-sm text-amber-700">{result.skippedCount} row(s) skipped:</p>
-                <ul className="text-xs text-gray-500 list-disc list-inside">
+                <ul className="text-xs text-gray-500 list-disc list-inside dark:text-gray-400">
                   {result.skipped.map((s, i) => (
                     <li key={i}>
                       {JSON.stringify(s.row)} — {s.reason}
@@ -138,11 +138,11 @@ export default function AdminBulkImport() {
           </div>
         )}
 
-        <form onSubmit={handleImport} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Import</h3>
+        <form onSubmit={handleImport} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Import</h3>
 
           <select
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full dark:border-gray-600"
             value={programId}
             onChange={(e) => setProgramId(e.target.value)}
           >
@@ -155,14 +155,14 @@ export default function AdminBulkImport() {
           </select>
 
           <div>
-            <p className="text-xs text-gray-400 mb-1">
+            <p className="text-xs text-gray-400 mb-1 dark:text-gray-500">
               Paste CSV with header <code>name,email,admissionNumber,phone</code> (phone optional). Example:
             </p>
-            <pre className="text-xs bg-gray-50 border border-gray-200 rounded-lg p-2 mb-2 overflow-x-auto">
+            <pre className="text-xs bg-gray-50 border border-gray-200 rounded-lg p-2 mb-2 overflow-x-auto dark:bg-gray-950 dark:border-gray-700">
               {SAMPLE_CSV}
             </pre>
             <textarea
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full font-mono"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full font-mono dark:border-gray-600"
               rows={8}
               placeholder={SAMPLE_CSV}
               value={csvText}

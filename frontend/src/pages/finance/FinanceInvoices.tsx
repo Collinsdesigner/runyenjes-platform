@@ -124,46 +124,46 @@ export default function FinanceInvoices() {
     <PortalLayout title="Invoices & Payments">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Invoices & Payments</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invoices & Payments</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Bill a student for the active term, then record payments as they come in.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleCreateInvoice} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Invoice</h3>
-          <p className="text-xs text-gray-400">
+        <form onSubmit={handleCreateInvoice} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Invoice</h3>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Student ID is the student's account ID (ask Registrar/Admin for it, or pull it from Admin &gt; Users).
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Student ID"
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Amount (KES)"
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2 dark:border-gray-600"
               placeholder="Description (e.g. Term 2 tuition fee)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
@@ -174,9 +174,9 @@ export default function FinanceInvoices() {
           </button>
         </form>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Student</th>
                 <th className="px-4 py-2">Description</th>
@@ -189,24 +189,24 @@ export default function FinanceInvoices() {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-gray-400">Loading...</td>
+                  <td colSpan={6} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td>
                 </tr>
               )}
               {!loading && invoices.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-gray-400">No invoices yet</td>
+                  <td colSpan={6} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No invoices yet</td>
                 </tr>
               )}
               {invoices.map((inv) => {
                 const paid = inv.payments.reduce((sum, p) => sum + Number(p.amount), 0);
                 return (
                   <>
-                    <tr key={inv.id} className="border-t border-gray-100">
+                    <tr key={inv.id} className="border-t border-gray-100 dark:border-gray-800">
                       <td className="px-4 py-2">{inv.student?.name}</td>
                       <td className="px-4 py-2">{inv.description}</td>
                       <td className="px-4 py-2">{inv.amount}</td>
                       <td className="px-4 py-2">
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{inv.status}</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{inv.status}</span>
                       </td>
                       <td className="px-4 py-2">{paid}</td>
                       <td className="px-4 py-2 text-right">
@@ -219,18 +219,18 @@ export default function FinanceInvoices() {
                       </td>
                     </tr>
                     {payingId === inv.id && (
-                      <tr className="bg-gray-50">
+                      <tr className="bg-gray-50 dark:bg-gray-950">
                         <td colSpan={6} className="px-4 py-3">
                           <div className="flex flex-wrap gap-2 items-center">
                             <input
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-32"
+                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-32 dark:border-gray-600"
                               placeholder="Amount"
                               type="number"
                               value={payAmount}
                               onChange={(e) => setPayAmount(e.target.value)}
                             />
                             <select
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
                               value={payMethod}
                               onChange={(e) => setPayMethod(e.target.value)}
                             >
@@ -241,7 +241,7 @@ export default function FinanceInvoices() {
                               <option value="OTHER">Other</option>
                             </select>
                             <input
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-40"
+                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-40 dark:border-gray-600"
                               placeholder="Reference (optional)"
                               value={payReference}
                               onChange={(e) => setPayReference(e.target.value)}

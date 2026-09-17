@@ -88,19 +88,19 @@ export default function Apply() {
 
   if (submittedApp) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow p-6">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 dark:bg-gray-950">
+        <div className="max-w-md w-full bg-white rounded-lg shadow p-6 dark:bg-gray-900">
           <h1 className="text-lg font-bold text-rgreen mb-2 text-center">Application submitted</h1>
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-gray-600 text-center dark:text-gray-400">
             Thank you, {applicantName}. Your application is awaiting review by the Registrar's
             office. You'll be contacted at <span className="font-medium">{email}</span> once a
             decision is made.
           </p>
 
           {selectedProgram?.currentFee && (
-            <div className="mt-5 border-t border-gray-100 pt-4">
+            <div className="mt-5 border-t border-gray-100 pt-4 dark:border-gray-800">
               {paySuccess ? (
-                <p className="text-sm text-green-700 text-center">
+                <p className="text-sm text-green-700 text-center dark:text-green-300">
                   ✔ Payment submitted. The Registrar will verify it and confirm your admission.
                 </p>
               ) : (
@@ -108,7 +108,7 @@ export default function Apply() {
                   <p className="text-sm font-medium text-center mb-1">
                     Fee for this program: KES {Number(selectedProgram.currentFee).toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 text-center mb-3">
+                  <p className="text-xs text-gray-500 text-center mb-3 dark:text-gray-400">
                     Already paid via M-Pesa to <strong>Paybill 247247</strong>, Account{' '}
                     <strong>0190274872116</strong>? Submit your transaction code below so the
                     Registrar can verify it.
@@ -120,14 +120,14 @@ export default function Apply() {
                       value={payAmount}
                       onChange={(e) => setPayAmount(e.target.value)}
                       placeholder="Amount paid (KES)"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                     />
                     <input
                       required
                       value={payReference}
                       onChange={(e) => setPayReference(e.target.value)}
                       placeholder="M-Pesa transaction code (e.g. QGH7XXXX)"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                     />
                     {payError && <p className="text-xs text-rmaroon">{payError}</p>}
                     <button
@@ -152,65 +152,65 @@ export default function Apply() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+    <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-950">
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6 dark:bg-gray-900">
         <h1 className="text-lg font-bold text-rgreen mb-1">Apply to Runyenjes</h1>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
           Fill this in to apply — no account needed yet.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Full name</label>
             <input
               required
               value={applicantName}
               onChange={(e) => setApplicantName(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Phone</label>
             <input
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               placeholder="07XXXXXXXX"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
               National ID / Birth Certificate No.
             </label>
             <input
               required
               value={idNumber}
               onChange={(e) => setIdNumber(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Program</label>
             <select
               required
               value={programId}
               onChange={(e) => setProgramId(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
             >
               <option value="">Select a program…</option>
               {departments.map((dept) => (
@@ -225,18 +225,18 @@ export default function Apply() {
               ))}
             </select>
             {selectedProgram?.currentFee && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                 Fee: KES {Number(selectedProgram.currentFee).toLocaleString()}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Intake</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Intake</label>
             <select
               value={intake}
               onChange={(e) => setIntake(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
             >
               <option>January 2027</option>
               <option>May 2027</option>
@@ -255,7 +255,7 @@ export default function Apply() {
           </button>
         </form>
 
-        <button onClick={() => navigate('/')} className="w-full text-center text-sm text-gray-500 mt-4 underline">
+        <button onClick={() => navigate('/')} className="w-full text-center text-sm text-gray-500 mt-4 underline dark:text-gray-400">
           Back to Home
         </button>
       </div>

@@ -80,38 +80,38 @@ const data = await api('/registrar/stats', { token });
     <PortalLayout title="Registrar Dashboard">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Registrar Dashboard
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Admissions, registration and student administration workspace.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">
             {error}
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Pending Applications
             </p>
 
-            <p className="text-3xl font-bold text-gray-900 mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-100">
               {loading ? '—' : stats.pendingApplications ?? 0}
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Students
             </p>
 
-            <p className="text-3xl font-bold text-gray-900 mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-100">
               {loading ? '—' : stats.students ?? 0}
             </p>
           </div>
@@ -123,7 +123,7 @@ const data = await api('/registrar/stats', { token });
               key={card.title}
               type="button"
               onClick={card.action}
-              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-rgreen hover:shadow-sm transition"
+              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-rgreen hover:shadow-sm transition dark:bg-gray-900 dark:border-gray-700"
             >
               <div className="flex items-start gap-4">
                 <div className="text-2xl">
@@ -131,11 +131,11 @@ const data = await api('/registrar/stats', { token });
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                     {card.title}
                   </h3>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                     {card.description}
                   </p>
 

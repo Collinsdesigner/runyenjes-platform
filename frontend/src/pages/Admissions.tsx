@@ -56,7 +56,7 @@ export default function Admissions() {
   // Not logged in, or logged in with the wrong role — this is Registrar/Admin/Founder only
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -67,7 +67,7 @@ export default function Admissions() {
   }
   if (!ALLOWED_ROLES.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         This page is only available to Registrar, Admin, or Founder accounts.
       </div>
     );
@@ -112,39 +112,39 @@ export default function Admissions() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">Admissions Review</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
           Back to Home
         </button>
       </header>
 
       <main className="max-w-2xl mx-auto p-4 space-y-3">
         {lastAdmission && (
-          <div className="bg-green-50 text-green-800 text-sm p-3 rounded-md">
+          <div className="bg-green-50 text-green-800 text-sm p-3 rounded-md dark:bg-green-950">
             ✔ {lastAdmission}
           </div>
         )}
-        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>}
 
         {loading ? (
-          <p className="text-sm text-gray-400 text-center">Loading applications…</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading applications…</p>
         ) : applications.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center">No applications yet.</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">No applications yet.</p>
         ) : (
           applications.map((app) => (
-            <div key={app.id} className="bg-white rounded-lg shadow p-4">
+            <div key={app.id} className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-medium text-sm">{app.applicantName}</p>
-                  <p className="text-xs text-gray-500">{app.email} · {app.phone}</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{app.email} · {app.phone}</p>
+                  <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                     {app.program.name}
                     {app.program.level ? ` — ${app.program.level}` : ''} ·{' '}
                     {app.program.department.name}
                   </p>
-                  <p className="text-xs text-gray-400">Intake: {app.intake}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Intake: {app.intake}</p>
                   {app.admissionNumber && (
                     <p className="text-xs font-medium text-rgreen mt-1">
                       Admission No: {app.admissionNumber}
@@ -197,11 +197,11 @@ export default function Admissions() {
               )}
 
               {app.payments.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
-                  <p className="text-xs font-medium text-gray-600">Payments</p>
+                <div className="mt-3 pt-3 border-t border-gray-100 space-y-2 dark:border-gray-800">
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Payments</p>
                   {app.payments.map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-xs">
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-gray-400">
                         KES {Number(p.amount).toLocaleString()} · {p.method}
                         {p.reference ? ` · Ref: ${p.reference}` : ''}
                       </span>

@@ -33,7 +33,7 @@ export default function ShortCourses() {
   // To make this public later, just remove this check.
 if (!user || user.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 text-center p-6">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 text-center p-6 dark:text-gray-400">
         This page is a preview, not yet approved for public launch.
         <br />
         Only Admin/Founder can view it right now.
@@ -42,29 +42,29 @@ if (!user || user.role !== 'ADMIN') {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">Short Courses</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
           Back to Home
         </button>
       </header>
 
       <main className="max-w-xl mx-auto p-4">
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
           Learn a practical skill in 1–2 months. No prior enrollment needed — apply directly below.
         </p>
 
         {loading ? (
-          <p className="text-sm text-gray-400 text-center">Loading…</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading…</p>
         ) : courses.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center">No short courses listed yet.</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">No short courses listed yet.</p>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {courses.map((c) => (
-              <div key={c.id} className="bg-white rounded-lg shadow p-4 flex flex-col">
+              <div key={c.id} className="bg-white rounded-lg shadow p-4 flex flex-col dark:bg-gray-900">
                 <p className="font-medium text-sm">{c.name}</p>
-                <p className="text-xs text-gray-500 mt-1 flex-1">
+                <p className="text-xs text-gray-500 mt-1 flex-1 dark:text-gray-400">
                   {c.currentFee ? `KES ${Number(c.currentFee).toLocaleString()}` : 'Fee to be announced'}
                 </p>
                 <button

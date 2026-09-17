@@ -122,24 +122,24 @@ export default function JobBoard() {
 
   function PostingCard({ p, showPoster }: { p: Posting; showPoster: boolean }) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
         <div className="flex items-start justify-between">
           <div>
-            <h4 className="font-semibold text-gray-900">{p.title}</h4>
-            <p className="text-sm text-gray-500">
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100">{p.title}</h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {p.company}
               {p.location ? ` — ${p.location}` : ''}
             </p>
           </div>
-          <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{p.status}</span>
+          <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{p.status}</span>
         </div>
-        <p className="text-sm text-gray-600 mt-2">{p.description}</p>
-        <div className="text-xs text-gray-400 mt-2 space-x-3">
+        <p className="text-sm text-gray-600 mt-2 dark:text-gray-400">{p.description}</p>
+        <div className="text-xs text-gray-400 mt-2 space-x-3 dark:text-gray-500">
           {p.applyLink && <span>Apply: {p.applyLink}</span>}
           {p.contactEmail && <span>Contact: {p.contactEmail}</span>}
         </div>
         {showPoster && p.postedBy && (
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
             Posted by {p.postedBy.name} ({p.postedBy.role})
           </p>
         )}
@@ -149,11 +149,11 @@ export default function JobBoard() {
               Close
             </button>
           ) : (
-            <button className="text-green-600 text-xs font-medium" onClick={() => handleStatus(p.id, 'OPEN')}>
+            <button className="text-green-600 text-xs font-medium dark:text-green-400" onClick={() => handleStatus(p.id, 'OPEN')}>
               Reopen
             </button>
           )}
-          <button className="text-red-600 text-xs font-medium" onClick={() => handleDelete(p.id)}>
+          <button className="text-red-600 text-xs font-medium dark:text-red-400" onClick={() => handleDelete(p.id)}>
             Delete
           </button>
         </div>
@@ -165,8 +165,8 @@ export default function JobBoard() {
     <PortalLayout title="Job Board">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Job Board</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Job Board</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             {isAdmin
               ? 'Post an opening, and moderate every listing on the board.'
               : canBrowse
@@ -176,47 +176,47 @@ export default function JobBoard() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handlePost} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">Post an Opening</h3>
+        <form onSubmit={handlePost} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">Post an Opening</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Job title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Company"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Location (optional)"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Apply link (optional)"
               value={applyLink}
               onChange={(e) => setApplyLink(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2 dark:border-gray-600"
               placeholder="Contact email (optional)"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
             />
             <textarea
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2 dark:border-gray-600"
               placeholder="Description"
               rows={3}
               value={description}
@@ -228,13 +228,13 @@ export default function JobBoard() {
           </button>
         </form>
 
-        {loading && <p className="text-sm text-gray-400">Loading...</p>}
+        {loading && <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>}
 
         {isAdmin && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900">All Postings (Moderation)</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">All Postings (Moderation)</h3>
             {!loading && allPostings.length === 0 && (
-              <p className="text-sm text-gray-400">No postings on the board yet.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">No postings on the board yet.</p>
             )}
             {allPostings.map((p) => (
               <PostingCard key={p.id} p={p} showPoster />
@@ -244,28 +244,28 @@ export default function JobBoard() {
 
         {!isAdmin && canBrowse && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900">Open Opportunities</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Open Opportunities</h3>
             {!loading && openPostings.length === 0 && (
-              <p className="text-sm text-gray-400">No open postings right now.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">No open postings right now.</p>
             )}
             {openPostings.map((p) => (
-              <div key={p.id} className="bg-white border border-gray-200 rounded-lg p-4">
+              <div key={p.id} className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-semibold text-gray-900">{p.title}</h4>
-                    <p className="text-sm text-gray-500">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">{p.title}</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {p.company}
                       {p.location ? ` — ${p.location}` : ''}
                     </p>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{p.status}</span>
+                  <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{p.status}</span>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">{p.description}</p>
-                <div className="text-xs text-gray-400 mt-2 space-x-3">
+                <p className="text-sm text-gray-600 mt-2 dark:text-gray-400">{p.description}</p>
+                <div className="text-xs text-gray-400 mt-2 space-x-3 dark:text-gray-500">
                   {p.applyLink && <span>Apply: {p.applyLink}</span>}
                   {p.contactEmail && <span>Contact: {p.contactEmail}</span>}
                 </div>
-                {p.postedBy && <p className="text-xs text-gray-400 mt-1">Posted by {p.postedBy.name}</p>}
+                {p.postedBy && <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">Posted by {p.postedBy.name}</p>}
               </div>
             ))}
           </div>
@@ -273,8 +273,8 @@ export default function JobBoard() {
 
         {!isAdmin && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900">My Postings</h3>
-            {myPostings.length === 0 && <p className="text-sm text-gray-400">You haven't posted anything yet.</p>}
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">My Postings</h3>
+            {myPostings.length === 0 && <p className="text-sm text-gray-400 dark:text-gray-500">You haven't posted anything yet.</p>}
             {myPostings.map((p) => (
               <PostingCard key={p.id} p={p} showPoster={false} />
             ))}

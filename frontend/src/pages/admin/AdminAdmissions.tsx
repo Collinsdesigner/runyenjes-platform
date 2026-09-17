@@ -78,19 +78,19 @@ export default function AdminAdmissions() {
     <PortalLayout title="Admissions">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Admissions</h2>
-          <p className="text-sm text-gray-500 mt-1">Review applications and verify payments.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Admissions</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Review applications and verify payments.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
         <select
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -102,9 +102,9 @@ export default function AdminAdmissions() {
           <option value="REPORTED">Reported</option>
         </select>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Applicant</th>
                 <th className="px-4 py-2">Programme</th>
@@ -116,24 +116,24 @@ export default function AdminAdmissions() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && visible.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400">No applications</td></tr>
+                <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No applications</td></tr>
               )}
               {visible.map((a) => (
-                <tr key={a.id} className="border-t border-gray-100 align-top">
+                <tr key={a.id} className="border-t border-gray-100 align-top dark:border-gray-800">
                   <td className="px-4 py-2">
-                    <div className="font-medium text-gray-900">{a.applicantName}</div>
-                    <div className="text-xs text-gray-400">{a.email}</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{a.applicantName}</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">{a.email}</div>
                   </td>
                   <td className="px-4 py-2">{a.program?.name}</td>
                   <td className="px-4 py-2">{a.intake}</td>
                   <td className="px-4 py-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{a.status}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{a.status}</span>
                   </td>
                   <td className="px-4 py-2">
-                    {a.payments.length === 0 && <span className="text-xs text-gray-400">None</span>}
+                    {a.payments.length === 0 && <span className="text-xs text-gray-400 dark:text-gray-500">None</span>}
                     {a.payments.map((p) => (
                       <div key={p.id} className="flex items-center gap-2 text-xs mb-1">
                         <span>
@@ -142,13 +142,13 @@ export default function AdminAdmissions() {
                         {p.status === 'pending' && (
                           <>
                             <button
-                              className="text-green-600 font-medium"
+                              className="text-green-600 font-medium dark:text-green-400"
                               onClick={() => handleVerifyPayment(p.id, 'verified')}
                             >
                               Verify
                             </button>
                             <button
-                              className="text-red-600 font-medium"
+                              className="text-red-600 font-medium dark:text-red-400"
                               onClick={() => handleVerifyPayment(p.id, 'rejected')}
                             >
                               Reject
@@ -162,7 +162,7 @@ export default function AdminAdmissions() {
                     {a.status === 'SUBMITTED' && (
                       <>
                         <button
-                          className="text-green-600 text-xs font-medium"
+                          className="text-green-600 text-xs font-medium dark:text-green-400"
                           onClick={() => handleStatus(a.id, 'ADMITTED')}
                         >
                           Admit
@@ -174,7 +174,7 @@ export default function AdminAdmissions() {
                           Waitlist
                         </button>
                         <button
-                          className="text-red-600 text-xs font-medium"
+                          className="text-red-600 text-xs font-medium dark:text-red-400"
                           onClick={() => handleStatus(a.id, 'REJECTED')}
                         >
                           Reject

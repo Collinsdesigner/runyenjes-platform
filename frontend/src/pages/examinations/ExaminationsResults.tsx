@@ -127,37 +127,37 @@ export default function ExaminationsResults() {
     <PortalLayout title="Exams & Results">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Exams & Results</h2>
-          <p className="text-sm text-gray-500 mt-1">Create exams for a unit and record student scores.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Exams & Results</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Create exams for a unit and record student scores.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleCreateExam} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Exam</h3>
-          <p className="text-xs text-gray-400">
+        <form onSubmit={handleCreateExam} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Exam</h3>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Unit ID is the course unit's ID (find it in Registrar &gt; Programmes &gt; unit list).
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Unit ID"
               value={unitId}
               onChange={(e) => setUnitId(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Exam name (e.g. CAT 1)"
               value={examName}
               onChange={(e) => setExamName(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Max score"
               type="number"
               value={maxScore}
@@ -169,9 +169,9 @@ export default function ExaminationsResults() {
           </button>
         </form>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Exam</th>
                 <th className="px-4 py-2">Unit</th>
@@ -182,14 +182,14 @@ export default function ExaminationsResults() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && exams.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No exams yet</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No exams yet</td></tr>
               )}
               {exams.map((exam) => (
                 <>
-                  <tr key={exam.id} className="border-t border-gray-100">
+                  <tr key={exam.id} className="border-t border-gray-100 dark:border-gray-800">
                     <td className="px-4 py-2">{exam.name}</td>
                     <td className="px-4 py-2">{exam.unit?.name}</td>
                     <td className="px-4 py-2">{exam.term?.name}</td>
@@ -201,24 +201,24 @@ export default function ExaminationsResults() {
                     </td>
                   </tr>
                   {openExamId === exam.id && (
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-gray-950">
                       <td colSpan={5} className="px-4 py-3">
                         <div className="flex flex-wrap gap-2 items-center mb-3">
                           <input
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-48"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-48 dark:border-gray-600"
                             placeholder="Student ID"
                             value={studentId}
                             onChange={(e) => setStudentId(e.target.value)}
                           />
                           <input
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24 dark:border-gray-600"
                             placeholder="Score"
                             type="number"
                             value={score}
                             onChange={(e) => setScore(e.target.value)}
                           />
                           <input
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24 dark:border-gray-600"
                             placeholder="Grade"
                             value={grade}
                             onChange={(e) => setGrade(e.target.value)}
@@ -231,7 +231,7 @@ export default function ExaminationsResults() {
                           </button>
                         </div>
                         <table className="w-full text-xs">
-                          <thead className="text-gray-500 text-left">
+                          <thead className="text-gray-500 text-left dark:text-gray-400">
                             <tr>
                               <th className="pr-4 py-1">Student</th>
                               <th className="pr-4 py-1">Score</th>
@@ -240,7 +240,7 @@ export default function ExaminationsResults() {
                           </thead>
                           <tbody>
                             {results.map((r) => (
-                              <tr key={r.id} className="border-t border-gray-200">
+                              <tr key={r.id} className="border-t border-gray-200 dark:border-gray-700">
                                 <td className="pr-4 py-1">{r.student?.name}</td>
                                 <td className="pr-4 py-1">{r.score}</td>
                                 <td className="pr-4 py-1">{r.grade || '—'}</td>

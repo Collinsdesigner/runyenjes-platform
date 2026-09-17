@@ -41,17 +41,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 dark:bg-gray-950">
+      <div className="w-full max-w-sm bg-white rounded-lg shadow p-6 dark:bg-gray-900">
         <h1 className="text-xl font-bold text-rgreen text-center mb-1">
           Runyenjes Technical & Vocational College
         </h1>
 
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 text-center mb-6 dark:text-gray-400">
           Member sign in
         </p>
 
-        <div className="flex rounded-md overflow-hidden border border-gray-200 mb-6">
+        <div className="flex rounded-md overflow-hidden border border-gray-200 mb-6 dark:border-gray-700">
           <button
             type="button"
             onClick={() => {
@@ -85,7 +85,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
               Email
             </label>
 
@@ -94,14 +94,14 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
               placeholder="you@runyenjestechnical.ac.ke"
             />
           </div>
 
           {mode === 'student' ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                 Admission Number
               </label>
 
@@ -110,13 +110,13 @@ export default function Login() {
                 required
                 value={admissionNumber}
                 onChange={(e) => setAdmissionNumber(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
                 placeholder="e.g. RTVC/2026/00123"
               />
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                 Password
               </label>
 
@@ -125,7 +125,7 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
                 placeholder="••••••••"
               />
             </div>
@@ -149,7 +149,7 @@ export default function Login() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="w-full text-center text-sm text-gray-500 mt-4 underline"
+          className="w-full text-center text-sm text-gray-500 mt-4 underline dark:text-gray-400"
         >
           Continue to Home feed without logging in
         </button>

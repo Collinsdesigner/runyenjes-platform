@@ -82,11 +82,11 @@ export default function RegistrarProgrammes() {
 
         {/* Header */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Programmes & Departments
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             View and manage the institution's departments and academic
             programmes.
           </p>
@@ -94,40 +94,40 @@ export default function RegistrarProgrammes() {
 
         {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Departments
             </p>
 
-            <p className="text-3xl font-bold text-gray-900 mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-100">
               {loading ? '—' : departments.length}
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Programmes
             </p>
 
-            <p className="text-3xl font-bold text-gray-900 mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-100">
               {loading ? '—' : totalPrograms}
             </p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                 Department
               </label>
 
               <select
                 value={selectedDepartment}
                 onChange={(event) => setSelectedDepartment(event.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
               >
                 <option value="ALL">All departments</option>
 
@@ -140,7 +140,7 @@ export default function RegistrarProgrammes() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                 Search
               </label>
 
@@ -149,7 +149,7 @@ export default function RegistrarProgrammes() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search programme, level, exam body..."
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
               />
             </div>
 
@@ -158,21 +158,21 @@ export default function RegistrarProgrammes() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">
             {error}
           </div>
         )}
 
         {/* Loading */}
         {loading && (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
             Loading programmes and departments...
           </div>
         )}
 
         {/* Empty */}
         {!loading && !error && filteredDepartments.length === 0 && (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
             No programmes found.
           </div>
         )}
@@ -183,17 +183,17 @@ export default function RegistrarProgrammes() {
             {filteredDepartments.map((department) => (
               <section
                 key={department.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700"
               >
                 {/* Department header */}
-                <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="px-5 py-4 border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-950">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                         {department.name}
                       </h3>
 
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                         {department.programs.length}{' '}
                         programme
                         {department.programs.length === 1 ? '' : 's'}
@@ -205,53 +205,53 @@ export default function RegistrarProgrammes() {
                 {/* Programme table */}
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm">
-                    <thead className="border-b border-gray-200">
+                    <thead className="border-b border-gray-200 dark:border-gray-700">
                       <tr>
-                        <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                           Programme
                         </th>
 
-                        <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                           Level
                         </th>
 
-                        <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                           Exam Body
                         </th>
 
-                        <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                           Type
                         </th>
 
-                        <th className="text-left px-5 py-3 font-medium text-gray-600">
+                        <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                           Current Fee
                         </th>
                       </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {department.programs.map((program) => (
                         <tr
                           key={program.id}
-                          className="hover:bg-gray-50"
+                          className="hover:bg-gray-50 dark:hover:bg-gray-800"
                         >
                           <td className="px-5 py-4">
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-gray-900 dark:text-gray-100">
                               {program.name}
                             </div>
 
                             {program.entryRequirements && (
-                              <div className="text-xs text-gray-500 mt-1 max-w-md">
+                              <div className="text-xs text-gray-500 mt-1 max-w-md dark:text-gray-400">
                                 Entry: {program.entryRequirements}
                               </div>
                             )}
                           </td>
 
-                          <td className="px-5 py-4 text-gray-700">
+                          <td className="px-5 py-4 text-gray-700 dark:text-gray-300">
                             {program.level ?? '—'}
                           </td>
 
-                          <td className="px-5 py-4 text-gray-700">
+                          <td className="px-5 py-4 text-gray-700 dark:text-gray-300">
                             {program.examBody ?? '—'}
                           </td>
 
@@ -269,7 +269,7 @@ export default function RegistrarProgrammes() {
                             </span>
                           </td>
 
-                          <td className="px-5 py-4 font-medium text-gray-900">
+                          <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                             {program.currentFee !== null
                               ? `KES ${Number(program.currentFee).toLocaleString()}`
                               : '—'}

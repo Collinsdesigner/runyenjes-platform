@@ -94,7 +94,7 @@ export default function StudentTimetable() {
   if (loading) {
     return (
       <PortalLayout title="My Timetable">
-        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
           Loading your timetable...
         </div>
       </PortalLayout>
@@ -104,7 +104,7 @@ export default function StudentTimetable() {
   if (error) {
     return (
       <PortalLayout title="My Timetable">
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
           <div className="font-semibold mb-1">
             Could not load timetable
           </div>
@@ -121,28 +121,28 @@ export default function StudentTimetable() {
       <div className="space-y-6">
 
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             My Timetable
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 mt-1 dark:text-gray-400">
             Welcome, {user?.name}
           </p>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Your scheduled classes, lecturers and rooms.
           </p>
         </div>
 
         {!data?.entries?.length ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-10 text-center">
+          <div className="bg-white border border-gray-200 rounded-xl p-10 text-center dark:bg-gray-900 dark:border-gray-700">
             <div className="text-4xl mb-3">▦</div>
 
-            <h2 className="font-semibold text-gray-900">
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100">
               No timetable published yet
             </h2>
 
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 mt-2 dark:text-gray-400">
               Your timetable will appear here once the Registrar
               schedules classes for your registered units.
             </p>
@@ -159,51 +159,51 @@ export default function StudentTimetable() {
               return (
                 <section
                   key={day}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden dark:bg-gray-900 dark:border-gray-700"
                 >
-                  <div className="px-5 py-4 border-b border-gray-200">
-                    <h2 className="font-semibold text-gray-900">
+                  <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="font-semibold text-gray-900 dark:text-gray-100">
                       {day}
                     </h2>
                   </div>
 
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
                     {dayEntries.map((entry) => (
                       <div
                         key={entry.id}
                         className="p-5 grid gap-4 md:grid-cols-4"
                       >
                         <div>
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                             {entry.startTime} – {entry.endTime}
                           </div>
                         </div>
 
                         <div>
-                          <div className="font-semibold text-gray-900">
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">
                             {entry.unit.name}
                           </div>
 
                           {entry.unit.code && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {entry.unit.code}
                             </div>
                           )}
                         </div>
 
                         <div>
-                          <div className="text-sm text-gray-700">
+                          <div className="text-sm text-gray-700 dark:text-gray-300">
                             {entry.lecturer?.name ?? 'Lecturer not assigned'}
                           </div>
                         </div>
 
                         <div>
-                          <div className="text-sm text-gray-700">
+                          <div className="text-sm text-gray-700 dark:text-gray-300">
                             {entry.room ?? 'Room not assigned'}
                           </div>
 
                           {entry.notes && (
-                            <div className="text-xs text-gray-500 mt-1">
+                            <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                               {entry.notes}
                             </div>
                           )}

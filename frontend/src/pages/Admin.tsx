@@ -163,7 +163,7 @@ const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -174,7 +174,7 @@ const [logoPreview, setLogoPreview] = useState<string | null>(null);
   }
   if (!ALLOWED.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         This page is only available to Admin or Founder accounts.
       </div>
     );
@@ -457,10 +457,10 @@ async function handleLogoUpload(file: File) {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">Admin Dashboard</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
           Back to Home
         </button>
       </header>
@@ -480,9 +480,9 @@ async function handleLogoUpload(file: File) {
           ))}
         </div>
 
-        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md mb-3">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md mb-3 dark:bg-red-950 dark:text-red-300">{error}</div>}
         {success && (
-          <div className="bg-green-50 text-green-800 text-sm p-3 rounded-md mb-3">✔ {success}</div>
+          <div className="bg-green-50 text-green-800 text-sm p-3 rounded-md mb-3 dark:bg-green-950">✔ {success}</div>
         )}
 
         {tab === 'stats' && stats && (
@@ -494,9 +494,9 @@ async function handleLogoUpload(file: File) {
               <StatCard label="Pending applications" value={stats.pendingApplications} />
               <StatCard label="Anonymous Home visits" value={stats.homeVisits ?? 0} />
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
               <p className="text-sm font-medium mb-1">Repair group memberships</p>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-gray-500 mb-2 dark:text-gray-400">
                 Run this if any staff/admin accounts are missing from their Teachers/Admins/
                 Department/School chat groups (e.g. accounts created directly in the database).
               </p>
@@ -507,21 +507,21 @@ async function handleLogoUpload(file: File) {
               >
                 {repairing ? 'Repairing…' : 'Run repair'}
               </button>
-              {repairMessage && <p className="text-xs text-green-700 mt-2">✔ {repairMessage}</p>}
+              {repairMessage && <p className="text-xs text-green-700 mt-2 dark:text-green-300">✔ {repairMessage}</p>}
             </div>
           </div>
         )}
 
         {tab === 'users' && (
           <div className="space-y-4">
-            <form onSubmit={handleCreateStaff} className="bg-white rounded-lg shadow p-4 space-y-2">
+            <form onSubmit={handleCreateStaff} className="bg-white rounded-lg shadow p-4 space-y-2 dark:bg-gray-900">
               <p className="text-sm font-medium">Create a staff account</p>
               <input
                 value={staffName}
                 onChange={(e) => setStaffName(e.target.value)}
                 placeholder="Full name"
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <input
                 type="email"
@@ -529,14 +529,14 @@ async function handleLogoUpload(file: File) {
                 onChange={(e) => setStaffEmail(e.target.value)}
                 placeholder="Email"
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <input
                 type="tel"
                 value={staffPhone}
                 onChange={(e) => setStaffPhone(e.target.value)}
                 placeholder="Phone (for emergencies/notifications)"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <input
                 type="password"
@@ -544,12 +544,12 @@ async function handleLogoUpload(file: File) {
                 onChange={(e) => setStaffPassword(e.target.value)}
                 placeholder="Temporary password"
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <select
                 value={staffRole}
                 onChange={(e) => setStaffRole(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
               >
                 <option value="TEACHER">Teacher</option>
                 <option value="ADMIN">Admin</option>
@@ -558,7 +558,7 @@ async function handleLogoUpload(file: File) {
               <select
                 value={staffDeptId}
                 onChange={(e) => setStaffDeptId(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
               >
                 <option value="">No department (school-wide only)</option>
                 {departments.map((d) => (
@@ -573,7 +573,7 @@ async function handleLogoUpload(file: File) {
             </form>
 
             {/* Search / filter / sort — essential once the roster is in the thousands */}
-            <div className="bg-white rounded-lg shadow p-3 space-y-2">
+            <div className="bg-white rounded-lg shadow p-3 space-y-2 dark:bg-gray-900">
               <input
                 value={search}
                 onChange={(e) => {
@@ -581,7 +581,7 @@ async function handleLogoUpload(file: File) {
                   setSearch(e.target.value);
                 }}
                 placeholder="Search by name, email, admission number, or phone…"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <div className="flex flex-wrap gap-2">
                 <select
@@ -590,7 +590,7 @@ async function handleLogoUpload(file: File) {
                     setPage(1);
                     setFilterRole(e.target.value);
                   }}
-                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white"
+                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-700 dark:bg-gray-900"
                 >
                   <option value="">All roles</option>
                   <option value="STUDENT">Students</option>
@@ -604,7 +604,7 @@ async function handleLogoUpload(file: File) {
                     setPage(1);
                     setFilterDept(e.target.value);
                   }}
-                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white"
+                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-700 dark:bg-gray-900"
                 >
                   <option value="">All departments</option>
                   {departments.map((d) => (
@@ -616,7 +616,7 @@ async function handleLogoUpload(file: File) {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white"
+                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-700 dark:bg-gray-900"
                 >
                   <option value="createdAt">Sort: Newest</option>
                   <option value="name">Sort: Name</option>
@@ -625,26 +625,26 @@ async function handleLogoUpload(file: File) {
                 </select>
                 <button
                   onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white"
+                  className="border border-gray-200 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-700 dark:bg-gray-900"
                   title="Toggle sort direction"
                 >
                   {sortDir === 'asc' ? '↑ Asc' : '↓ Desc'}
                 </button>
               </div>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
                 {userTotal} result{userTotal === 1 ? '' : 's'}
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow divide-y divide-gray-100">
+            <div className="bg-white rounded-lg shadow divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
               {users.map((u) => (
                 <div key={u.id} className="p-3 text-sm">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">
-                        {u.name} <span className="text-xs text-gray-400">({u.role})</span>
+                        {u.name} <span className="text-xs text-gray-400 dark:text-gray-500">({u.role})</span>
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {u.email} {u.admissionNumber ? `· ${u.admissionNumber}` : ''}
                         {u.phone ? ` · 📞 ${u.phone}` : ''}
                         {u.department ? ` · ${u.department.name}` : ''}
@@ -657,7 +657,7 @@ async function handleLogoUpload(file: File) {
                           setDeptChangeFor(u.department?.id ?? '');
                           setNewPasswordFor('');
                         }}
-                        className="text-xs text-gray-500 underline"
+                        className="text-xs text-gray-500 underline dark:text-gray-400"
                       >
                         Manage
                       </button>
@@ -691,15 +691,15 @@ async function handleLogoUpload(file: File) {
                   </div>
 
                   {expandedUserId === u.id && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 space-y-3">
+                    <div className="mt-3 pt-3 border-t border-gray-100 space-y-3 dark:border-gray-800">
                       {/* Change department — any role */}
                       <div>
-                        <p className="text-xs font-medium text-gray-600 mb-1">Change department</p>
+                        <p className="text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Change department</p>
                         <div className="flex gap-2">
                           <select
                             value={deptChangeFor}
                             onChange={(e) => setDeptChangeFor(e.target.value)}
-                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs bg-white"
+                            className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs bg-white dark:border-gray-600 dark:bg-gray-900"
                           >
                             <option value="">No department</option>
                             {departments.map((d) => (
@@ -720,14 +720,14 @@ async function handleLogoUpload(file: File) {
                       {/* Reset password — staff only (students log in with admission number) */}
                       {u.role !== 'STUDENT' && (
                         <div>
-                          <p className="text-xs font-medium text-gray-600 mb-1">Reset password</p>
+                          <p className="text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Reset password</p>
                           <div className="flex gap-2">
                             <input
                               type="text"
                               value={newPasswordFor}
                               onChange={(e) => setNewPasswordFor(e.target.value)}
                               placeholder="New temporary password"
-                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs dark:border-gray-600"
                             />
                             <button
                               onClick={() => handleResetPassword(u.id)}
@@ -736,7 +736,7 @@ async function handleLogoUpload(file: File) {
                               Reset
                             </button>
                           </div>
-                          <p className="text-[10px] text-gray-400 mt-1">
+                          <p className="text-[10px] text-gray-400 mt-1 dark:text-gray-500">
                             You'll need to tell them the new password directly — it isn't emailed automatically yet.
                           </p>
                         </div>
@@ -746,7 +746,7 @@ async function handleLogoUpload(file: File) {
                 </div>
               ))}
               {users.length === 0 && (
-                <p className="p-4 text-center text-sm text-gray-400">No users match this search.</p>
+                <p className="p-4 text-center text-sm text-gray-400 dark:text-gray-500">No users match this search.</p>
               )}
             </div>
 
@@ -759,7 +759,7 @@ async function handleLogoUpload(file: File) {
                 >
                   ← Prev
                 </button>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   Page {page} of {userTotalPages}
                 </span>
                 <button
@@ -776,25 +776,25 @@ async function handleLogoUpload(file: File) {
 
         {tab === 'departments' && (
           <div className="space-y-4">
-            <form onSubmit={handleCreateDepartment} className="bg-white rounded-lg shadow p-4 flex gap-2">
+            <form onSubmit={handleCreateDepartment} className="bg-white rounded-lg shadow p-4 flex gap-2 dark:bg-gray-900">
               <input
                 value={newDeptName}
                 onChange={(e) => setNewDeptName(e.target.value)}
                 placeholder="New department name"
                 required
-                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <button type="submit" className="bg-rgreen text-white text-sm px-4 py-2 rounded-md">
                 Add department
               </button>
             </form>
 
-            <form onSubmit={handleCreateProgram} className="bg-white rounded-lg shadow p-4 space-y-2">
+            <form onSubmit={handleCreateProgram} className="bg-white rounded-lg shadow p-4 space-y-2 dark:bg-gray-900">
               <p className="text-sm font-medium">Add a program to a department</p>
               <select
                 value={progDeptId}
                 onChange={(e) => setProgDeptId(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
               >
                 <option value="">Select department…</option>
                 {departments.map((d) => (
@@ -808,13 +808,13 @@ async function handleLogoUpload(file: File) {
                 onChange={(e) => setProgName(e.target.value)}
                 placeholder="Program name (e.g. Plumbing)"
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <input
                 value={progLevel}
                 onChange={(e) => setProgLevel(e.target.value)}
                 placeholder="Level (e.g. Level 4) — leave blank for short courses"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
               <button type="submit" className="bg-rgreen text-white text-sm px-4 py-1.5 rounded-md">
                 Add program
@@ -822,17 +822,17 @@ async function handleLogoUpload(file: File) {
             </form>
 
             {/* Existing catalog — rename/delete departments and programs */}
-            <div className="bg-white rounded-lg shadow p-4 space-y-3">
+            <div className="bg-white rounded-lg shadow p-4 space-y-3 dark:bg-gray-900">
               <p className="text-sm font-medium">Existing departments &amp; programs</p>
               {catalog.map((dept) => (
-                <div key={dept.id} className="border border-gray-100 rounded-md p-3">
+                <div key={dept.id} className="border border-gray-100 rounded-md p-3 dark:border-gray-800">
                   <div className="flex items-center justify-between">
                     {editingDeptId === dept.id ? (
                       <div className="flex gap-2 flex-1">
                         <input
                           value={editDeptName}
                           onChange={(e) => setEditDeptName(e.target.value)}
-                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-sm"
+                          className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-sm dark:border-gray-600"
                         />
                         <button
                           onClick={() => handleRenameDepartment(dept.id)}
@@ -842,7 +842,7 @@ async function handleLogoUpload(file: File) {
                         </button>
                         <button
                           onClick={() => setEditingDeptId(null)}
-                          className="text-xs text-gray-400"
+                          className="text-xs text-gray-400 dark:text-gray-500"
                         >
                           Cancel
                         </button>
@@ -856,7 +856,7 @@ async function handleLogoUpload(file: File) {
                               setEditingDeptId(dept.id);
                               setEditDeptName(dept.name);
                             }}
-                            className="text-xs text-gray-500 underline"
+                            className="text-xs text-gray-500 underline dark:text-gray-400"
                           >
                             Rename
                           </button>
@@ -880,13 +880,13 @@ async function handleLogoUpload(file: File) {
                             <input
                               value={editProgName}
                               onChange={(e) => setEditProgName(e.target.value)}
-                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs dark:border-gray-600"
                             />
                             <input
                               value={editProgLevel}
                               onChange={(e) => setEditProgLevel(e.target.value)}
                               placeholder="Level"
-                              className="w-24 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                              className="w-24 border border-gray-300 rounded-md px-2 py-1 text-xs dark:border-gray-600"
                             />
                             <button
                               onClick={() => handleSaveProgram(p.id)}
@@ -896,14 +896,14 @@ async function handleLogoUpload(file: File) {
                             </button>
                             <button
                               onClick={() => setEditingProgramId(null)}
-                              className="text-gray-400"
+                              className="text-gray-400 dark:text-gray-500"
                             >
                               Cancel
                             </button>
                           </div>
                         ) : (
                           <>
-                            <span className="text-gray-600">
+                            <span className="text-gray-600 dark:text-gray-400">
                               {p.name}
                               {p.level ? ` — ${p.level}` : ''}
                               {p.currentFee ? ` · KES ${Number(p.currentFee).toLocaleString()}` : ' · No fee set'}
@@ -924,7 +924,7 @@ async function handleLogoUpload(file: File) {
                                   setEditProgName(p.name);
                                   setEditProgLevel(p.level ?? '');
                                 }}
-                                className="text-gray-400 underline"
+                                className="text-gray-400 underline dark:text-gray-500"
                               >
                                 Edit
                               </button>
@@ -945,7 +945,7 @@ async function handleLogoUpload(file: File) {
                               value={feeAmount}
                               onChange={(e) => setFeeAmount(e.target.value)}
                               placeholder="Fee amount (KES)"
-                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs"
+                              className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-xs dark:border-gray-600"
                             />
                             <button
                               onClick={() => handleSetFee(p.id)}
@@ -965,16 +965,16 @@ async function handleLogoUpload(file: File) {
         )}
         {tab === 'import' && (
           <div className="space-y-4">
-            <form onSubmit={handleBulkImport} className="bg-white rounded-lg shadow p-4 space-y-2">
+            <form onSubmit={handleBulkImport} className="bg-white rounded-lg shadow p-4 space-y-2 dark:bg-gray-900">
               <p className="text-sm font-medium">Import existing students (launch day)</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 For students already enrolled before this platform existed — this skips the
                 Apply/Review pipeline and creates their accounts directly.
               </p>
               <select
                 value={importProgramId}
                 onChange={(e) => setImportProgramId(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
               >
                 <option value="">Select the class/program to import into…</option>
                 {programOptions.map((p) => (
@@ -983,7 +983,7 @@ async function handleLogoUpload(file: File) {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 One student per line: <code>Full Name, email, admission number, phone (optional)</code>
               </p>
               <textarea
@@ -991,7 +991,7 @@ async function handleLogoUpload(file: File) {
                 onChange={(e) => setImportText(e.target.value)}
                 rows={6}
                 placeholder={`Jane Wanjiku, jane.wanjiku@gmail.com, RTVC/2025/00110, 0712345678\nBrian Otieno, brian.otieno@gmail.com, RTVC/2025/00111, 0723456789`}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono dark:border-gray-600"
               />
               <button
                 type="submit"
@@ -1003,8 +1003,8 @@ async function handleLogoUpload(file: File) {
             </form>
 
             {importResult && (
-              <div className="bg-white rounded-lg shadow p-4 text-sm space-y-2">
-                <p className="text-green-700">
+              <div className="bg-white rounded-lg shadow p-4 text-sm space-y-2 dark:bg-gray-900">
+                <p className="text-green-700 dark:text-green-300">
                   ✔ {importResult.createdCount} student{importResult.createdCount === 1 ? '' : 's'}{' '}
                   created
                 </p>
@@ -1013,7 +1013,7 @@ async function handleLogoUpload(file: File) {
                     <p className="text-rmaroon">
                       ⚠ {importResult.skippedCount} skipped:
                     </p>
-                    <ul className="text-xs text-gray-500 list-disc pl-5">
+                    <ul className="text-xs text-gray-500 list-disc pl-5 dark:text-gray-400">
                       {importResult.skipped.map((s, i) => (
                         <li key={i}>
                           {s.row.name || '(no name)'} — {s.reason}
@@ -1028,64 +1028,64 @@ async function handleLogoUpload(file: File) {
         )}
 
         {tab === 'settings' && siteSettings && (
-          <form onSubmit={handleSaveSettings} className="bg-white rounded-lg shadow p-4 space-y-3">
+          <form onSubmit={handleSaveSettings} className="bg-white rounded-lg shadow p-4 space-y-3 dark:bg-gray-900">
             <p className="text-sm font-medium">Institution settings</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Changes here apply everywhere in the app immediately — no code change needed.
             </p>
 
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Institution name</label>
+              <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Institution name</label>
               <input
                 value={settingsForm.institutionName ?? ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, institutionName: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Short name</label>
+              <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Short name</label>
               <input
                 value={settingsForm.shortName ?? ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, shortName: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Tagline / motto</label>
+              <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Tagline / motto</label>
               <input
                 value={settingsForm.tagline ?? ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, tagline: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
             </div>
 <div>
-  <label className="block text-xs text-gray-600 mb-1">About the Institution</label>
+  <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">About the Institution</label>
   <textarea
     value={settingsForm.about ?? ''}
     onChange={(e) => setSettingsForm({ ...settingsForm, about: e.target.value })}
     placeholder="Write a short description about the institution"
-    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
     rows={4}
   />
 </div>
 
 <div>
-  <label className="block text-xs text-gray-600 mb-1">Physical Location</label>
+  <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Physical Location</label>
   <input
     value={settingsForm.physicalLocation ?? ''}
     onChange={(e) => setSettingsForm({ ...settingsForm, physicalLocation: e.target.value })}
     placeholder="Example: Karurumo Location, Kavai Village, Embu County, Kenya"
-    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
   />
 </div>
 
 <div>
-  <label className="block text-xs text-gray-600 mb-1">Google Maps Link</label>
+  <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Google Maps Link</label>
   <input
     value={settingsForm.googleMapsUrl ?? ''}
     onChange={(e) => setSettingsForm({ ...settingsForm, googleMapsUrl: e.target.value })}
     placeholder="Paste Google Maps location link"
-    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
   />
 </div>            
 
@@ -1093,7 +1093,7 @@ async function handleLogoUpload(file: File) {
 
 
 <div>
-  <label className="block text-xs text-gray-600 mb-1">
+  <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">
     Institution Logo
   </label>
 
@@ -1111,7 +1111,7 @@ async function handleLogoUpload(file: File) {
     />
 
     {uploadingLogo && (
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-gray-500 dark:text-gray-400">
         Uploading...
       </span>
     )}
@@ -1130,70 +1130,70 @@ async function handleLogoUpload(file: File) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Primary color</label>
+                <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Primary color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={settingsForm.primaryColor ?? '#0B7A2B'}
                     onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
-                    className="w-10 h-9 border border-gray-300 rounded-md"
+                    className="w-10 h-9 border border-gray-300 rounded-md dark:border-gray-600"
                   />
                   <input
                     value={settingsForm.primaryColor ?? ''}
                     onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Secondary color</label>
+                <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Secondary color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={settingsForm.secondaryColor ?? '#5C0F00'}
                     onChange={(e) => setSettingsForm({ ...settingsForm, secondaryColor: e.target.value })}
-                    className="w-10 h-9 border border-gray-300 rounded-md"
+                    className="w-10 h-9 border border-gray-300 rounded-md dark:border-gray-600"
                   />
                   <input
                     value={settingsForm.secondaryColor ?? ''}
                     onChange={(e) => setSettingsForm({ ...settingsForm, secondaryColor: e.target.value })}
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                   />
                 </div>
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Address</label>
+              <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Address</label>
               <input
                 value={settingsForm.address ?? ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Phone</label>
+                <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Phone</label>
                 <input
                   value={settingsForm.phone ?? ''}
                   onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Email</label>
+                <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Email</label>
                 <input
                   value={settingsForm.email ?? ''}
                   onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Website</label>
+              <label className="block text-xs text-gray-600 mb-1 dark:text-gray-400">Website</label>
               <input
                 value={settingsForm.website ?? ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, website: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
               />
             </div>
 
@@ -1209,9 +1209,9 @@ async function handleLogoUpload(file: File) {
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white rounded-lg shadow p-4 text-center">
+    <div className="bg-white rounded-lg shadow p-4 text-center dark:bg-gray-900">
       <p className="text-2xl font-bold text-rgreen">{value}</p>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
+      <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">{label}</p>
     </div>
   );
 }

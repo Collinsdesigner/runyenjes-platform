@@ -114,19 +114,19 @@ export default function AdminLibrary() {
     <PortalLayout title="Library">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Library</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage units and learning materials per programme.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Library</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Manage units and learning materials per programme.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
         <select
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96 dark:border-gray-600"
           value={selectedProgramId}
           onChange={(e) => loadUnits(e.target.value)}
         >
@@ -140,9 +140,9 @@ export default function AdminLibrary() {
 
         {selectedProgramId && (
           <>
-            <form onSubmit={handleAddUnit} className="bg-white border border-gray-200 rounded-lg p-5 flex gap-3">
+            <form onSubmit={handleAddUnit} className="bg-white border border-gray-200 rounded-lg p-5 flex gap-3 dark:bg-gray-900 dark:border-gray-700">
               <input
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                 placeholder="New unit name"
                 value={newUnitName}
                 onChange={(e) => setNewUnitName(e.target.value)}
@@ -154,9 +154,9 @@ export default function AdminLibrary() {
 
             <div className="space-y-3">
               {units.map((unit) => (
-                <div key={unit.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={unit.id} className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">{unit.name}</h3>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{unit.name}</h3>
                     <div className="space-x-3">
                       <button
                         className="text-rgreen text-xs font-medium"
@@ -164,7 +164,7 @@ export default function AdminLibrary() {
                       >
                         {materialFormUnitId === unit.id ? 'Cancel' : 'Add material'}
                       </button>
-                      <button className="text-red-600 text-xs font-medium" onClick={() => handleDeleteUnit(unit.id)}>
+                      <button className="text-red-600 text-xs font-medium dark:text-red-400" onClick={() => handleDeleteUnit(unit.id)}>
                         Delete unit
                       </button>
                     </div>
@@ -173,13 +173,13 @@ export default function AdminLibrary() {
                   {materialFormUnitId === unit.id && (
                     <div className="flex flex-wrap gap-2 items-center mt-3">
                       <input
-                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm flex-1 min-w-[200px]"
+                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm flex-1 min-w-[200px] dark:border-gray-600"
                         placeholder="Material URL"
                         value={materialUrl}
                         onChange={(e) => setMaterialUrl(e.target.value)}
                       />
                       <select
-                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                        className="border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
                         value={materialType}
                         onChange={(e) => setMaterialType(e.target.value)}
                       >
@@ -198,7 +198,7 @@ export default function AdminLibrary() {
                   )}
 
                   {unit.materials.length > 0 && (
-                    <ul className="mt-3 text-xs text-gray-500 space-y-1">
+                    <ul className="mt-3 text-xs text-gray-500 space-y-1 dark:text-gray-400">
                       {unit.materials.map((m) => (
                         <li key={m.id}>
                           [{m.type}] {m.fileUrl} — uploaded by {m.uploader.name}

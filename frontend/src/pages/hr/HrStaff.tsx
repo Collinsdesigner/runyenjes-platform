@@ -99,43 +99,43 @@ export default function HrStaff() {
     <PortalLayout title="Staff & Leave">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Staff & Leave</h2>
-          <p className="text-sm text-gray-500 mt-1">Staff profiles and leave request approvals.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Staff & Leave</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Staff profiles and leave request approvals.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleCreateStaff} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Staff Profile</h3>
-          <p className="text-xs text-gray-400">
+        <form onSubmit={handleCreateStaff} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Staff Profile</h3>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             User ID is the staff member's account ID (create the account in Admin &gt; Users first).
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="User ID"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Employee number (optional)"
               value={employeeNumber}
               onChange={(e) => setEmployeeNumber(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Position (optional)"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
             />
             <select
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               value={employmentType}
               onChange={(e) => setEmploymentType(e.target.value)}
             >
@@ -149,10 +149,10 @@ export default function HrStaff() {
           </button>
         </form>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm">Staff Profiles</div>
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">Staff Profiles</div>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Employee #</th>
@@ -163,13 +163,13 @@ export default function HrStaff() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && staff.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No staff profiles yet</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No staff profiles yet</td></tr>
               )}
               {staff.map((s) => (
-                <tr key={s.id} className="border-t border-gray-100">
+                <tr key={s.id} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-4 py-2">{s.user?.name}</td>
                   <td className="px-4 py-2">{s.employeeNumber || '—'}</td>
                   <td className="px-4 py-2">{s.position || '—'}</td>
@@ -181,10 +181,10 @@ export default function HrStaff() {
           </table>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm">Leave Requests</div>
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">Leave Requests</div>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Staff</th>
                 <th className="px-4 py-2">Type</th>
@@ -195,10 +195,10 @@ export default function HrStaff() {
             </thead>
             <tbody>
               {leave.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No leave requests</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No leave requests</td></tr>
               )}
               {leave.map((l) => (
-                <tr key={l.id} className="border-t border-gray-100">
+                <tr key={l.id} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-4 py-2">{l.staff?.name}</td>
                   <td className="px-4 py-2">{l.type}</td>
                   <td className="px-4 py-2">
@@ -209,13 +209,13 @@ export default function HrStaff() {
                     {l.status === 'PENDING' && (
                       <>
                         <button
-                          className="text-green-600 text-xs font-medium"
+                          className="text-green-600 text-xs font-medium dark:text-green-400"
                           onClick={() => handleDecision(l.id, 'APPROVED')}
                         >
                           Approve
                         </button>
                         <button
-                          className="text-red-600 text-xs font-medium"
+                          className="text-red-600 text-xs font-medium dark:text-red-400"
                           onClick={() => handleDecision(l.id, 'REJECTED')}
                         >
                           Reject

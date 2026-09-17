@@ -56,27 +56,27 @@ export default function AdminStudents() {
     <PortalLayout title="Students">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Students</h2>
-          <p className="text-sm text-gray-500 mt-1">Student records and account status.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Students</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Student records and account status.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
         <input
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96 dark:border-gray-600"
           placeholder="Search name, email, admission #..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Admission #</th>
@@ -87,21 +87,21 @@ export default function AdminStudents() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && students.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No students found</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No students found</td></tr>
               )}
               {students.map((s) => (
-                <tr key={s.id} className="border-t border-gray-100">
+                <tr key={s.id} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-4 py-2">
-                    <div className="font-medium text-gray-900">{s.name}</div>
-                    <div className="text-xs text-gray-400">{s.email}</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{s.name}</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">{s.email}</div>
                   </td>
                   <td className="px-4 py-2">{s.admissionNumber || '—'}</td>
                   <td className="px-4 py-2">{s.department?.name || '—'}</td>
                   <td className="px-4 py-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{s.status}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{s.status}</span>
                   </td>
                   <td className="px-4 py-2 text-right space-x-2">
                     {s.status !== 'SUSPENDED' && (
@@ -114,7 +114,7 @@ export default function AdminStudents() {
                     )}
                     {s.status !== 'ACTIVE' && (
                       <button
-                        className="text-green-600 text-xs font-medium"
+                        className="text-green-600 text-xs font-medium dark:text-green-400"
                         onClick={() => handleStatus(s.id, 'ACTIVE')}
                       >
                         Reactivate

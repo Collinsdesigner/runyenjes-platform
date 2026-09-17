@@ -123,7 +123,7 @@ export default function AIAssistant() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -164,11 +164,11 @@ export default function AIAssistant() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex dark:bg-gray-950">
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-3 border-b border-gray-100">
+        <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col dark:bg-gray-900 dark:border-gray-700">
+          <div className="p-3 border-b border-gray-100 dark:border-gray-800">
             <button
               onClick={startNewChat}
               className="w-full bg-rgreen text-white text-sm py-2 rounded-md"
@@ -178,7 +178,7 @@ export default function AIAssistant() {
           </div>
           <div className="flex-1 overflow-y-auto">
             {conversations.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center p-4">No past chats yet.</p>
+              <p className="text-xs text-gray-400 text-center p-4 dark:text-gray-500">No past chats yet.</p>
             ) : (
               conversations.map((c) => (
                 <button
@@ -191,7 +191,7 @@ export default function AIAssistant() {
                   <span className="truncate">{c.title}</span>
                   <span
                     onClick={(e) => handleDeleteConversation(c.id, e)}
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-rmaroon ml-1"
+                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-rmaroon ml-1 dark:text-gray-500"
                   >
                     ✕
                   </span>
@@ -204,18 +204,18 @@ export default function AIAssistant() {
 
       {/* Main chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0 dark:bg-gray-900 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSidebar((s) => !s)}
-              className="text-gray-400 text-sm"
+              className="text-gray-400 text-sm dark:text-gray-500"
               title="Toggle chat history"
             >
               ☰
             </button>
             <h1 className="font-bold text-rgreen">RTVC AI Assistance</h1>
           </div>
-          <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+          <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
             Back to Home
           </button>
         </header>
@@ -226,13 +226,13 @@ export default function AIAssistant() {
               <div className="mt-6 space-y-4">
                 {(QUICK_ACTIONS[user.role] ?? []).length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs text-gray-400 text-center">Quick actions for your role:</p>
+                    <p className="text-xs text-gray-400 text-center dark:text-gray-500">Quick actions for your role:</p>
                     {(QUICK_ACTIONS[user.role] ?? []).map((qa) => (
                       <button
                         key={qa.action}
                         onClick={() => handleQuickAction(qa.action, `${qa.icon} ${qa.label}`)}
                         disabled={sending}
-                        className="w-full text-left bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:border-rgreen hover:shadow-sm transition disabled:opacity-50"
+                        className="w-full text-left bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:border-rgreen hover:shadow-sm transition disabled:opacity-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300"
                       >
                         <span className="mr-2">{qa.icon}</span>
                         {qa.label}
@@ -240,7 +240,7 @@ export default function AIAssistant() {
                     ))}
                   </div>
                 )}
-                <div className="text-center text-sm text-gray-400">
+                <div className="text-center text-sm text-gray-400 dark:text-gray-500">
                   Or ask me anything about your coursework — explain a concept, summarize notes,
                   or help you study for an upcoming test.
                 </div>
@@ -263,13 +263,13 @@ export default function AIAssistant() {
 
             {sending && (
               <div className="flex justify-start">
-                <div className="bg-white shadow rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-gray-400">
+                <div className="bg-white shadow rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-gray-400 dark:bg-gray-900 dark:text-gray-500">
                   Thinking…
                 </div>
               </div>
             )}
 
-            {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">{error}</div>}
+            {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>}
             <div ref={bottomRef} />
           </div>
 
@@ -278,7 +278,7 @@ export default function AIAssistant() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a study question…"
-              className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+              className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-700"
             />
             <button
               type="submit"

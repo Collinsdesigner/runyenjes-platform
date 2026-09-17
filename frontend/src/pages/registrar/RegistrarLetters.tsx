@@ -106,20 +106,20 @@ export default function RegistrarLetters() {
     <PortalLayout title="Letters & Certificates">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Letters & Certificates</h2>
-          <p className="text-sm text-gray-500 mt-1">Search a student, then draft and issue a real PDF letter or certificate.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Letters & Certificates</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Search a student, then draft and issue a real PDF letter or certificate.</p>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>}
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5 flex gap-2">
+        <div className="bg-white border border-gray-200 rounded-lg p-5 flex gap-2 dark:bg-gray-900 dark:border-gray-700">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search by name, email, or admission number"
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
           />
           <button type="button" onClick={handleSearch} className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg">
             Search
@@ -127,16 +127,16 @@ export default function RegistrarLetters() {
         </div>
 
         {results.length > 0 && !selectedStudent && (
-          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-800">
             {results.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => selectStudent(s)}
-                className="w-full text-left px-5 py-3 hover:bg-gray-50 text-sm"
+                className="w-full text-left px-5 py-3 hover:bg-gray-50 text-sm dark:hover:bg-gray-800"
               >
-                <span className="font-medium text-gray-900">{s.name}</span>{' '}
-                <span className="text-xs text-gray-400">{s.admissionNumber || 'No admission number'} · {s.email}</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{s.name}</span>{' '}
+                <span className="text-xs text-gray-400 dark:text-gray-500">{s.admissionNumber || 'No admission number'} · {s.email}</span>
               </button>
             ))}
           </div>
@@ -145,21 +145,21 @@ export default function RegistrarLetters() {
         {selectedStudent && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 Issuing letters for <span className="font-semibold">{selectedStudent.name}</span>
               </div>
               <button
                 type="button"
                 onClick={() => { setSelectedStudent(null); setLetters([]); }}
-                className="text-xs text-gray-500"
+                className="text-xs text-gray-500 dark:text-gray-400"
               >
                 Change student
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-              <h3 className="font-semibold text-gray-900">Draft a Letter / Certificate</h3>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Draft a Letter / Certificate</h3>
+              <select value={type} onChange={(e) => setType(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600">
                 {LETTER_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
@@ -168,14 +168,14 @@ export default function RegistrarLetters() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder='Title (e.g. "Letter of Introduction")'
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               />
               <textarea
                 value={bodyText}
                 onChange={(e) => setBodyText(e.target.value)}
                 placeholder="Write rough notes, then ask AI to draft it into formal wording -- or write the full body yourself."
                 rows={6}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               />
               <AIAssistBox
                 task="draft_letter"
@@ -194,25 +194,25 @@ export default function RegistrarLetters() {
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-4 border-b border-gray-200 font-semibold text-gray-900">Issued Letters</div>
+            <div className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+              <div className="p-4 border-b border-gray-200 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100">Issued Letters</div>
               {lettersLoading ? (
-                <p className="text-sm text-gray-400 p-4">Loading...</p>
+                <p className="text-sm text-gray-400 p-4 dark:text-gray-500">Loading...</p>
               ) : letters.length === 0 ? (
-                <p className="text-sm text-gray-400 p-4">No letters issued yet.</p>
+                <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No letters issued yet.</p>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
                   {letters.map((l) => (
                     <div key={l.id} className="px-5 py-3 flex items-center justify-between gap-3">
                       <div>
                         <a href={l.fileUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-rgreen">
                           {l.title}
                         </a>
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                           {l.type} · Issued by {l.issuedBy.name} · {new Date(l.createdAt).toLocaleDateString()}
                         </div>
                       </div>
-                      <button type="button" onClick={() => handleDelete(l.id)} className="text-xs font-medium text-red-600">
+                      <button type="button" onClick={() => handleDelete(l.id)} className="text-xs font-medium text-red-600 dark:text-red-400">
                         Delete
                       </button>
                     </div>

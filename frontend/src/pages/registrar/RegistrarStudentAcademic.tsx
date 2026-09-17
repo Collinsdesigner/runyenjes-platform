@@ -247,7 +247,7 @@ export default function RegistrarStudentAcademic() {
   if (loading) {
     return (
       <PortalLayout title="Student Academic Record">
-        <div className="bg-white border border-gray-200 rounded-lg p-10 text-center text-gray-500">
+        <div className="bg-white border border-gray-200 rounded-lg p-10 text-center text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
           Loading student academic record...
         </div>
       </PortalLayout>
@@ -257,7 +257,7 @@ export default function RegistrarStudentAcademic() {
   if (!student) {
     return (
       <PortalLayout title="Student Academic Record">
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-5">
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-5 dark:bg-red-950 dark:border-red-800 dark:text-red-300">
           {error || 'Student record not found.'}
         </div>
       </PortalLayout>
@@ -274,94 +274,94 @@ export default function RegistrarStudentAcademic() {
           <div>
             <button
               onClick={() => navigate('/registrar/students')}
-              className="text-sm text-gray-500 hover:text-gray-900 mb-2"
+              className="text-sm text-gray-500 hover:text-gray-900 mb-2 dark:text-gray-400"
             >
               ← Back to Student Records
             </button>
 
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Student Academic Record
             </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
               Manage programme enrolment and current unit registration.
             </p>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">
             {error}
           </div>
         )}
 
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">
             {message}
           </div>
         )}
 
         {/* Student profile */}
-        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
               Student Information
             </h3>
           </div>
 
           <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <p className="text-xs text-gray-500">Full Name</p>
-              <p className="font-medium text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Full Name</p>
+              <p className="font-medium text-gray-900 mt-1 dark:text-gray-100">
                 {student.name}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Admission Number</p>
-              <p className="font-medium text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Admission Number</p>
+              <p className="font-medium text-gray-900 mt-1 dark:text-gray-100">
                 {student.admissionNumber ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Status</p>
-              <p className="font-medium text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
+              <p className="font-medium text-gray-900 mt-1 dark:text-gray-100">
                 {student.status}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Email</p>
-              <p className="text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+              <p className="text-gray-900 mt-1 dark:text-gray-100">
                 {student.email}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Phone</p>
-              <p className="text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+              <p className="text-gray-900 mt-1 dark:text-gray-100">
                 {student.phone ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Intake</p>
-              <p className="text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Intake</p>
+              <p className="text-gray-900 mt-1 dark:text-gray-100">
                 {student.intake ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Department</p>
-              <p className="text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Department</p>
+              <p className="text-gray-900 mt-1 dark:text-gray-100">
                 {student.department?.name ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Current Programme</p>
-              <p className="text-gray-900 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Current Programme</p>
+              <p className="text-gray-900 mt-1 dark:text-gray-100">
                 {student.program?.name ?? 'Not assigned'}
               </p>
             </div>
@@ -369,12 +369,12 @@ export default function RegistrarStudentAcademic() {
         </section>
 
         {/* Term */}
-        <section className="bg-white border border-gray-200 rounded-lg p-5">
+        <section className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <p className="text-xs text-gray-500">Active Academic Term</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Active Academic Term</p>
 
-              <h3 className="text-lg font-semibold text-gray-900 mt-1">
+              <h3 className="text-lg font-semibold text-gray-900 mt-1 dark:text-gray-100">
                 {term?.name ?? 'No active term'}
               </h3>
             </div>
@@ -392,9 +392,9 @@ export default function RegistrarStudentAcademic() {
         </section>
 
         {/* Programme enrolment */}
-        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">
+        <section className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
               Programme Enrolment
             </h3>
           </div>
@@ -403,18 +403,18 @@ export default function RegistrarStudentAcademic() {
             {currentEnrollment ? (
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
                 <div>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {currentEnrollment.program.name}
                   </p>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                     {currentEnrollment.program.department.name}
                     {currentEnrollment.program.level
                       ? ` • ${currentEnrollment.program.level}`
                       : ''}
                   </p>
 
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-gray-400 mt-2 dark:text-gray-500">
                     Enrolled{' '}
                     {new Date(
                       currentEnrollment.enrolledAt
@@ -422,13 +422,13 @@ export default function RegistrarStudentAcademic() {
                   </p>
                 </div>
 
-                <span className="inline-flex w-fit px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                <span className="inline-flex w-fit px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:text-green-300">
                   {currentEnrollment.status}
                 </span>
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   This student has not yet been enrolled in a programme.
                 </p>
 
@@ -438,7 +438,7 @@ export default function RegistrarStudentAcademic() {
                     onChange={(event) =>
                       setSelectedProgram(event.target.value)
                     }
-                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm"
+                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm dark:border-gray-600"
                   >
                     <option value="">Select programme</option>
 
@@ -465,14 +465,14 @@ export default function RegistrarStudentAcademic() {
 
         {/* Current unit registration */}
         {currentEnrollment && (
-          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 dark:border-gray-700">
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   Current Unit Registration
                 </h3>
 
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                   {term?.name ?? 'No active term'} •{' '}
                   {programmeUnits.length} programme unit
                   {programmeUnits.length === 1 ? '' : 's'}
@@ -495,15 +495,15 @@ export default function RegistrarStudentAcademic() {
             </div>
 
             {!term ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 No active academic term is open for unit registration.
               </div>
             ) : programmeUnits.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 No units have been defined for this programme.
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
                 {programmeUnits.map((unit) => {
                   const registered = registeredUnitIds.has(unit.id);
                   const selected = selectedUnits.includes(unit.id);
@@ -511,7 +511,7 @@ export default function RegistrarStudentAcademic() {
                   return (
                     <label
                       key={unit.id}
-                      className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 cursor-pointer dark:hover:bg-gray-800"
                     >
                       <input
                         type="checkbox"
@@ -522,11 +522,11 @@ export default function RegistrarStudentAcademic() {
                       />
 
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-900 dark:text-gray-100">
                           {unit.name}
                         </p>
 
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                           {registered
                             ? 'Registered for current term'
                             : selected
@@ -536,7 +536,7 @@ export default function RegistrarStudentAcademic() {
                       </div>
 
                       {registered && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:text-green-300">
                           REGISTERED
                         </span>
                       )}
@@ -550,56 +550,56 @@ export default function RegistrarStudentAcademic() {
 
         {/* Registration history */}
         {currentEnrollment && (
-          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900">
+          <section className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 Registration History
               </h3>
             </div>
 
             {currentEnrollment.unitRegistrations.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 No unit registration history yet.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 border-b border-gray-200 dark:bg-gray-950 dark:border-gray-700">
                     <tr>
-                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                         Unit
                       </th>
-                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                         Term
                       </th>
-                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                         Status
                       </th>
-                      <th className="text-left px-5 py-3 font-medium text-gray-600">
+                      <th className="text-left px-5 py-3 font-medium text-gray-600 dark:text-gray-400">
                         Registered
                       </th>
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                     {currentEnrollment.unitRegistrations.map(
                       (registration) => (
                         <tr key={registration.id}>
-                          <td className="px-5 py-4 font-medium text-gray-900">
+                          <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                             {registration.unit.name}
                           </td>
 
-                          <td className="px-5 py-4 text-gray-700">
+                          <td className="px-5 py-4 text-gray-700 dark:text-gray-300">
                             {registration.term.name}
                           </td>
 
                           <td className="px-5 py-4">
-                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:text-green-300">
                               {registration.status}
                             </span>
                           </td>
 
-                          <td className="px-5 py-4 text-gray-500">
+                          <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
                             {new Date(
                               registration.createdAt
                             ).toLocaleDateString()}

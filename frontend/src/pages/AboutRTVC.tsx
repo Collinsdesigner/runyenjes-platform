@@ -35,12 +35,12 @@ export default function AboutRTVC() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-6 dark:bg-gray-800">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Header */}
         <div
-          className="bg-white rounded-xl shadow p-8 text-center"
+          className="bg-white rounded-xl shadow p-8 text-center dark:bg-gray-900"
           style={{
             borderTop: `8px solid ${settings.primaryColor || '#0B7A2B'}`
           }}
@@ -57,18 +57,18 @@ export default function AboutRTVC() {
             {settings.institutionName}
           </h1>
 
-          <p className="text-lg font-semibold text-gray-600 mt-2">
+          <p className="text-lg font-semibold text-gray-600 mt-2 dark:text-gray-400">
             {settings.shortName}
           </p>
 
-          <p className="italic mt-3 text-gray-700">
+          <p className="italic mt-3 text-gray-700 dark:text-gray-300">
             "{settings.tagline}"
           </p>
         </div>
 
 
         {/* About */}
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-6 dark:bg-gray-900">
           <h2
             className="text-xl font-bold mb-4"
             style={{ color: settings.primaryColor }}
@@ -76,7 +76,7 @@ export default function AboutRTVC() {
             About Runyenjes TVC
           </h2>
 
-          <p className="text-gray-700 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed dark:text-gray-300">
             {settings.about ||
               'Runyenjes Technical & Vocational College is committed to technical skills development, innovation and entrepreneurship.'}
           </p>
@@ -84,7 +84,7 @@ export default function AboutRTVC() {
 
 
         {/* Location */}
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-6 dark:bg-gray-900">
           <h2
             className="text-xl font-bold mb-4"
             style={{ color: settings.primaryColor }}
@@ -92,7 +92,7 @@ export default function AboutRTVC() {
             Location
           </h2>
 
-          <p className="text-gray-700">
+          <p className="text-gray-700 dark:text-gray-300">
             📍 {settings.physicalLocation}
           </p>
 
@@ -110,7 +110,7 @@ export default function AboutRTVC() {
 
 
         {/* Contact */}
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-6 dark:bg-gray-900">
           <h2
             className="text-xl font-bold mb-4"
             style={{ color: settings.primaryColor }}
@@ -118,7 +118,7 @@ export default function AboutRTVC() {
             Contact Information
           </h2>
 
-          <div className="space-y-2 text-gray-700">
+          <div className="space-y-2 text-gray-700 dark:text-gray-300">
             <p>📮 {settings.address}</p>
             <p>☎ {settings.phone}</p>
             <p>✉ {settings.email}</p>
@@ -128,7 +128,7 @@ export default function AboutRTVC() {
 
 
         {/* Branding */}
-        <section className="bg-white rounded-xl shadow p-6">
+        <section className="bg-white rounded-xl shadow p-6 dark:bg-gray-900">
           <h2
             className="text-xl font-bold mb-4"
             style={{ color: settings.primaryColor }}
@@ -139,7 +139,7 @@ export default function AboutRTVC() {
           <div className="flex gap-6">
 
             <div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Primary Colour
               </p>
 
@@ -157,7 +157,7 @@ export default function AboutRTVC() {
 
 
             <div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Secondary Colour
               </p>
 

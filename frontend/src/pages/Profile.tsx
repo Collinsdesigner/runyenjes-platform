@@ -22,7 +22,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -84,16 +84,16 @@ async function handleRemoveAvatar() {
 }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">My Profile</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
           Back to Home
         </button>
       </header>
 
       <main className="max-w-sm mx-auto p-4">
-        <div className="bg-white rounded-lg shadow p-6 text-center">
+        <div className="bg-white rounded-lg shadow p-6 text-center dark:bg-gray-900">
           {user.avatarUrl && !imgError ? (
             <img
               src={user.avatarUrl}
@@ -108,7 +108,7 @@ async function handleRemoveAvatar() {
           )}
 
           <p className="font-semibold mt-3">{user.name}</p>
-          <p className="text-xs text-gray-400">{user.role}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">{user.role}</p>
 
 {user.role !== 'STUDENT' && (
   <div className="mt-4">
@@ -136,16 +136,16 @@ async function handleRemoveAvatar() {
   <button
     type="button"
     onClick={handleRemoveAvatar}
-    className="block mx-auto mt-3 text-sm text-red-600 underline"
+    className="block mx-auto mt-3 text-sm text-red-600 underline dark:text-red-400"
   >
     Remove profile picture
   </button>
 )}
 
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <p className="text-sm font-medium text-gray-700 mb-2">My Accent Color</p>
-            <p className="text-xs text-gray-400 mb-3">
+          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+            <p className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">My Accent Color</p>
+            <p className="text-xs text-gray-400 mb-3 dark:text-gray-500">
               Personal preference, just for your own view -- doesn't change anyone else's.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -179,7 +179,7 @@ async function handleRemoveAvatar() {
           </div>
 
           {error && <p className="text-xs text-rmaroon mt-2">{error}</p>}
-          {success && <p className="text-xs text-green-700 mt-2">✔ {success}</p>}
+          {success && <p className="text-xs text-green-700 mt-2 dark:text-green-300">✔ {success}</p>}
         </div>
       </main>
     </div>

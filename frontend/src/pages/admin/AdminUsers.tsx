@@ -107,43 +107,43 @@ export default function AdminUsers() {
     <PortalLayout title="Users">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Users</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Users</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Create accounts and grant or change roles — this is how privileges are managed.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleCreateUser} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Staff Account</h3>
+        <form onSubmit={handleCreateUser} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Staff Account</h3>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Temporary password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             <select
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               value={newUserRole}
               onChange={(e) => setNewUserRole(e.target.value)}
             >
@@ -159,13 +159,13 @@ export default function AdminUsers() {
 
         <div className="flex flex-wrap gap-3">
           <input
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
             placeholder="Search name, email, admission #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -176,9 +176,9 @@ export default function AdminUsers() {
           </select>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Email</th>
@@ -189,23 +189,23 @@ export default function AdminUsers() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && users.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No users found</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No users found</td></tr>
               )}
               {users.map((u) => (
-                <tr key={u.id} className="border-t border-gray-100">
+                <tr key={u.id} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-4 py-2">{u.name}</td>
                   <td className="px-4 py-2">{u.email}</td>
                   <td className="px-4 py-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100">{u.role}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{u.role}</span>
                   </td>
                   <td className="px-4 py-2">{u.status}</td>
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-2">
                       <select
-                        className="border border-gray-300 rounded-lg px-2 py-1 text-xs"
+                        className="border border-gray-300 rounded-lg px-2 py-1 text-xs dark:border-gray-600"
                         value={roleEdits[u.id] ?? u.role}
                         onChange={(e) => setRoleEdits((prev) => ({ ...prev, [u.id]: e.target.value }))}
                       >

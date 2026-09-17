@@ -43,7 +43,7 @@ export default function Library() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -54,27 +54,27 @@ export default function Library() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
         <h1 className="font-bold text-rgreen">Library</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
           Back to Home
         </button>
       </header>
 
       <main className="max-w-md mx-auto p-4 space-y-4">
         {loading ? (
-          <p className="text-sm text-gray-400 text-center">Loading…</p>
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading…</p>
         ) : isStaff ? (
           departments.map((dept) => (
-            <div key={dept.id} className="bg-white rounded-lg shadow p-4">
+            <div key={dept.id} className="bg-white rounded-lg shadow p-4 dark:bg-gray-900">
               <p className="font-medium text-sm mb-2">{dept.name}</p>
               <div className="space-y-1">
                 {dept.programs.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => navigate(`/library/${p.id}`)}
-                    className="w-full text-left text-sm text-gray-700 hover:text-rgreen py-1"
+                    className="w-full text-left text-sm text-gray-700 hover:text-rgreen py-1 dark:text-gray-300"
                   >
                     {p.name}
                     {p.level ? ` — ${p.level}` : ''}
@@ -84,7 +84,7 @@ export default function Library() {
             </div>
           ))
         ) : classGroups.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center">
+          <p className="text-sm text-gray-400 text-center dark:text-gray-500">
             You're not enrolled in any class yet.
           </p>
         ) : (
@@ -94,10 +94,10 @@ export default function Library() {
                 <button
                   key={g.id}
                   onClick={() => navigate(`/library/${g.programId}`)}
-                  className="w-full text-left bg-white rounded-lg shadow p-4 hover:bg-gray-50"
+                  className="w-full text-left bg-white rounded-lg shadow p-4 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800"
                 >
                   <p className="font-medium text-sm">{g.name}</p>
-                  <p className="text-xs text-gray-400">View units & materials</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">View units & materials</p>
                 </button>
               )
           )

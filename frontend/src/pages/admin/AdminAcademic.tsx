@@ -131,20 +131,20 @@ export default function AdminAcademic() {
     <PortalLayout title="Academic Structure">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Academic Structure</h2>
-          <p className="text-sm text-gray-500 mt-1">Departments, programmes and fees.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Academic Structure</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Departments, programmes and fees.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleAddDepartment} className="bg-white border border-gray-200 rounded-lg p-5 flex gap-3">
+        <form onSubmit={handleAddDepartment} className="bg-white border border-gray-200 rounded-lg p-5 flex gap-3 dark:bg-gray-900 dark:border-gray-700">
           <input
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
             placeholder="New department name"
             value={newDeptName}
             onChange={(e) => setNewDeptName(e.target.value)}
@@ -154,19 +154,19 @@ export default function AdminAcademic() {
           </button>
         </form>
 
-        {loading && <p className="text-sm text-gray-400">Loading...</p>}
+        {loading && <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>}
 
         <div className="space-y-3">
           {departments.map((dept) => (
-            <div key={dept.id} className="bg-white border border-gray-200 rounded-lg p-4">
+            <div key={dept.id} className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <button
-                  className="font-semibold text-gray-900 text-left"
+                  className="font-semibold text-gray-900 text-left dark:text-gray-100"
                   onClick={() => setExpandedDeptId(expandedDeptId === dept.id ? null : dept.id)}
                 >
-                  {dept.name} <span className="text-xs text-gray-400">({dept.programs.length} programmes)</span>
+                  {dept.name} <span className="text-xs text-gray-400 dark:text-gray-500">({dept.programs.length} programmes)</span>
                 </button>
-                <button className="text-red-600 text-xs font-medium" onClick={() => handleDeleteDepartment(dept.id)}>
+                <button className="text-red-600 text-xs font-medium dark:text-red-400" onClick={() => handleDeleteDepartment(dept.id)}>
                   Delete department
                 </button>
               </div>
@@ -175,13 +175,13 @@ export default function AdminAcademic() {
                 <div className="mt-3 space-y-3">
                   <div className="flex flex-wrap gap-2 items-center">
                     <input
-                      className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                      className="border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
                       placeholder="Programme name"
                       value={newProgName}
                       onChange={(e) => setNewProgName(e.target.value)}
                     />
                     <input
-                      className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-32"
+                      className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-32 dark:border-gray-600"
                       placeholder="Level (optional)"
                       value={newProgLevel}
                       onChange={(e) => setNewProgLevel(e.target.value)}
@@ -195,7 +195,7 @@ export default function AdminAcademic() {
                   </div>
 
                   <table className="w-full text-xs">
-                    <thead className="text-gray-500 text-left">
+                    <thead className="text-gray-500 text-left dark:text-gray-400">
                       <tr>
                         <th className="pr-4 py-1">Programme</th>
                         <th className="pr-4 py-1">Current fee</th>
@@ -205,13 +205,13 @@ export default function AdminAcademic() {
                     </thead>
                     <tbody>
                       {dept.programs.map((p) => (
-                        <tr key={p.id} className="border-t border-gray-100">
+                        <tr key={p.id} className="border-t border-gray-100 dark:border-gray-800">
                           <td className="pr-4 py-1">{p.name} {p.level || ''}</td>
                           <td className="pr-4 py-1">{p.fees[0] ? `KES ${p.fees[0].amount}` : '—'}</td>
                           <td className="pr-4 py-1">
                             <div className="flex gap-1">
                               <input
-                                className="border border-gray-300 rounded px-2 py-0.5 text-xs w-24"
+                                className="border border-gray-300 rounded px-2 py-0.5 text-xs w-24 dark:border-gray-600"
                                 placeholder="Amount"
                                 value={feeAmount[p.id] || ''}
                                 onChange={(e) => setFeeAmount((prev) => ({ ...prev, [p.id]: e.target.value }))}
@@ -226,7 +226,7 @@ export default function AdminAcademic() {
                           </td>
                           <td className="pr-4 py-1">
                             <button
-                              className="text-red-600 font-medium"
+                              className="text-red-600 font-medium dark:text-red-400"
                               onClick={() => handleDeleteProgramme(p.id)}
                             >
                               Delete

@@ -138,23 +138,23 @@ export default function TeacherAssessments() {
     <PortalLayout title="Assessments">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Assessments</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Assessments</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             {term ? `CATs and exams for your units this term (${term}).` : 'No active academic term right now.'}
           </p>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {message && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <section className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-5 border-b border-gray-200 space-y-3">
-              <h3 className="font-semibold text-gray-900">New Assessment</h3>
+          <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+            <div className="p-5 border-b border-gray-200 space-y-3 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Assessment</h3>
               <select
                 value={newUnitId}
                 onChange={(e) => setNewUnitId(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               >
                 <option value="">Select unit</option>
                 {units.map((u) => (
@@ -165,21 +165,21 @@ export default function TeacherAssessments() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder='Name (e.g. "CAT 1")'
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               />
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="date"
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                 />
                 <input
                   type="number"
                   value={newMaxScore}
                   onChange={(e) => setNewMaxScore(e.target.value)}
                   placeholder="Max score"
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                 />
               </div>
               <button
@@ -191,9 +191,9 @@ export default function TeacherAssessments() {
               </button>
             </div>
 
-            <div className="divide-y divide-gray-100">
-              {loading && <p className="text-sm text-gray-400 p-4">Loading...</p>}
-              {!loading && exams.length === 0 && <p className="text-sm text-gray-400 p-4">No assessments yet.</p>}
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              {loading && <p className="text-sm text-gray-400 p-4 dark:text-gray-500">Loading...</p>}
+              {!loading && exams.length === 0 && <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No assessments yet.</p>}
               {exams.map((e) => (
                 <button
                   key={e.id}
@@ -203,8 +203,8 @@ export default function TeacherAssessments() {
                     selectedExam?.id === e.id ? 'bg-green-50 border-l-4 border-rgreen' : ''
                   }`}
                 >
-                  <div className="font-medium text-gray-900">{e.name}</div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="font-medium text-gray-900 dark:text-gray-100">{e.name}</div>
+                  <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                     {e.unitName} · out of {e.maxScore} · {e.resultCount} result{e.resultCount === 1 ? '' : 's'} recorded
                   </div>
                 </button>
@@ -212,30 +212,30 @@ export default function TeacherAssessments() {
             </div>
           </section>
 
-          <section className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-5 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900">
+          <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+            <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 {selectedExam ? `Enter Scores — ${selectedExam.name}` : 'Enter Scores'}
               </h3>
-              {!selectedExam && <p className="text-sm text-gray-500 mt-1">Select an assessment to enter scores.</p>}
+              {!selectedExam && <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Select an assessment to enter scores.</p>}
             </div>
-            {rosterLoading && <p className="text-sm text-gray-400 p-4">Loading roster...</p>}
+            {rosterLoading && <p className="text-sm text-gray-400 p-4 dark:text-gray-500">Loading roster...</p>}
             {!rosterLoading && selectedExam && roster.length === 0 && (
-              <p className="text-sm text-gray-400 p-4">No students registered in this unit yet.</p>
+              <p className="text-sm text-gray-400 p-4 dark:text-gray-500">No students registered in this unit yet.</p>
             )}
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {roster.map((r) => (
                 <div key={r.studentId} className="px-5 py-4 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-medium text-gray-900 truncate">{r.name}</div>
-                    <div className="text-xs text-gray-400">{r.admissionNumber || 'No admission number'}</div>
+                    <div className="font-medium text-gray-900 truncate dark:text-gray-100">{r.name}</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">{r.admissionNumber || 'No admission number'}</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <input
                       type="number"
                       value={scoreDrafts[r.studentId] ?? ''}
                       onChange={(e) => setScoreDrafts({ ...scoreDrafts, [r.studentId]: e.target.value })}
-                      className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                      className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
                       placeholder={`/${selectedExam?.maxScore ?? 100}`}
                     />
                     <button

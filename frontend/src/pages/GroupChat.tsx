@@ -127,7 +127,7 @@ export default function GroupChat() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -138,9 +138,9 @@ export default function GroupChat() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate('/groups')} className="text-sm text-gray-500 underline">
+    <div className="min-h-screen bg-gray-50 flex flex-col dark:bg-gray-950">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between dark:bg-gray-900 dark:border-gray-700">
+        <button onClick={() => navigate('/groups')} className="text-sm text-gray-500 underline dark:text-gray-400">
           ← My Groups
         </button>
         <button
@@ -153,14 +153,14 @@ export default function GroupChat() {
 
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col">
         {error && (
-          <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md mb-2">{error}</div>
+          <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md mb-2 dark:bg-red-950 dark:text-red-300">{error}</div>
         )}
 
         <div className="flex-1 space-y-2 overflow-y-auto mb-3">
           {loading ? (
-            <p className="text-sm text-gray-400 text-center">Loading messages…</p>
+            <p className="text-sm text-gray-400 text-center dark:text-gray-500">Loading messages…</p>
           ) : messages.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center">
+            <p className="text-sm text-gray-400 text-center dark:text-gray-500">
               No messages yet — say hello!
             </p>
           ) : (
@@ -171,27 +171,27 @@ export default function GroupChat() {
               return (
                 <div key={m.id} className="flex gap-2 items-start">
                   <MiniAvatar name={m.sender.name} avatarUrl={m.sender.avatarUrl} />
-                  <div className="bg-white rounded-lg shadow-sm px-3 py-2 flex-1">
+                  <div className="bg-white rounded-lg shadow-sm px-3 py-2 flex-1 dark:bg-gray-900">
                     <div className="flex items-center justify-between">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-medium">{m.sender.name}</span>
-                        <span className="text-[10px] text-gray-400">{m.sender.role}</span>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500">{m.sender.role}</span>
                       </div>
                       {canDelete && (
                         <button
                           onClick={() => handleDeleteMessage(m.id)}
-                          className="text-[10px] text-gray-400 hover:text-rmaroon"
+                          className="text-[10px] text-gray-400 hover:text-rmaroon dark:text-gray-500"
                         >
                           Delete
                         </button>
                       )}
                     </div>
-                    {m.content && <p className="text-sm text-gray-800">{m.content}</p>}
+                    {m.content && <p className="text-sm text-gray-800 dark:text-gray-200">{m.content}</p>}
                     {m.attachmentUrl && (
                       <img
                         src={m.attachmentUrl}
                         alt=""
-                        className="mt-1 max-w-full max-h-64 object-contain rounded-md bg-gray-50"
+                        className="mt-1 max-w-full max-h-64 object-contain rounded-md bg-gray-50 dark:bg-gray-950"
                       />
                     )}
                   </div>
@@ -204,7 +204,7 @@ export default function GroupChat() {
 
         {attachmentUrl && (
           <div className="relative mb-2 inline-block">
-            <img src={attachmentUrl} alt="Preview" className="max-h-32 rounded-md object-contain bg-gray-100" />
+            <img src={attachmentUrl} alt="Preview" className="max-h-32 rounded-md object-contain bg-gray-100 dark:bg-gray-800" />
             <button
               type="button"
               onClick={() => setAttachmentUrl('')}
@@ -215,7 +215,7 @@ export default function GroupChat() {
           </div>
         )}
         <form onSubmit={handleSend} className="flex gap-2">
-          <label className="flex items-center px-2 text-lg cursor-pointer text-gray-500">
+          <label className="flex items-center px-2 text-lg cursor-pointer text-gray-500 dark:text-gray-400">
             <input
               type="file"
               accept="image/*"
@@ -229,7 +229,7 @@ export default function GroupChat() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Message this group…"
-            className="flex-1 border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen"
+            className="flex-1 border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-700"
           />
           <button
             type="submit"

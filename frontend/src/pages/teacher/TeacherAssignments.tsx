@@ -168,19 +168,19 @@ export default function TeacherAssignments() {
     <PortalLayout title="Assignments">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Assignments</h2>
-          <p className="text-sm text-gray-500 mt-1">Create assignments for your units and grade submissions.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Assignments</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Create assignments for your units and grade submissions.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
         <select
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-96 dark:border-gray-600"
           value={selectedUnitId}
           onChange={(e) => loadAssignments(e.target.value)}
         >
@@ -194,30 +194,30 @@ export default function TeacherAssignments() {
 
         {selectedUnitId && (
           <>
-            <form onSubmit={handleCreate} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-              <h3 className="font-semibold text-gray-900">New Assignment</h3>
+            <form onSubmit={handleCreate} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Assignment</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2 dark:border-gray-600"
                   placeholder="Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <textarea
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:col-span-2 dark:border-gray-600"
                   placeholder="Description (optional)"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
                 <input
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                 />
                 <input
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                   placeholder="Max score"
                   type="number"
                   value={maxScore}
@@ -230,14 +230,14 @@ export default function TeacherAssignments() {
             </form>
 
             <div className="space-y-3">
-              {assignments.length === 0 && <p className="text-sm text-gray-400">No assignments for this unit yet.</p>}
+              {assignments.length === 0 && <p className="text-sm text-gray-400 dark:text-gray-500">No assignments for this unit yet.</p>}
               {assignments.map((a) => (
-                <div key={a.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={a.id} className="bg-white border border-gray-200 rounded-lg p-4 dark:bg-gray-900 dark:border-gray-700">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{a.title}</h4>
-                      {a.description && <p className="text-sm text-gray-600 mt-1">{a.description}</p>}
-                      <p className="text-xs text-gray-400 mt-1">
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">{a.title}</h4>
+                      {a.description && <p className="text-sm text-gray-600 mt-1 dark:text-gray-400">{a.description}</p>}
+                      <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                         {a.dueDate ? `Due ${new Date(a.dueDate).toLocaleDateString()}` : 'No due date'} — Max {a.maxScore}
                       </p>
                     </div>
@@ -245,39 +245,39 @@ export default function TeacherAssignments() {
                       <button className="text-rgreen font-medium" onClick={() => openSubmissions(a.id)}>
                         {openAssignmentId === a.id ? 'Hide submissions' : 'View submissions'}
                       </button>
-                      <button className="text-red-600 font-medium" onClick={() => handleDelete(a.id)}>
+                      <button className="text-red-600 font-medium dark:text-red-400" onClick={() => handleDelete(a.id)}>
                         Delete
                       </button>
                     </div>
                   </div>
 
                   {openAssignmentId === a.id && (
-                    <div className="mt-3 border-t border-gray-100 pt-3 space-y-3">
+                    <div className="mt-3 border-t border-gray-100 pt-3 space-y-3 dark:border-gray-800">
                       {submissions.length === 0 && (
-                        <p className="text-xs text-gray-400">No submissions yet.</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">No submissions yet.</p>
                       )}
                       {submissions.map((s) => (
-                        <div key={s.id} className="bg-gray-50 rounded-lg p-3">
+                        <div key={s.id} className="bg-gray-50 rounded-lg p-3 dark:bg-gray-950">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                               {s.student.name} {s.student.admissionNumber ? `(${s.student.admissionNumber})` : ''}
                             </p>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
                               {new Date(s.submittedAt).toLocaleString()}
                             </span>
                           </div>
-                          {s.textAnswer && <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">{s.textAnswer}</p>}
+                          {s.textAnswer && <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap dark:text-gray-300">{s.textAnswer}</p>}
                           {s.fileUrl && (
-                            <p className="text-xs text-gray-500 mt-1">File/link: {s.fileUrl}</p>
+                            <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">File/link: {s.fileUrl}</p>
                           )}
                           {s.score !== null ? (
-                            <p className="text-xs text-green-700 mt-2">
+                            <p className="text-xs text-green-700 mt-2 dark:text-green-300">
                               Graded: {s.score} {s.feedback ? `— ${s.feedback}` : ''}
                             </p>
                           ) : (
                             <div className="flex flex-wrap gap-2 items-center mt-2">
                               <input
-                                className="border border-gray-300 rounded-lg px-2 py-1 text-xs w-20"
+                                className="border border-gray-300 rounded-lg px-2 py-1 text-xs w-20 dark:border-gray-600"
                                 placeholder="Score"
                                 type="number"
                                 value={gradeDrafts[s.id]?.score || ''}
@@ -289,7 +289,7 @@ export default function TeacherAssignments() {
                                 }
                               />
                               <input
-                                className="border border-gray-300 rounded-lg px-2 py-1 text-xs flex-1 min-w-[160px]"
+                                className="border border-gray-300 rounded-lg px-2 py-1 text-xs flex-1 min-w-[160px] dark:border-gray-600"
                                 placeholder="Feedback (optional)"
                                 value={gradeDrafts[s.id]?.feedback || ''}
                                 onChange={(e) =>

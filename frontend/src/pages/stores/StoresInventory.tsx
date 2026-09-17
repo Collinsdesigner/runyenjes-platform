@@ -97,40 +97,40 @@ export default function StoresInventory() {
     <PortalLayout title="Inventory">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Inventory</h2>
-          <p className="text-sm text-gray-500 mt-1">Stock items and movement history.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Inventory</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Stock items and movement history.</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{message}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm dark:bg-green-950 dark:border-green-800 dark:text-green-300">{message}</div>
         )}
 
-        <form onSubmit={handleCreateItem} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-          <h3 className="font-semibold text-gray-900">New Item</h3>
+        <form onSubmit={handleCreateItem} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">New Item</h3>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Item name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Category (optional)"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Unit (pcs, kg, litres...)"
               value={uom}
               onChange={(e) => setUom(e.target.value)}
             />
             <input
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
               placeholder="Reorder level"
               type="number"
               value={reorderLevel}
@@ -142,9 +142,9 @@ export default function StoresInventory() {
           </button>
         </form>
 
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-left">
+            <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Item</th>
                 <th className="px-4 py-2">Category</th>
@@ -155,14 +155,14 @@ export default function StoresInventory() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">Loading...</td></tr>
               )}
               {!loading && items.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400">No items yet</td></tr>
+                <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 dark:text-gray-500">No items yet</td></tr>
               )}
               {items.map((item) => (
                 <>
-                  <tr key={item.id} className="border-t border-gray-100">
+                  <tr key={item.id} className="border-t border-gray-100 dark:border-gray-800">
                     <td className="px-4 py-2">{item.name}</td>
                     <td className="px-4 py-2">{item.category || '—'}</td>
                     <td className="px-4 py-2">
@@ -179,11 +179,11 @@ export default function StoresInventory() {
                     </td>
                   </tr>
                   {movingId === item.id && (
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-gray-950">
                       <td colSpan={5} className="px-4 py-3">
                         <div className="flex flex-wrap gap-2 items-center">
                           <select
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
                             value={moveType}
                             onChange={(e) => setMoveType(e.target.value)}
                           >
@@ -192,14 +192,14 @@ export default function StoresInventory() {
                             <option value="ADJUSTMENT">Adjustment</option>
                           </select>
                           <input
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-24 dark:border-gray-600"
                             placeholder="Quantity"
                             type="number"
                             value={moveQty}
                             onChange={(e) => setMoveQty(e.target.value)}
                           />
                           <input
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-48"
+                            className="border border-gray-300 rounded-lg px-2 py-1 text-sm w-48 dark:border-gray-600"
                             placeholder="Reason (optional)"
                             value={moveReason}
                             onChange={(e) => setMoveReason(e.target.value)}

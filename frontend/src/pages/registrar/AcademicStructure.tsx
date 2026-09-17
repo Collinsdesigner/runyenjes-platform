@@ -161,32 +161,32 @@ export default function AcademicStructure() {
       <div className="space-y-6">
 
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Academic Structure
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Manage departments, programmes, levels and units.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center dark:bg-gray-900 dark:border-gray-700">
             Loading academic structure...
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {/* Departments */}
-            <section className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-5 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900">
+            <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   Departments
                 </h3>
 
@@ -195,7 +195,7 @@ export default function AcademicStructure() {
                     value={newDepartment}
                     onChange={(e) => setNewDepartment(e.target.value)}
                     placeholder="New department"
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                   />
 
                   <button
@@ -208,7 +208,7 @@ export default function AcademicStructure() {
                 </div>
               </div>
 
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
                 {departments.map((item) => (
                   <button
                     key={item.id}
@@ -223,11 +223,11 @@ export default function AcademicStructure() {
                         : ''
                     }`}
                   >
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
                       {item.name}
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                       {item.programs.length} programme
                       {item.programs.length === 1 ? '' : 's'}
                     </div>
@@ -237,14 +237,14 @@ export default function AcademicStructure() {
             </section>
 
             {/* Programmes */}
-            <section className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-5 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900">
+            <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   Programmes
                 </h3>
 
                 {!department ? (
-                  <p className="text-sm text-gray-500 mt-3">
+                  <p className="text-sm text-gray-500 mt-3 dark:text-gray-400">
                     Select a department.
                   </p>
                 ) : (
@@ -253,13 +253,13 @@ export default function AcademicStructure() {
                       value={newProgramme}
                       onChange={(e) => setNewProgramme(e.target.value)}
                       placeholder="Programme name"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                     />
 
                     <select
                       value={newLevel}
                       onChange={(e) => setNewLevel(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                     >
                       <option value="">No level</option>
                       <option>Level 3</option>
@@ -282,7 +282,7 @@ export default function AcademicStructure() {
                 )}
               </div>
 
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
                 {department?.programs.map((item) => (
                   <button
                     key={item.id}
@@ -294,11 +294,11 @@ export default function AcademicStructure() {
                         : ''
                     }`}
                   >
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
                       {item.name}
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                       {item.level || 'No level'} · {item.units.length} unit
                       {item.units.length === 1 ? '' : 's'}
                     </div>
@@ -308,14 +308,14 @@ export default function AcademicStructure() {
             </section>
 
             {/* Units */}
-            <section className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-5 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900">
+            <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   Units
                 </h3>
 
                 {!programme ? (
-                  <p className="text-sm text-gray-500 mt-3">
+                  <p className="text-sm text-gray-500 mt-3 dark:text-gray-400">
                     Select a programme.
                   </p>
                 ) : (
@@ -324,7 +324,7 @@ export default function AcademicStructure() {
                       value={newUnit}
                       onChange={(e) => setNewUnit(e.target.value)}
                       placeholder="Unit name"
-                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                     />
 
                     <button
@@ -338,8 +338,8 @@ export default function AcademicStructure() {
                 )}
 
                 {programme && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 dark:text-gray-400">
                       Bulk add units (one per line)
                     </label>
                     <textarea
@@ -347,7 +347,7 @@ export default function AcademicStructure() {
                       onChange={(e) => setBulkUnitText(e.target.value)}
                       placeholder={'Communication Skills\nEntrepreneurship\nICT Skills'}
                       rows={5}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
                     />
                     <button
                       type="button"
@@ -358,17 +358,17 @@ export default function AcademicStructure() {
                       {bulkSubmitting ? 'Adding...' : 'Bulk Add Units'}
                     </button>
                     {bulkResultMessage && (
-                      <p className="text-xs text-gray-500 mt-2">{bulkResultMessage}</p>
+                      <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">{bulkResultMessage}</p>
                     )}
                   </div>
                 )}
               </div>
 
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
                 {programme?.units.map((unit) => (
                   <div
                     key={unit.id}
-                    className="px-5 py-4 text-sm text-gray-800"
+                    className="px-5 py-4 text-sm text-gray-800 dark:text-gray-200"
                   >
                     {unit.name}
                   </div>

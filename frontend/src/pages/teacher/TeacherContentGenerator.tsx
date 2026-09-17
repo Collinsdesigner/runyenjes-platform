@@ -68,19 +68,19 @@ export default function TeacherContentGenerator() {
     <PortalLayout title="AI Content Generator">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">AI Content Generator</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI Content Generator</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             Draft lecture material or an assignment brief for one of your units. Review and copy the result to use wherever you need it.
           </p>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
           <select
             value={unitId}
             onChange={(e) => setUnitId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
           >
             <option value="">Select unit</option>
             {units.map((u) => (
@@ -88,7 +88,7 @@ export default function TeacherContentGenerator() {
             ))}
           </select>
 
-          <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
+          <div className="flex bg-gray-100 rounded-lg p-1 w-fit dark:bg-gray-800">
             <button
               type="button"
               onClick={() => setContentType('material')}
@@ -109,7 +109,7 @@ export default function TeacherContentGenerator() {
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder='Topic (e.g. "Introduction to Newtons Second Law")'
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
           />
 
           <button
@@ -123,25 +123,25 @@ export default function TeacherContentGenerator() {
         </div>
 
         {copyMessage && (
-          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-2 text-xs">{copyMessage}</div>
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-2 text-xs dark:bg-green-950 dark:border-green-800 dark:text-green-300">{copyMessage}</div>
         )}
 
         {materialResult && (
-          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Draft Material</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Draft Material</h3>
               <button type="button" onClick={() => copyText(materialResult)} className="text-xs font-medium text-rgreen">
                 Copy
               </button>
             </div>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{materialResult}</p>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap dark:text-gray-300">{materialResult}</p>
           </div>
         )}
 
         {assignmentResult && (
-          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3 dark:bg-gray-900 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Draft Assignment</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Draft Assignment</h3>
               <button
                 type="button"
                 onClick={() => copyText(`${assignmentResult.title}\n\n${assignmentResult.description}`)}
@@ -151,14 +151,14 @@ export default function TeacherContentGenerator() {
               </button>
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Title</div>
-              <p className="text-sm font-medium text-gray-900">{assignmentResult.title}</p>
+              <div className="text-xs text-gray-500 mb-1 dark:text-gray-400">Title</div>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{assignmentResult.title}</p>
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Description</div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{assignmentResult.description}</p>
+              <div className="text-xs text-gray-500 mb-1 dark:text-gray-400">Description</div>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap dark:text-gray-300">{assignmentResult.description}</p>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               Copy this into the Assignments tab to actually create it for students.
             </p>
           </div>

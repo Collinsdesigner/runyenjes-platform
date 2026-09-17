@@ -73,7 +73,7 @@ export default function VideoCall() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
         Please{' '}
         <button onClick={() => navigate('/login')} className="text-rgreen underline mx-1">
           sign in
@@ -92,14 +92,14 @@ export default function VideoCall() {
         >
           ← Back to chat
         </button>
-        <span className="text-xs text-gray-400">Runyenjes Video Call</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">Runyenjes Video Call</span>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm p-3 m-4 rounded-md">{error}</div>
+        <div className="bg-red-50 text-red-700 text-sm p-3 m-4 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>
       )}
       {loading && !error && (
-        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm dark:text-gray-500">
           Connecting to the call…
         </div>
       )}

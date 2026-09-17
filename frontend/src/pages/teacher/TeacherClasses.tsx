@@ -35,8 +35,8 @@ export default function TeacherClasses() {
     <PortalLayout title="My Classes">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Classes</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Classes</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             {term
               ? `The class cohorts you teach into this term (${term}), grouped by programme.`
               : 'No active academic term right now.'}
@@ -44,31 +44,31 @@ export default function TeacherClasses() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
 
         {loading ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             Loading your classes...
           </div>
         ) : classes.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             You are not assigned to any units this term yet, so no classes to show.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {classes.map((c) => (
-              <div key={c.programId} className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="font-semibold text-gray-900">
+              <div key={c.programId} className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   {c.programName} {c.programLevel || ''}
                 </h3>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-gray-400 mt-2 dark:text-gray-500">
                   {c.studentCount} student{c.studentCount === 1 ? '' : 's'} across {c.units.length} unit
                   {c.units.length === 1 ? '' : 's'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {c.units.map((u) => (
-                    <span key={u} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                    <span key={u} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full dark:bg-gray-800 dark:text-gray-400">
                       {u}
                     </span>
                   ))}

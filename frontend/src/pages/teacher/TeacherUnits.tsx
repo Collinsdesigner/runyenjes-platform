@@ -36,33 +36,33 @@ export default function TeacherUnits() {
     <PortalLayout title="My Units">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Units</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Units</h2>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
             {term ? `Units you are assigned to teach this term (${term}).` : 'No active academic term right now.'}
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>
         )}
 
         {loading ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             Loading your units...
           </div>
         ) : units.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             You are not assigned to any units this term yet.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {units.map((u) => (
-              <div key={u.unitId} className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="font-semibold text-gray-900">{u.unitName}</h3>
-                <p className="text-sm text-gray-500 mt-1">
+              <div key={u.unitId} className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{u.unitName}</h3>
+                <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                   {u.programmeName} {u.programmeLevel || ''}
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-gray-400 mt-2 dark:text-gray-500">
                   {u.studentCount} student{u.studentCount === 1 ? '' : 's'} registered
                 </p>
                 <Link

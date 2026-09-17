@@ -57,8 +57,8 @@ export default function StudentFees() {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Fees & Payments</h2>
-            <p className="text-sm text-gray-500 mt-1">Your invoices and payments on record.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fees & Payments</h2>
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Your invoices and payments on record.</p>
           </div>
           <button
             type="button"
@@ -70,31 +70,31 @@ export default function StudentFees() {
           </button>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{aiError}</div>}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
+        {aiError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{aiError}</div>}
         {aiReply && (
-          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap">
+          <div className="bg-green-50 border border-green-200 text-gray-800 rounded-lg p-4 text-sm whitespace-pre-wrap dark:bg-green-950 dark:border-green-800 dark:text-gray-200">
             {aiReply}
           </div>
         )}
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>
         ) : invoices.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-400 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-500">
             No invoices on record yet.
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100 dark:bg-gray-900 dark:border-gray-700 dark:divide-gray-800">
             {invoices.map((inv) => (
               <div key={inv.id} className="px-5 py-4 flex items-center justify-between gap-3">
                 <div>
-                  <div className="font-medium text-gray-900">{inv.description}</div>
-                  <div className="text-xs text-gray-500 mt-1">{inv.termName}</div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">{inv.description}</div>
+                  <div className="text-xs text-gray-500 mt-1 dark:text-gray-400">{inv.termName}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-800">Balance: KES {inv.balance}</div>
-                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{inv.status}</span>
+                  <div className="text-sm text-gray-800 dark:text-gray-200">Balance: KES {inv.balance}</div>
+                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full dark:bg-gray-800">{inv.status}</span>
                 </div>
               </div>
             ))}
