@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 
 const router = Router();
 
@@ -66,6 +67,14 @@ router.post('/invoices', requireAuth, requireRole('FINANCE_OFFICER', 'ADMIN'), a
     },
   });
 
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'CREATE_INVOICE',
+    entityType: 'Invoice',
+    entityId: invoice.id,
+    after: invoice,
+  });
+
   res.status(201).json(invoice);
 });
 
@@ -104,6 +113,14 @@ router.post(
       totalPaid <= 0 ? 'PENDING' : totalPaid < invoiceAmount ? 'PARTIALLY_PAID' : 'PAID';
 
     await prisma.invoice.update({ where: { id: invoiceId }, data: { status } });
+
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'RECORD_PAYMENT',
+      entityType: 'FeePayment',
+      entityId: payment.id,
+      after: { ...payment, newInvoiceStatus: status },
+    });
 
     res.status(201).json(payment);
   }

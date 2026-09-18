@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 import { uploadImage, deleteImage } from '../services/media.service';
 
 const router = Router();
@@ -146,6 +147,14 @@ router.post('/users', async (req, res) => {
     });
   }
 
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'CREATE_STAFF_USER',
+    entityType: 'User',
+    entityId: user.id,
+    after: { name: user.name, email: user.email, role: user.role },
+  });
+
   res.status(201).json(user);
 });
 
@@ -165,6 +174,16 @@ router.patch('/users/:id/status', async (req, res) => {
     data: { status },
     select: { id: true, name: true, status: true },
   });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_USER_STATUS',
+    entityType: 'User',
+    entityId: id,
+    before: { status: target.status },
+    after: { status: user.status },
+  });
+
   res.json(user);
 });
 
@@ -202,6 +221,15 @@ router.patch('/users/:id/role', async (req, res) => {
     select: { id: true, name: true, email: true, role: true },
   });
 
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_USER_ROLE',
+    entityType: 'User',
+    entityId: id,
+    before: { role: target.role },
+    after: { role: user.role },
+  });
+
   res.json(user);
 });
 
@@ -229,6 +257,14 @@ await prisma.user.update({
     mustChangePassword: true,
     passwordChangedAt: null,
   },
+});
+
+await logAudit({
+  actorId: req.user!.userId,
+  action: 'RESET_USER_PASSWORD',
+  entityType: 'User',
+  entityId: id,
+  after: { targetName: target.name },
 });
 
 res.json({ success: true });
@@ -265,6 +301,15 @@ router.patch('/users/:id/department', async (req, res) => {
         .catch(() => {});
     }
   }
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_USER_DEPARTMENT',
+    entityType: 'User',
+    entityId: id,
+    before: { departmentId: target.departmentId },
+    after: { departmentId: updated.department?.id ?? null },
+  });
 
   res.json(updated);
 });
@@ -303,6 +348,8 @@ router.patch('/departments/:id', async (req, res) => {
 router.delete('/departments/:id', async (req, res) => {
   const { id } = req.params;
 
+  const departmentBefore = await prisma.department.findUnique({ where: { id }, select: { name: true } });
+
   const programCount = await prisma.program.count({ where: { departmentId: id } });
   if (programCount > 0) {
     return res.status(400).json({
@@ -318,6 +365,15 @@ router.delete('/departments/:id', async (req, res) => {
   }
 
   await prisma.department.delete({ where: { id } });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'DELETE_DEPARTMENT',
+    entityType: 'Department',
+    entityId: id,
+    before: departmentBefore,
+  });
+
   res.status(204).send();
 });
 
@@ -380,6 +436,8 @@ router.patch('/programs/:id', async (req, res) => {
 router.delete('/programs/:id', async (req, res) => {
   const { id } = req.params;
 
+  const programBefore = await prisma.program.findUnique({ where: { id }, select: { name: true, departmentId: true } });
+
   const group = await prisma.group.findUnique({ where: { programId: id } });
   if (group) {
     const memberCount = await prisma.groupMember.count({ where: { groupId: group.id } });
@@ -400,26 +458,16 @@ router.delete('/programs/:id', async (req, res) => {
   await prisma.programFee.deleteMany({ where: { programId: id } });
 
   await prisma.program.delete({ where: { id } });
-  res.status(204).send();
-});
 
-// ---------- Set/update a program's fee (versioned — past applicants keep what they were charged) ----------
-router.post('/programs/:id/fee', async (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
-
-  if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-    return res.status(400).json({ error: 'A valid positive fee amount is required' });
-  }
-
-  const program = await prisma.program.findUnique({ where: { id } });
-  if (!program) return res.status(404).json({ error: 'Program not found' });
-
-  const fee = await prisma.programFee.create({
-    data: { programId: id, amount: Math.round(Number(amount)) },
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'DELETE_PROGRAM',
+    entityType: 'Program',
+    entityId: id,
+    before: programBefore,
   });
 
-  res.status(201).json(fee);
+  res.status(204).send();
 });
 
 // ---------- Bulk-import existing students (for launch day, not new applicants) ----------
@@ -500,6 +548,14 @@ router.post('/programs/:id/fee', async (req, res) => {
     data: { programId: id, amount: Number(amount), setBy: req.user!.userId },
   });
 
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'SET_PROGRAM_FEE',
+    entityType: 'ProgramFee',
+    entityId: fee.id,
+    after: { programId: id, amount: fee.amount },
+  });
+
   res.status(201).json(fee);
 });
 
@@ -524,6 +580,8 @@ router.patch('/settings', async (req, res) => {
     googleMapsUrl,
   } = req.body;
 
+  const settingsBefore = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+
   const settings = await prisma.siteSettings.update({
     where: { id: 1 },
     data: {
@@ -542,6 +600,15 @@ router.patch('/settings', async (req, res) => {
       ...(googleMapsUrl !== undefined && { googleMapsUrl }),
 
     },
+  });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_SITE_SETTINGS',
+    entityType: 'SiteSettings',
+    entityId: '1',
+    before: settingsBefore,
+    after: settings,
   });
 
   res.json(settings);

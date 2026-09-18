@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 import { uploadDocument, deleteDocument } from '../services/media.service';
 
 const router = Router();
@@ -58,6 +59,14 @@ router.post(
         },
       });
 
+      await logAudit({
+        actorId: req.user!.userId,
+        action: 'UPLOAD_DOCUMENT',
+        entityType: 'StudentDocument',
+        entityId: doc.id,
+        after: { studentId, title: doc.title },
+      });
+
       res.status(201).json(doc);
     } catch (error) {
       console.error('Document upload failed:', error);
@@ -99,6 +108,15 @@ router.delete('/:id', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req
   }
 
   await prisma.studentDocument.delete({ where: { id } });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'DELETE_DOCUMENT',
+    entityType: 'StudentDocument',
+    entityId: id,
+    before: doc,
+  });
+
   res.status(204).send();
 });
 

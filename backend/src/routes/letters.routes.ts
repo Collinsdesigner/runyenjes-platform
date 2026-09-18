@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 import { uploadBuffer } from '../services/media.service';
 import { generateLetterPdf } from '../services/letter-pdf.service';
 
@@ -49,6 +50,14 @@ router.post('/students/:studentId', requireAuth, requireRole('REGISTRAR', 'ADMIN
       },
     });
 
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'ISSUE_LETTER',
+      entityType: 'IssuedLetter',
+      entityId: letter.id,
+      after: { studentId, type, title },
+    });
+
     res.status(201).json(letter);
   } catch (error) {
     console.error('Letter generation failed:', error);
@@ -83,6 +92,15 @@ router.delete('/:id', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req
   if (!letter) return res.status(404).json({ error: 'Letter not found' });
 
   await prisma.issuedLetter.delete({ where: { id } });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'DELETE_LETTER',
+    entityType: 'IssuedLetter',
+    entityId: id,
+    before: letter,
+  });
+
   res.status(204).send();
 });
 

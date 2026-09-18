@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 
 const router = Router();
 
@@ -81,6 +82,14 @@ router.post(
         remarks: remarks || null,
         recordedById: req.user!.userId,
       },
+    });
+
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'RECORD_EXAM_RESULT',
+      entityType: 'ExamResult',
+      entityId: result.id,
+      after: result,
     });
 
     res.status(201).json(result);

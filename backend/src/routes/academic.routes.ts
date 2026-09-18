@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { logAudit } from '../services/audit.service';
 
 const router = Router();
 
@@ -876,6 +877,14 @@ router.delete(
       where: { id },
     });
 
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'DELETE_TIMETABLE_ENTRY',
+      entityType: 'TimetableEntry',
+      entityId: id,
+      before: existing,
+    });
+
     res.json({
       message: 'Timetable entry deleted successfully',
     });
@@ -1351,6 +1360,8 @@ router.delete(
   async (req, res) => {
     const { id } = req.params;
 
+    const unitBefore = await prisma.unit.findUnique({ where: { id } });
+
     const materialCount = await prisma.material.count({
       where: { unitId: id },
     });
@@ -1363,6 +1374,14 @@ router.delete(
 
     await prisma.unit.delete({
       where: { id },
+    });
+
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'DELETE_UNIT',
+      entityType: 'Unit',
+      entityId: id,
+      before: unitBefore,
     });
 
     res.json({ message: 'Unit deleted successfully' });
@@ -1794,6 +1813,14 @@ router.delete(
       where: {
         id,
       },
+    });
+
+    await logAudit({
+      actorId: req.user!.userId,
+      action: 'DELETE_TIMETABLE_ENTRY',
+      entityType: 'TimetableEntry',
+      entityId: id,
+      before: existing,
     });
 
     res.json({
