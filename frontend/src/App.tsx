@@ -73,6 +73,7 @@ import ExaminationsResults from './pages/examinations/ExaminationsResults';
 import StoresPortal from './pages/portal/StoresPortal';
 import StoresInventory from './pages/stores/StoresInventory';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminAuditLog from './pages/admin/AdminAuditLog';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
 
 export default function App() {
@@ -175,6 +176,7 @@ export default function App() {
                 <Route path="/stores" element={<StoresPortal />} />
                 <Route path="/stores/items" element={<StoresInventory />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/audit-log" element={<AdminAuditLog />} />
 </Routes>
       </BrowserRouter>
     </AuthProvider>

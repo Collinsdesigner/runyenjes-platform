@@ -187,6 +187,7 @@ const roleSections: Record<string, NavSection[]> = {
       title: 'Management',
       items: [
         { label: 'Reports', path: '/admin/reports', icon: '📊' },
+        { label: 'Audit Log', path: '/admin/audit-log', icon: '📜' },
         { label: 'Settings', path: '/admin/settings', icon: '⚙' },
       ],
     },
