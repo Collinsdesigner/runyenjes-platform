@@ -76,7 +76,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }
 }
 
 export default function Home() {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, darkMode, toggleDarkMode } = useAuth();
   const navigate = useNavigate();
 
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -486,6 +486,15 @@ export default function Home() {
             className="font-bold text-rgreen"
           >
             About Runyenjes TVC
+          </button>
+          <button
+            type="button"
+            onClick={toggleDarkMode}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+          >
+            {darkMode ? '☀' : '🌙'}
           </button>
           <button
             onClick={() => navigate('/login')}

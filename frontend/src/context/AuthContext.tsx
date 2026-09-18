@@ -24,6 +24,7 @@ interface AuthContextValue {
   logout: () => void;
   updateAvatar: (avatarUrl: string | null) => void;
   toggleDarkMode: () => Promise<void>;
+  darkMode: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -38,6 +39,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return stored ? JSON.parse(stored) : null;
   });
 
+  const [guestDarkMode, setGuestDarkMode] = useState<boolean>(
+    () => localStorage.getItem('runyenjes_guest_dark_mode') === 'true'
+  );
+
+  const darkMode = user ? Boolean(user.darkMode) : guestDarkMode;
+
   const [authLoading, setAuthLoading] = useState(true);
 
   function clearSession() {
@@ -50,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', Boolean(user?.darkMode));
-  }, [user?.darkMode]);
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
 
   useEffect(() => {
     const unregister = registerSessionExpiredHandler(() => {
@@ -177,7 +184,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   async function toggleDarkMode() {
-    if (!user || !token) return;
+    // Logged-out guest: browser-only preference, no account to save to.
+    if (!user || !token) {
+      setGuestDarkMode((prev) => {
+        const next = !prev;
+        localStorage.setItem('runyenjes_guest_dark_mode', String(next));
+        return next;
+      });
+      return;
+    }
 
     const next = !user.darkMode;
 
@@ -227,6 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         updateAvatar,
         toggleDarkMode,
+        darkMode,
       }}
     >
       {children}
