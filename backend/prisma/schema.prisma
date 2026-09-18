@@ -466,12 +466,20 @@ model AIMessage {
 // ─────────────────────────────────────────────
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  actorId   String
-  actor     User     @relation("ActorLogs", fields: [actorId], references: [id])
-  action    String
-  target    String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  actorId    String
+  actor      User     @relation("ActorLogs", fields: [actorId], references: [id])
+  action     String
+  target     String?
+  entityType String?
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
 }
 
 model TimetableEntry {
