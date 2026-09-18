@@ -283,25 +283,11 @@ export default function PortalLayout({
   title,
   children,
 }: PortalLayoutProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, toggleDarkMode } = useAuth();
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [isDark, setIsDark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains('dark'));
-  }, []);
-
-  function toggleDarkMode() {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle('dark', next);
-    try {
-      localStorage.setItem('runyenjes_dark_mode', String(next));
-    } catch (e) {}
-  }
 
   useEffect(() => {
     api('/settings')
@@ -506,7 +492,7 @@ export default function PortalLayout({
               aria-label="Toggle dark mode"
               title="Toggle dark mode"
             >
-              {isDark ? '☀️' : '🌙'}
+              {user.darkMode ? '☀️' : '🌙'}
             </button>
 
             {/* Notifications */}
