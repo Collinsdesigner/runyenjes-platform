@@ -129,6 +129,7 @@ model User {
   assignmentsCreated     Assignment[]           @relation("AssignmentCreatedBy")
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
+  darkMode  Boolean  @default(false)
 }
 
 // ─────────────────────────────────────────────

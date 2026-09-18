@@ -16,6 +16,7 @@ router.get('/me', requireAuth, async (req, res) => {
       phone: true,
       avatarUrl: true,
       role: true,
+      darkMode: true,
       admissionNumber: true,
       department: { select: { name: true } },
     },
@@ -109,4 +110,34 @@ router.delete('/avatar', requireAuth, async (req, res) => {
     });
   }
 });
+
+// ---------- Update my own dark mode preference ----------
+router.patch('/theme', requireAuth, async (req, res) => {
+  try {
+    const { darkMode } = req.body;
+
+    if (typeof darkMode !== 'boolean') {
+      return res.status(400).json({
+        error: 'darkMode (boolean) is required',
+      });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user!.userId },
+      data: { darkMode },
+      select: {
+        id: true,
+        darkMode: true,
+      },
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Theme update failed:', error);
+    res.status(500).json({
+      error: 'Failed to update theme preference',
+    });
+  }
+});
+
 export default router;

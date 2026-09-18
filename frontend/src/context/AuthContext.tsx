@@ -13,6 +13,7 @@ interface CurrentUser {
   role: string;
   avatarUrl: string | null;
   mustChangePassword?: boolean;
+  darkMode?: boolean;
 }
 
 interface AuthContextValue {
@@ -22,6 +23,7 @@ interface AuthContextValue {
   staffLogin: (email: string, password: string) => Promise<CurrentUser>;
   logout: () => void;
   updateAvatar: (avatarUrl: string | null) => void;
+  toggleDarkMode: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -45,6 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
   }
+
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', Boolean(user?.darkMode));
+  }, [user?.darkMode]);
 
   useEffect(() => {
     const unregister = registerSessionExpiredHandler(() => {
@@ -79,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: currentUser.name,
           role: currentUser.role,
           avatarUrl: currentUser.avatarUrl ?? null,
+          darkMode: Boolean(currentUser.darkMode),
         };
 
         localStorage.setItem(
@@ -167,6 +175,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }
 
+
+  async function toggleDarkMode() {
+    if (!user || !token) return;
+
+    const next = !user.darkMode;
+
+    // Optimistic local update first.
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, darkMode: next };
+      localStorage.setItem('runyenjes_user', JSON.stringify(updated));
+      return updated;
+    });
+
+    try {
+      await api('/profile/theme', {
+        method: 'PATCH',
+        token,
+        body: { darkMode: next },
+      });
+    } catch (error) {
+      console.error('Failed to save dark mode preference:', error);
+      // Roll back on failure.
+      setUser((prev) => {
+        if (!prev) return prev;
+        const reverted = { ...prev, darkMode: !next };
+        localStorage.setItem('runyenjes_user', JSON.stringify(reverted));
+        return reverted;
+      });
+    }
+  }
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -186,6 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         staffLogin,
         logout,
         updateAvatar,
+        toggleDarkMode,
       }}
     >
       {children}
