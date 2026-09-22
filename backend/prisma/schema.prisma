@@ -130,6 +130,9 @@ model User {
   assignmentSubmissions  AssignmentSubmission[] @relation("AssignmentSubmittedBy")
   assignmentsGraded      AssignmentSubmission[] @relation("AssignmentGradedBy")
   darkMode  Boolean  @default(false)
+
+  requestsSubmitted    Request[]      @relation("RequestSubmitter")
+  requestStagesActedOn RequestStage[] @relation("RequestStageActedBy")
 }
 
 // ─────────────────────────────────────────────
@@ -928,6 +931,7 @@ model IssuedLetter {
   filePublicId String
   issuedById   String
   issuedBy     User     @relation("LetterIssuedBy", fields: [issuedById], references: [id])
+  generatedForRequest Request?
 
   createdAt DateTime @default(now())
 
@@ -982,4 +986,70 @@ model AssignmentSubmission {
 
   @@unique([assignmentId, studentId])
   @@index([studentId])
+}
+
+// ─────────────────────────────────────────────
+// Generic request / approval engine
+// One model per request type would mean a new table for every future
+// government-services feature. Instead: one Request + one ordered chain
+// of RequestStage rows, with the approval chain and (if any) the
+// resulting document defined per-type in requestWorkflows.config.ts.
+// ─────────────────────────────────────────────
+
+enum RequestType {
+  PROGRAMME_CHANGE
+  CLEARANCE
+  GRADUATION
+  ACADEMIC_REQUISITION
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum RequestStageStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Request {
+  id     String        @id @default(uuid())
+  type   RequestType
+  status RequestStatus @default(PENDING)
+
+  submitterId String
+  submitter   User   @relation("RequestSubmitter", fields: [submitterId], references: [id])
+
+  payload      Json?
+  currentStage Int   @default(0)
+
+  stages RequestStage[]
+
+  generatedDocumentId String?       @unique
+  generatedDocument   IssuedLetter? @relation(fields: [generatedDocumentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([submitterId])
+}
+
+model RequestStage {
+  id           String              @id @default(uuid())
+  requestId    String
+  request      Request             @relation(fields: [requestId], references: [id])
+  order        Int
+  approverRole Role
+  status       RequestStageStatus  @default(PENDING)
+
+  actedById String?
+  actedBy   User?     @relation("RequestStageActedBy", fields: [actedById], references: [id])
+  actedAt   DateTime?
+  comment   String?
+
+  @@index([requestId])
 }

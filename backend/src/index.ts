@@ -36,6 +36,7 @@ import reportsRoutes from './routes/reports.routes';
 import documentsRoutes from './routes/documents.routes';
 import lettersRoutes from './routes/letters.routes';
 import auditRoutes from './routes/audit.routes';
+import requestsRoutes from './routes/requests.routes';
 import { errorHandler } from './middleware/errorHandler';
 import morgan from 'morgan';
 
@@ -178,6 +179,7 @@ app.use('/reports', reportsRoutes);
 app.use('/documents', documentsRoutes);
 app.use('/letters', lettersRoutes);
 app.use('/audit', auditRoutes);
+app.use('/requests', requestsRoutes);
 
 /**
  * =========================
