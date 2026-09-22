@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import OfficialDocuments from '../../components/student/OfficialDocuments';
 
 interface DocumentRow {
   id: string;
@@ -50,6 +51,8 @@ export default function StudentRecords() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Documents & Letters</h2>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Documents and letters issued to you by the Registrar.</p>
         </div>
+
+        <OfficialDocuments />
 
         {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
 

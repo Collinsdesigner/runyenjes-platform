@@ -189,3 +189,40 @@ export async function api(
 
   return data;
 }
+
+// ------------------------------------------------------------
+// Download a file (e.g. a PDF) from an authenticated endpoint.
+// Errors arrive as JSON ({ error }) and are thrown like api() errors.
+// ------------------------------------------------------------
+export async function downloadFile(
+  path: string,
+  token: string | null,
+  fallbackFilename: string
+): Promise<void> {
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_URL}${path}`, { headers });
+
+  if (res.status === 401) {
+    handleUnauthorized();
+  }
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Download failed (${res.status})`);
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fallbackFilename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
