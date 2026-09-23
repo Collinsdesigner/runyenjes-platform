@@ -77,6 +77,7 @@ const roleSections: Record<string, NavSection[]> = {
       items: [
         { label: 'Fees & Payments', path: '/student/fees', icon: '💰' },
         { label: 'My Documents & Letters', path: '/student/records', icon: '📄' },
+        { label: 'Request a Document', path: '/student/requests', icon: '🧾' },
       ],
     },
   ],
@@ -134,6 +135,7 @@ const roleSections: Record<string, NavSection[]> = {
       items: [
         { label: 'Student Documents', path: '/registrar/documents', icon: '📄' },
         { label: 'Letters & Certificates', path: '/registrar/letters', icon: '📜' },
+        { label: 'Approvals', path: '/registrar/approvals', icon: '✅' },
       ],
     },
     {
@@ -200,7 +202,10 @@ const roleSections: Record<string, NavSection[]> = {
     },
     {
       title: 'Finance',
-      items: [{ label: 'Invoices & Payments', path: '/finance/invoices', icon: '💰' }],
+      items: [
+        { label: 'Invoices & Payments', path: '/finance/invoices', icon: '💰' },
+        { label: 'Approvals', path: '/finance/approvals', icon: '✅' },
+      ],
     },
   ],
 
