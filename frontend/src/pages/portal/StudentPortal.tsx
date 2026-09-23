@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -110,14 +111,15 @@ export default function StudentPortal() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
           {[
-            ['My Units', 'View your current units'],
-            ['Timetable', 'Check your classes'],
-            ['Results', 'View academic results'],
-            ['Fees', 'View fees and payments'],
-          ].map(([title, description]) => (
-            <div
+            ['My Units', 'View your current units', '/student/academics'],
+            ['Timetable', 'Check your classes', '/student/timetable'],
+            ['Results', 'View academic results', '/student/results'],
+            ['Fees', 'View fees and payments', '/student/fees'],
+          ].map(([title, description, path]) => (
+            <Link
               key={title}
-              className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700"
+              to={path}
+              className="block bg-white border border-gray-200 rounded-lg p-5 hover:border-rgreen hover:shadow-sm transition dark:bg-gray-900 dark:border-gray-700"
             >
               <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 {title}
@@ -126,7 +128,7 @@ export default function StudentPortal() {
               <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
                 {description}
               </p>
-            </div>
+            </Link>
           ))}
 
         </div>

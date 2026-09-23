@@ -177,7 +177,8 @@ export default function AdminUsers() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Name</th>
@@ -225,6 +226,7 @@ export default function AdminUsers() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </PortalLayout>

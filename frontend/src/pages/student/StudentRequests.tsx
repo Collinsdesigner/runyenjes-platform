@@ -237,6 +237,26 @@ export default function StudentRequests() {
                       ))}
                   </div>
 
+                  {r.stages.some((s) => s.comment) && (
+                    <div className="space-y-1">
+                      {r.stages
+                        .slice()
+                        .sort((a, b) => a.order - b.order)
+                        .filter((s) => s.comment)
+                        .map((s) => (
+                          <p
+                            key={s.id}
+                            className={
+                              'text-xs ' +
+                              (s.status === 'REJECTED' ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400')
+                            }
+                          >
+                            <span className="font-medium">{roleLabel(s.approverRole)}:</span> {s.comment}
+                          </p>
+                        ))}
+                    </div>
+                  )}
+
                   {r.status === 'APPROVED' && r.generatedDocumentId && (
                     <p className="text-xs text-green-700 dark:text-green-400">
                       Your document has been issued — see My Documents & Letters.
