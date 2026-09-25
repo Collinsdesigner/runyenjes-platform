@@ -169,6 +169,7 @@ export default function WorkersPortal() {
           <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">
             My Leave Requests
           </div>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
@@ -194,6 +195,7 @@ export default function WorkersPortal() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </PortalLayout>

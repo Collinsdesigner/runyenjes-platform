@@ -486,6 +486,7 @@ export default function RegistrarTimetable() {
 
           {draft && draft.length > 0 && (
             <div className="border border-gray-200 rounded-lg overflow-x-auto mt-3 dark:border-gray-700">
+              <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="bg-gray-50 text-left text-gray-500 dark:bg-gray-950 dark:text-gray-400">
                   <tr>
@@ -562,6 +563,7 @@ export default function RegistrarTimetable() {
                   ))}
                 </tbody>
               </table>
+              </div>
               <div className="p-3 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"

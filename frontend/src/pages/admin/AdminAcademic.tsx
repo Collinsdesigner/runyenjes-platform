@@ -194,6 +194,7 @@ export default function AdminAcademic() {
                     </button>
                   </div>
 
+                  <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="text-gray-500 text-left dark:text-gray-400">
                       <tr>
@@ -236,6 +237,7 @@ export default function AdminAcademic() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               )}
             </div>

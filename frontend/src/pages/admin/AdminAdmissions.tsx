@@ -103,6 +103,7 @@ export default function AdminAdmissions() {
         </select>
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
@@ -186,6 +187,7 @@ export default function AdminAdmissions() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </PortalLayout>

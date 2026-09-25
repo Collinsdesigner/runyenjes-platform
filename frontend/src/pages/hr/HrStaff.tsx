@@ -151,6 +151,7 @@ export default function HrStaff() {
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">Staff Profiles</div>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
@@ -179,10 +180,12 @@ export default function HrStaff() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden dark:bg-gray-900 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900 text-sm dark:border-gray-800 dark:text-gray-100">Leave Requests</div>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500 text-left dark:bg-gray-950 dark:text-gray-400">
               <tr>
@@ -227,6 +230,7 @@ export default function HrStaff() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </PortalLayout>
