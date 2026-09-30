@@ -107,6 +107,25 @@ export default function Home() {
     return id;
   });
 
+  // HOME_GUEST_THREE_COLUMN_V1
+  // Institution details for the guest header/sidebar -- never hard-coded
+  // (roadmap Section 5). Public endpoint, no token needed.
+  const [settings, setSettings] = useState<{
+    institutionName?: string;
+    shortName?: string;
+    tagline?: string;
+    logoUrl?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    api('/settings')
+      .then(setSettings)
+      .catch(() => {});
+  }, []);
+
   async function loadPosts() {
     try {
       const data = await api('/posts', { token });
@@ -473,10 +492,17 @@ export default function Home() {
   }
 
   // Logged-out guest: standalone public page, no sidebar to fit into.
+  const instName = settings?.shortName || settings?.institutionName || 'Runyenjes';
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm dark:bg-gray-900 dark:border-gray-700">
-        <h1 className="font-bold text-rgreen">Runyenjes Home</h1>
+        <div className="flex items-center gap-2">
+          {settings?.logoUrl && (
+            <img src={settings.logoUrl} alt="" className="w-8 h-8 object-contain rounded" />
+          )}
+          <h1 className="font-bold text-rgreen">{instName} Home</h1>
+        </div>
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/apply')} className="text-sm text-gray-600 underline dark:text-gray-400">
             Apply
@@ -488,7 +514,7 @@ export default function Home() {
             onClick={() => navigate('/about-rtvc')}
             className="font-bold text-rgreen"
           >
-            About Runyenjes TVC
+            About {instName}
           </button>
           <button
             type="button"
@@ -508,7 +534,73 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto p-4 space-y-4">{feedContent}</main>
+      <main className="max-w-6xl mx-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_280px] gap-4 items-start">
+          {/* Left: quick links -- desktop only, collapses away on mobile */}
+          <aside className="hidden lg:block sticky top-20">
+            <div className="bg-white rounded-xl shadow p-4 dark:bg-gray-900">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 dark:text-gray-500">
+                Quick Links
+              </p>
+              <nav className="space-y-1">
+                <button
+                  onClick={() => navigate('/apply')}
+                  className="w-full text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-2 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  📝 Apply Now
+                </button>
+                <button
+                  onClick={() => navigate('/about-rtvc')}
+                  className="w-full text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-2 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  🏫 About {instName}
+                </button>
+                <button
+                  onClick={() => navigate('/browser')}
+                  className="w-full text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-2 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  🌐 Research Browser
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="w-full text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-2 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  🔐 Member Sign In
+                </button>
+              </nav>
+            </div>
+          </aside>
+
+          {/* Center: the feed (Stories rail, composer, posts) */}
+          <div className="max-w-xl w-full mx-auto lg:mx-0 space-y-4">{feedContent}</div>
+
+          {/* Right: institution card -- desktop only, sourced from /settings */}
+          <aside className="hidden lg:block sticky top-20">
+            <div className="bg-white rounded-xl shadow p-4 dark:bg-gray-900">
+              {settings?.logoUrl && (
+                <img src={settings.logoUrl} alt="" className="w-14 h-14 object-contain mx-auto mb-2" />
+              )}
+              <h2 className="font-bold text-center dark:text-gray-100">{instName}</h2>
+              {settings?.tagline && (
+                <p className="text-xs text-gray-500 text-center italic mt-1 dark:text-gray-400">
+                  "{settings.tagline}"
+                </p>
+              )}
+              <div className="text-xs text-gray-500 mt-3 space-y-1 dark:text-gray-400">
+                {settings?.address && <p>📮 {settings.address}</p>}
+                {settings?.phone && <p>☎ {settings.phone}</p>}
+                {settings?.email && <p>✉ {settings.email}</p>}
+              </div>
+              <button
+                onClick={() => navigate('/about-rtvc')}
+                className="text-xs text-rgreen font-medium mt-3 block mx-auto"
+              >
+                Learn more →
+              </button>
+            </div>
+          </aside>
+        </div>
+      </main>
     </div>
   );
 }
