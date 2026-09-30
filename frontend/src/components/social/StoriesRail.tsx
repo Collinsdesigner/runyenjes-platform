@@ -87,6 +87,52 @@ function AvatarCircle({ author, size }: { author: StoryAuthor; size: number }) {
   );
 }
 
+// STORY_PREVIEW_CIRCLE_V1
+// Shows a preview of the story itself (its photo, or a text snippet on a
+// gradient) rather than just the poster's avatar, with a small avatar
+// badge in the corner for attribution.
+function StoryPreviewCircle({
+  story,
+  author,
+  size,
+}: {
+  story: StoryItem;
+  author: StoryAuthor;
+  size: number;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const px = `${size}px`;
+  const hasImage = Boolean(story.mediaUrl) && !imgError;
+  const snippet = story.content.trim().slice(0, 28);
+
+  return (
+    <div style={{ width: px, height: px }} className="relative rounded-full overflow-hidden">
+      {hasImage ? (
+        <img
+          src={story.mediaUrl as string}
+          alt=""
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center px-1"
+          style={{ background: `linear-gradient(135deg, ${avatarColor(author.name)}, #1D4ED8)` }}
+        >
+          <span className="text-white text-[8px] leading-tight text-center font-medium line-clamp-3">
+            {snippet || author.name}
+          </span>
+        </div>
+      )}
+
+      {/* Small avatar badge -- identifies who posted it */}
+      <div className="absolute -bottom-0.5 -right-0.5 rounded-full ring-2 ring-white dark:ring-gray-900">
+        <AvatarCircle author={author} size={Math.round(size * 0.4)} />
+      </div>
+    </div>
+  );
+}
+
 export default function StoriesRail() {
   const { user, token } = useAuth();
   const [stories, setStories] = useState<StoryItem[]>([]);
@@ -288,7 +334,7 @@ export default function StoriesRail() {
                   style={{ background: 'linear-gradient(45deg, #0B7A2B, #1D4ED8)' }}
                 >
                   <div className="w-full h-full rounded-full bg-white p-[2px] dark:bg-gray-900">
-                    <AvatarCircle author={author} size={52} />
+                    <StoryPreviewCircle story={group[group.length - 1]} author={author} size={52} />
                   </div>
                 </div>
                 <span className="text-[10px] text-gray-600 truncate w-16 text-center dark:text-gray-400">
