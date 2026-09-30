@@ -118,6 +118,7 @@ model User {
   purchaseRequestsApproved PurchaseRequest[] @relation("PurchaseRequestApprovedBy")
   jobPostings JobPosting[] @relation("JobPostingPostedBy")
   announcementsPosted Announcement[] @relation("AnnouncementPostedBy")
+  storiesPosted Story[] @relation("StoryAuthor")
   notes Note[]
   attendanceAsStudent AttendanceRecord[] @relation("AttendanceStudent")
   attendanceRecorded  AttendanceRecord[] @relation("AttendanceRecordedBy")
@@ -1052,4 +1053,22 @@ model RequestStage {
   comment   String?
 
   @@index([requestId])
+}
+
+// ─────────────────────────────────────────────
+// STORIES (24-hour, staff-posted, auto-expiring)
+// ─────────────────────────────────────────────
+model Story {
+  id            String   @id @default(uuid())
+  content       String
+  mediaUrl      String?
+  mediaPublicId String?
+  authorId      String
+  author        User     @relation("StoryAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+
+  @@index([expiresAt])
+  @@index([authorId])
 }
