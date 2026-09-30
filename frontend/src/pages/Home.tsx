@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api, uploadImage } from '../api/client';
 import PortalLayout from '../components/portal/PortalLayout';
+import StoriesRail from '../components/social/StoriesRail';
 
 interface CommentType {
   id: string;
@@ -239,6 +240,8 @@ export default function Home() {
       {error && (
         <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md dark:bg-red-950 dark:text-red-300">{error}</div>
       )}
+
+      <StoriesRail />
 
       {/* New post composer — Facebook style */}
       {user ? (

@@ -81,6 +81,22 @@ export default function Announcements() {
     }
   }
 
+  // STORIES_SHARE_HANDLER_V1
+  async function handleShareAsStory(a: AnnouncementItem) {
+    setError('');
+    setMessage('');
+    try {
+      await api('/stories', {
+        method: 'POST',
+        token,
+        body: { content: `${a.title}\n\n${a.body}` },
+      });
+      setMessage('Shared as a 24-hour story');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not share as story');
+    }
+  }
+
   return (
     <PortalLayout title="Announcements">
       <div className="space-y-6">
@@ -156,6 +172,14 @@ export default function Announcements() {
                   onClick={() => handleDelete(a.id)}
                 >
                   Delete
+                </button>
+              )}
+              {canPost && (
+                <button
+                  className="text-rgreen text-xs font-medium mt-2 ml-3"
+                  onClick={() => handleShareAsStory(a)}
+                >
+                  Share as story
                 </button>
               )}
             </div>
