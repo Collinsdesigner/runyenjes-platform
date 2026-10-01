@@ -6,6 +6,7 @@ import { deleteImage } from '../services/media.service';
 const router = Router();
 
 // ---------- View the Home feed (anyone, no login needed) ----------
+// LIKED_BY_NAMES_V1
 router.get('/', optionalAuth, async (req, res) => {
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: 'desc' },
@@ -16,16 +17,24 @@ router.get('/', optionalAuth, async (req, res) => {
         orderBy: { createdAt: 'asc' },
         include: { author: { select: { name: true, avatarUrl: true } } },
       },
-      likes: { select: { userId: true } },
+      likes: {
+        select: {
+          userId: true,
+          guestName: true,
+          user: { select: { name: true } },
+        },
+      },
     },
   });
 
-  // Reshape likes into a simple count + "did the current viewer like this" flag,
-  // rather than sending every liker's id to the client.
+  // Reshape likes into a count, "did the current viewer like this" flag, and
+  // a plain list of who liked it (member name or guest display name) --
+  // without exposing raw user/guest ids to the client.
   const shaped = posts.map((p) => ({
     ...p,
     likeCount: p.likes.length,
     likedByMe: req.user ? p.likes.some((l) => l.userId === req.user!.userId) : false,
+    likedByNames: p.likes.map((l) => l.user?.name || l.guestName || 'A visitor').slice(0, 50),
     likes: undefined,
   }));
 

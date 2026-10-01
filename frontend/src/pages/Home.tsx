@@ -24,6 +24,7 @@ interface PostType {
   comments: CommentType[];
   likeCount: number;
   likedByMe: boolean;
+  likedByNames?: string[];
 }
 
 const AVATAR_COLORS = ['#0B7A2B', '#5C0F00', '#1D4ED8', '#B45309', '#7C3AED', '#0891B2'];
@@ -52,6 +53,58 @@ function relativeTime(iso: string) {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+// Encodes who's speaking with what authority -- information, not decoration.
+const ROLE_LABELS: Record<string, { label: string; className: string }> = {
+  ADMIN: { label: 'Administration', className: 'bg-rgreen/10 text-rgreen' },
+  REGISTRAR: { label: "Registrar's Office", className: 'bg-rgreen/10 text-rgreen' },
+  TEACHER: {
+    label: 'Lecturer',
+    className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+  },
+  STUDENT: {
+    label: 'Student',
+    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
+  },
+  ALUMNI: { label: 'Alumnus', className: 'bg-rmaroon/10 text-rmaroon' },
+};
+
+function RoleBadge({ role }: { role: string }) {
+  const info = ROLE_LABELS[role] || {
+    label: role.charAt(0) + role.slice(1).toLowerCase(),
+    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
+  };
+  return (
+    <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${info.className}`}>
+      {info.label}
+    </span>
+  );
+}
+
+const POST_TRUNCATE_LENGTH = 280;
+
+function PostText({
+  content,
+  expanded,
+  onToggle,
+}: {
+  content: string;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const isLong = content.length > POST_TRUNCATE_LENGTH;
+  const shown = expanded || !isLong ? content : content.slice(0, POST_TRUNCATE_LENGTH).trimEnd() + '\u2026';
+  return (
+    <p className="text-sm text-gray-800 whitespace-pre-wrap mt-3 dark:text-gray-200">
+      {shown}
+      {isLong && (
+        <button type="button" onClick={onToggle} className="text-rgreen font-medium ml-1">
+          {expanded ? 'See less' : 'See more'}
+        </button>
+      )}
+    </p>
+  );
 }
 
 function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }) {
@@ -91,6 +144,34 @@ export default function Home() {
 
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  // HOME_POST_CARD_POLISH_V1
+  const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
+  const [copiedPostId, setCopiedPostId] = useState<string | null>(null);
+  // HOME_LIKES_AND_NATIVE_SHARE_V1
+  const [likesListOpen, setLikesListOpen] = useState<Record<string, boolean>>({});
+
+  async function handleSharePost(postId: string, postContent: string) {
+    const url = `${window.location.origin}${window.location.pathname}#post-${postId}`;
+    const nav = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
+
+    if (nav.share) {
+      try {
+        await nav.share({ text: postContent.slice(0, 100), url });
+        return;
+      } catch {
+        // Cancelled, or the OS share sheet failed mid-call -- fall through
+        // to copy-link rather than leaving the user with no feedback.
+      }
+    }
+
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => {
+        setCopiedPostId(postId);
+        setTimeout(() => setCopiedPostId(null), 2000);
+      })
+      .catch(() => {});
+  }
 
   const [guestName, setGuestName] = useState(
     localStorage.getItem('rtvcGuestName') || ''
@@ -344,7 +425,26 @@ export default function Home() {
 
       {/* Feed */}
       {loading ? (
-        <p className="text-center text-gray-400 text-sm dark:text-gray-500">Loading feed…</p>
+        <div className="space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl shadow overflow-hidden p-4 animate-pulse dark:bg-gray-900"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800" />
+                <div className="space-y-2">
+                  <div className="h-3 w-32 bg-gray-200 rounded dark:bg-gray-800" />
+                  <div className="h-2 w-20 bg-gray-200 rounded dark:bg-gray-800" />
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                <div className="h-3 w-full bg-gray-200 rounded dark:bg-gray-800" />
+                <div className="h-3 w-5/6 bg-gray-200 rounded dark:bg-gray-800" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : posts.length === 0 ? (
         <p className="text-center text-gray-400 text-sm dark:text-gray-500">No posts yet — be the first!</p>
       ) : (
@@ -353,17 +453,23 @@ export default function Home() {
           const commentsOpen = openComments[post.id];
           const canDelete = user && (post.authorId === user.id || ['ADMIN'].includes(user.role));
           return (
-            <div key={post.id} className="bg-white rounded-xl shadow overflow-hidden dark:bg-gray-900">
+            <div
+              key={post.id}
+              id={`post-${post.id}`}
+              className="bg-white rounded-xl shadow overflow-hidden dark:bg-gray-900"
+            >
               <div className="p-4 pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar name={authorName} avatarUrl={post.author?.avatarUrl} />
                     <div>
                       <p className="font-semibold text-sm leading-tight">{authorName}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {post.author?.role && `${post.author.role} · `}
-                        {relativeTime(post.createdAt)}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {post.author?.role && <RoleBadge role={post.author.role} />}
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          {relativeTime(post.createdAt)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   {canDelete && (
@@ -376,7 +482,11 @@ export default function Home() {
                     </button>
                   )}
                 </div>
-                <p className="text-sm text-gray-800 whitespace-pre-wrap mt-3 dark:text-gray-200">{post.content}</p>
+                <PostText
+                  content={post.content}
+                  expanded={!!expandedPosts[post.id]}
+                  onToggle={() => setExpandedPosts((p) => ({ ...p, [post.id]: !p[post.id] }))}
+                />
               </div>
 
               {post.mediaUrl && (
@@ -398,14 +508,28 @@ export default function Home() {
 
               {/* Like / comment counts */}
               {(post.likeCount > 0 || post.comments.length > 0) && (
-                <div className="px-4 pt-2 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-                  <span>
-                    {post.likeCount > 0 && `❤ ${post.likeCount}`}
-                  </span>
-                  <span>
-                    {post.comments.length > 0 &&
-                      `${post.comments.length} comment${post.comments.length === 1 ? '' : 's'}`}
-                  </span>
+                <div className="px-4 pt-2 text-xs text-gray-400 dark:text-gray-500">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        post.likeCount > 0 &&
+                        setLikesListOpen((p) => ({ ...p, [post.id]: !p[post.id] }))
+                      }
+                      className={post.likeCount > 0 ? 'hover:underline' : ''}
+                    >
+                      {post.likeCount > 0 && `❤ ${post.likeCount}`}
+                    </button>
+                    <span>
+                      {post.comments.length > 0 &&
+                        `${post.comments.length} comment${post.comments.length === 1 ? '' : 's'}`}
+                    </span>
+                  </div>
+                  {likesListOpen[post.id] && post.likedByNames && post.likedByNames.length > 0 && (
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
+                      Liked by {post.likedByNames.join(', ')}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -413,8 +537,8 @@ export default function Home() {
               <div className="flex border-t border-gray-100 mt-2 text-sm dark:border-gray-800">
                 <button
                   onClick={() => handleToggleLike(post.id)}
-                  className={`flex-1 py-2 flex items-center justify-center gap-1.5 font-medium hover:bg-gray-50 ${
-                    post.likedByMe ? 'text-rmaroon' : 'text-gray-500'
+                  className={`flex-1 py-2 flex items-center justify-center gap-1.5 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    post.likedByMe ? 'text-rmaroon' : 'text-gray-500 dark:text-gray-400'
                   }`}
                 >
                   {post.likedByMe ? '❤' : '🤍'} Like
@@ -425,7 +549,39 @@ export default function Home() {
                 >
                   💬 Comment
                 </button>
+                <button
+                  onClick={() => handleSharePost(post.id, post.content)}
+                  className="flex-1 py-2 flex items-center justify-center gap-1.5 font-medium text-gray-500 hover:bg-gray-50 border-l border-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:border-gray-800"
+                >
+                  {copiedPostId === post.id ? '✅ Copied' : '🔗 Share'}
+                </button>
               </div>
+
+              {/* Comment preview -- visible even before opening the full thread */}
+              {!commentsOpen && post.comments.length > 0 && (
+                <div className="px-4 pb-3 space-y-1">
+                  {post.comments.slice(-2).map((c) => {
+                    const cName = c.author?.name ?? c.authorNamePublic ?? 'Guest';
+                    const preview =
+                      c.content.length > 80 ? c.content.slice(0, 80).trimEnd() + '\u2026' : c.content;
+                    return (
+                      <p key={c.id} className="text-xs text-gray-600 dark:text-gray-400">
+                        <span className="font-semibold text-gray-800 dark:text-gray-200">{cName}</span>{' '}
+                        {preview}
+                      </p>
+                    );
+                  })}
+                  {post.comments.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setOpenComments((p) => ({ ...p, [post.id]: true }))}
+                      className="text-xs text-gray-400 hover:text-rgreen dark:text-gray-500"
+                    >
+                      View all {post.comments.length} comments
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Comments (collapsible) */}
               {commentsOpen && (
