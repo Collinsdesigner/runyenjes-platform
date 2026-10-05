@@ -9,6 +9,7 @@ export default function AdminSettings() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
+  // ADMIN_SETTINGS_HIGHLIGHTS_V1
   const [form, setForm] = useState({
     institutionName: '',
     shortName: '',
@@ -22,6 +23,8 @@ export default function AdminSettings() {
     about: '',
     physicalLocation: '',
     googleMapsUrl: '',
+    highlightsTitle: '',
+    highlightsBody: '',
   });
 
   useEffect(() => {
@@ -40,6 +43,8 @@ export default function AdminSettings() {
           about: data.about || '',
           physicalLocation: data.physicalLocation || '',
           googleMapsUrl: data.googleMapsUrl || '',
+          highlightsTitle: data.highlightsTitle || '',
+          highlightsBody: data.highlightsBody || '',
         })
       )
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings'))
@@ -186,6 +191,27 @@ export default function AdminSettings() {
                 rows={4}
                 value={form.about}
                 onChange={(e) => set('about', e.target.value)}
+              />
+            </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="text-gray-500 dark:text-gray-400">
+                Highlights title (optional -- leave blank to hide this card on About)
+              </span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. Why Choose Us, Accreditation, Admissions Update"
+                value={form.highlightsTitle}
+                onChange={(e) => set('highlightsTitle', e.target.value)}
+              />
+            </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="text-gray-500 dark:text-gray-400">Highlights body</span>
+              <textarea
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                rows={4}
+                placeholder="Whatever's worth putting on the public About page right now. Leave both fields blank to hide this card."
+                value={form.highlightsBody}
+                onChange={(e) => set('highlightsBody', e.target.value)}
               />
             </label>
           </div>

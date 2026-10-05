@@ -563,6 +563,7 @@ router.post('/programs/:id/fee', async (req, res) => {
 // This is what makes the blueprint's promise real: renaming the college,
 // changing colors, or updating contact info is a form edit here, not a
 // code change or redeployment.
+// SITE_SETTINGS_HIGHLIGHTS_V1
 router.patch('/settings', async (req, res) => {
   const {
     institutionName,
@@ -578,6 +579,8 @@ router.patch('/settings', async (req, res) => {
     about,
     physicalLocation,
     googleMapsUrl,
+    highlightsTitle,
+    highlightsBody,
   } = req.body;
 
   const settingsBefore = await prisma.siteSettings.findUnique({ where: { id: 1 } });
@@ -598,6 +601,8 @@ router.patch('/settings', async (req, res) => {
       ...(about !== undefined && { about }),
       ...(physicalLocation !== undefined && { physicalLocation }),
       ...(googleMapsUrl !== undefined && { googleMapsUrl }),
+      ...(highlightsTitle !== undefined && { highlightsTitle }),
+      ...(highlightsBody !== undefined && { highlightsBody }),
 
     },
   });

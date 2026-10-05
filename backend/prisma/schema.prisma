@@ -34,6 +34,8 @@ model SiteSettings {
   about            String?
   physicalLocation String?
   googleMapsUrl    String?
+  highlightsTitle    String?
+  highlightsBody     String?
   updatedAt        DateTime @default(now()) @updatedAt
 }
 
