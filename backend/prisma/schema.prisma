@@ -438,8 +438,9 @@ model ContinuationCheckIn {
 // One row. Counts anonymous (not-logged-in) visits to the public Home feed —
 // no identity or IP stored, just a number.
 model VisitCounter {
-  id    Int @id @default(1)
-  count Int @default(0)
+  id          Int      @id @default(1)
+  count       Int      @default(0)
+  periodStart DateTime @default(now())
 }
 
 // ─────────────────────────────────────────────

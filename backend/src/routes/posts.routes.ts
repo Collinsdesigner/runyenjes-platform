@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { optionalAuth, requireAuth } from '../middleware/auth';
 import { deleteImage } from '../services/media.service';
+import { recordVisit } from '../services/visitCounter.service';
 
 const router = Router();
 
@@ -39,12 +40,9 @@ router.get('/', optionalAuth, async (req, res) => {
   }));
 
   // Anonymous visit counter — no identity stored, just a number
+  // VISIT_STATS_V1 -- resets weekly, see services/visitCounter.service.ts
   if (!req.user) {
-    await prisma.visitCounter.upsert({
-      where: { id: 1 },
-      update: { count: { increment: 1 } },
-      create: { id: 1, count: 1 },
-    });
+    await recordVisit();
   }
 
   res.json(shaped);

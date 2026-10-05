@@ -5,6 +5,7 @@ import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { logAudit } from '../services/audit.service';
 import { uploadImage, deleteImage } from '../services/media.service';
+import { getVisitStats } from '../services/visitCounter.service';
 
 const router = Router();
 
@@ -30,14 +31,15 @@ router.get('/stats', async (req, res) => {
     prisma.user.count({ where: { role: 'TEACHER', status: 'ACTIVE' } }),
     prisma.department.count(),
     prisma.application.count({ where: { status: 'SUBMITTED' } }),
-    prisma.visitCounter.findUnique({ where: { id: 1 } }),
+    getVisitStats(),
   ]);
   res.json({
     students,
     teachers,
     departments,
     pendingApplications,
-    homeVisits: visitCounter?.count ?? 0,
+    homeVisits: visitCounter.count,
+    homeVisitsResetAt: visitCounter.nextResetAt,
   });
 });
 
