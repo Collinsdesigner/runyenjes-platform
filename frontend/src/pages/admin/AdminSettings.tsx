@@ -25,6 +25,9 @@ export default function AdminSettings() {
     googleMapsUrl: '',
     highlightsTitle: '',
     highlightsBody: '',
+    mpesaPaybill: '',
+    mpesaAccountNumber: '',
+    intakeOptions: '',
   });
 
   useEffect(() => {
@@ -45,6 +48,9 @@ export default function AdminSettings() {
           googleMapsUrl: data.googleMapsUrl || '',
           highlightsTitle: data.highlightsTitle || '',
           highlightsBody: data.highlightsBody || '',
+          mpesaPaybill: data.mpesaPaybill || '',
+          mpesaAccountNumber: data.mpesaAccountNumber || '',
+          intakeOptions: data.intakeOptions || '',
         })
       )
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings'))
@@ -212,6 +218,36 @@ export default function AdminSettings() {
                 placeholder="Whatever's worth putting on the public About page right now. Leave both fields blank to hide this card."
                 value={form.highlightsBody}
                 onChange={(e) => set('highlightsBody', e.target.value)}
+              />
+            </label>
+            {/* SITE_SETTINGS_PAYMENT_V1 -- M-Pesa details & intake options shown on the public Apply page */}
+            <label className="text-sm">
+              <span className="text-gray-500 dark:text-gray-400">M-Pesa Paybill number</span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. 247247"
+                value={form.mpesaPaybill}
+                onChange={(e) => set('mpesaPaybill', e.target.value)}
+              />
+            </label>
+            <label className="text-sm">
+              <span className="text-gray-500 dark:text-gray-400">M-Pesa account number</span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. 0190274872116"
+                value={form.mpesaAccountNumber}
+                onChange={(e) => set('mpesaAccountNumber', e.target.value)}
+              />
+            </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="text-gray-500 dark:text-gray-400">
+                Intake options (comma-separated, shown on the Apply page)
+              </span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. September 2026, January 2027, May 2027"
+                value={form.intakeOptions}
+                onChange={(e) => set('intakeOptions', e.target.value)}
               />
             </label>
           </div>

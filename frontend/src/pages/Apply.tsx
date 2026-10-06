@@ -27,7 +27,13 @@ export default function Apply() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [idNumber, setIdNumber] = useState('');
-  const [intake, setIntake] = useState('September 2026');
+  const [intake, setIntake] = useState('');
+  // SITE_SETTINGS_PAYMENT_V1 -- paybill/account/intake options come from admin-editable SiteSettings
+  const [settings, setSettings] = useState<{
+    mpesaPaybill?: string;
+    mpesaAccountNumber?: string;
+    intakeOptions?: string;
+  }>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submittedApp, setSubmittedApp] = useState<{ id: string } | null>(null);
@@ -43,9 +49,24 @@ export default function Apply() {
     .flatMap((d) => d.programs)
     .find((p) => p.id === programId);
 
+  const intakeChoices = (settings.intakeOptions || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   useEffect(() => {
     api('/programs').then(setDepartments).catch(() => setError('Could not load programs'));
   }, []);
+
+  useEffect(() => {
+    api('/settings').then(setSettings).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!intake && intakeChoices.length) {
+      setIntake(intakeChoices[0]);
+    }
+  }, [settings.intakeOptions]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,11 +129,14 @@ export default function Apply() {
                   <p className="text-sm font-medium text-center mb-1">
                     Fee for this program: KES {Number(selectedProgram.currentFee).toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 text-center mb-3 dark:text-gray-400">
-                    Already paid via M-Pesa to <strong>Paybill 247247</strong>, Account{' '}
-                    <strong>0190274872116</strong>? Submit your transaction code below so the
-                    Registrar can verify it.
-                  </p>
+                  {(settings.mpesaPaybill || settings.mpesaAccountNumber) && (
+                    <p className="text-xs text-gray-500 text-center mb-3 dark:text-gray-400">
+                      Already paid via M-Pesa
+                      {settings.mpesaPaybill && <> to <strong>Paybill {settings.mpesaPaybill}</strong></>}
+                      {settings.mpesaAccountNumber && <>, Account <strong>{settings.mpesaAccountNumber}</strong></>}
+                      ? Submit your transaction code below so the Registrar can verify it.
+                    </p>
+                  )}
                   <form onSubmit={handleSubmitPayment} className="space-y-2">
                     <input
                       type="number"
@@ -238,9 +262,12 @@ export default function Apply() {
               onChange={(e) => setIntake(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white dark:border-gray-600 dark:bg-gray-900"
             >
-              <option>January 2027</option>
-              <option>May 2027</option>
-              <option>September 2026</option>
+              {intakeChoices.length === 0 && (
+                <option value="">Contact the Registrar for intake dates</option>
+              )}
+              {intakeChoices.map((choice) => (
+                <option key={choice}>{choice}</option>
+              ))}
             </select>
           </div>
 

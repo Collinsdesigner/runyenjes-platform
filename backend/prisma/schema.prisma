@@ -36,6 +36,9 @@ model SiteSettings {
   googleMapsUrl    String?
   highlightsTitle    String?
   highlightsBody     String?
+  mpesaPaybill        String?
+  mpesaAccountNumber  String?
+  intakeOptions       String?
   updatedAt        DateTime @default(now()) @updatedAt
 }
 

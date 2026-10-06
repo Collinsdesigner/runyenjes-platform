@@ -583,6 +583,9 @@ router.patch('/settings', async (req, res) => {
     googleMapsUrl,
     highlightsTitle,
     highlightsBody,
+    mpesaPaybill,
+    mpesaAccountNumber,
+    intakeOptions,
   } = req.body;
 
   const settingsBefore = await prisma.siteSettings.findUnique({ where: { id: 1 } });
@@ -605,7 +608,9 @@ router.patch('/settings', async (req, res) => {
       ...(googleMapsUrl !== undefined && { googleMapsUrl }),
       ...(highlightsTitle !== undefined && { highlightsTitle }),
       ...(highlightsBody !== undefined && { highlightsBody }),
-
+      ...(mpesaPaybill !== undefined && { mpesaPaybill }),
+      ...(mpesaAccountNumber !== undefined && { mpesaAccountNumber }),
+      ...(intakeOptions !== undefined && { intakeOptions }),
     },
   });
 
