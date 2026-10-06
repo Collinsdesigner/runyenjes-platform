@@ -18,19 +18,18 @@ datasource db {
 // changed from a settings screen later without touching any code.
 model SiteSettings {
   id              Int    @id @default(1)
-  institutionName String @default("Runyenjes Technical & Vocational College")
-  shortName       String @default("Runyenjes")
-  tagline         String @default("Empowering Through Skills and Technology")
-
+  institutionName String
+  shortName       String
+  tagline         String
   logoUrl      String?
   logoPublicId String?
 
-  primaryColor     String   @default("#0B7A2B")
-  secondaryColor   String   @default("#5C0F00")
-  address          String   @default("P.O. Box 239-60103, Runyenjes")
-  phone            String   @default("0797210054")
-  email            String   @default("runyenjestti@gmail.com")
-  website          String   @default("www.runyenjestechnical.ac.ke")
+  primaryColor     String
+  secondaryColor   String
+  address          String
+  phone            String
+  email            String
+  website          String
   about            String?
   physicalLocation String?
   googleMapsUrl    String?
