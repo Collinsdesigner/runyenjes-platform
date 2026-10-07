@@ -44,3 +44,14 @@ export const uploadLimiter = rateLimit({
     message: 'Upload limit reached.',
   },
 });
+
+// First-run setup limiter (public routes that can create the first admin)
+export const setupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: 'Too many setup requests. Try again in 15 minutes.',
+  },
+});

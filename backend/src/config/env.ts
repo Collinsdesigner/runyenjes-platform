@@ -20,6 +20,9 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional(),
 
   CLOUDINARY_API_SECRET: z.string().optional(),
+
+  // Optional. If set, the first-run setup wizard requires it.
+  SETUP_TOKEN: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

@@ -8,6 +8,8 @@ import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
 import postsRoutes from './routes/posts.routes';
 import settingsRoutes from './routes/settings.routes';
+import setupRoutes from './routes/setup.routes';
+import { setupLimiter } from './middleware/rateLimit';
 import programsRoutes from './routes/programs.routes';
 import applicationsRoutes from './routes/applications.routes';
 import groupsRoutes from './routes/groups.routes';
@@ -152,6 +154,7 @@ app.get('/', (_, res) => {
 app.use('/auth', loginLimiter, authRoutes);
 app.use('/posts', postsRoutes);
 app.use('/settings', settingsRoutes);
+app.use('/setup', setupLimiter, setupRoutes);
 app.use('/programs', programsRoutes);
 app.use('/applications', applicationsRoutes);
 app.use('/groups', groupsRoutes);

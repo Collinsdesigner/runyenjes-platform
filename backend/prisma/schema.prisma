@@ -1077,3 +1077,24 @@ model Story {
   @@index([expiresAt])
   @@index([authorId])
 }
+
+
+// Installation wizard: which optional modules are switched on.
+// A missing row means enabled (see settings.routes.ts).
+model ModuleSetting {
+  key       String   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+// Installation wizard: link-out cards to systems the institution runs
+// elsewhere. We only store a name + URL; no data is read from or written to
+// the external system.
+model ExternalSystem {
+  id             String   @id @default(uuid())
+  name           String
+  url            String
+  visibleToRoles Role[]
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+}
