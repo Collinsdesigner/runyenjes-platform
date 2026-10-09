@@ -586,6 +586,7 @@ router.patch('/settings', async (req, res) => {
     mpesaPaybill,
     mpesaAccountNumber,
     intakeOptions,
+    admissionNumberExample,
   } = req.body;
 
   const settingsBefore = await prisma.siteSettings.findUnique({ where: { id: 1 } });
@@ -611,6 +612,7 @@ router.patch('/settings', async (req, res) => {
       ...(mpesaPaybill !== undefined && { mpesaPaybill }),
       ...(mpesaAccountNumber !== undefined && { mpesaAccountNumber }),
       ...(intakeOptions !== undefined && { intakeOptions }),
+      ...(admissionNumberExample !== undefined && { admissionNumberExample }),
     },
   });
 

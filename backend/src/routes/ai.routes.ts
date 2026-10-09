@@ -1,3 +1,4 @@
+import { getInstitutionName } from '../utils/institution';
 import { Router } from 'express';
 import dns from 'dns';
 import { prisma } from '../lib/prisma';
@@ -13,7 +14,7 @@ const router = Router();
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'openai/gpt-oss-120b';
 
-const SYSTEM_PROMPT = `You are the Runyenjes Technical & Vocational College study assistant.
+const SYSTEM_PROMPT = `You are the {{INSTITUTION}} study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,
 summarizing notes, and general TVET-related academic help. Be clear, concise, and encouraging.
 If asked something completely unrelated to school/learning, you can still help, but gently
@@ -177,11 +178,13 @@ router.post('/chat', requireAuth, async (req, res) => {
 
   // If this conversation is scoped to a unit, ground the system prompt in
   // that unit's context (looked up fresh each time, cheap query).
-  let systemPrompt = SYSTEM_PROMPT;
+  const institutionName = await getInstitutionName();
+  const basePrompt = SYSTEM_PROMPT.replace('{{INSTITUTION}}', institutionName);
+  let systemPrompt = basePrompt;
   if (convo.unitId) {
     const unitContext = await buildUnitContext(convo.unitId);
     if (unitContext) {
-      systemPrompt = `${SYSTEM_PROMPT}
+      systemPrompt = `${basePrompt}
 
 You are specifically tutoring this student on the following unit. Ground your answers in this
 context where relevant, and reference the materials listed if they seem useful, but you may also

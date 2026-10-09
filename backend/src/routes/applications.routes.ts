@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
-import { generateAdmissionNumber } from '../utils/admissionNumber';
+import { getInstitutionName } from '../utils/institution';
 import { sendEmail } from '../utils/email';
 
 const router = Router();
@@ -77,11 +77,13 @@ requireRole('REGISTRAR', 'ADMIN'),
       include: { application: true },
     });
 
+    // INST_NAME_PAYMENT_V1
+    const instName = await getInstitutionName();
     const subject = status === 'verified' ? 'Payment Verified' : 'Payment Could Not Be Verified';
     const body =
       status === 'verified'
-        ? `Hello ${updated.application.applicantName},\n\nYour payment of KES ${updated.amount} (ref: ${updated.reference}) has been verified. Thank you.\n\n— Runyenjes Technical & Vocational College`
-        : `Hello ${updated.application.applicantName},\n\nWe could not verify your payment of KES ${updated.amount} (ref: ${updated.reference}). Please contact the Registrar's office.\n\n— Runyenjes Technical & Vocational College`;
+        ? `Hello ${updated.application.applicantName},\n\nYour payment of KES ${updated.amount} (ref: ${updated.reference}) has been verified. Thank you.\n\n— ${instName}`
+        : `Hello ${updated.application.applicantName},\n\nWe could not verify your payment of KES ${updated.amount} (ref: ${updated.reference}). Please contact the Registrar's office.\n\n— ${instName}`;
     sendEmail(updated.application.email, subject, body);
 
     res.json(updated);
@@ -137,20 +139,50 @@ requireRole('REGISTRAR', 'ADMIN'),
     });
     if (!application) return res.status(404).json({ error: 'Application not found' });
 
+    const instName = await getInstitutionName();
+
+    // Admission numbers are typed by the registrar, never auto-generated.
+    // Schools number differently, and the number of a student who never
+    // arrives is sometimes reissued, so the system must not decide.
+    // Enter an admission number for this student.
+    let admissionNumber = '';
+    if (status === 'ADMITTED') {
+      const alreadyStudent = await prisma.user.findUnique({
+        where: { email: application.email },
+      });
+      if (!alreadyStudent) {
+        admissionNumber = String(req.body.admissionNumber ?? '').trim();
+        if (!admissionNumber) {
+          return res.status(400).json({ error: 'Enter an admission number for this student.' });
+        }
+        if (admissionNumber.length > 40) {
+          return res
+            .status(400)
+            .json({ error: 'The admission number is too long (40 characters at most).' });
+        }
+        const holder = await prisma.user.findUnique({ where: { admissionNumber } });
+        if (holder) {
+          return res.status(409).json({
+            error: `Admission number ${admissionNumber} is already used by ${holder.name}.`,
+          });
+        }
+      }
+    }
+
     const updated = await prisma.application.update({
       where: { id },
       data: { status },
     });
 
     const statusText: Record<string, string> = {
-      ADMITTED: 'admitted! Welcome to Runyenjes Technical & Vocational College',
+      ADMITTED: `admitted! Welcome to ${instName}`,
       REJECTED: 'not successful this time',
       WAITLISTED: 'placed on the waitlist',
     };
     sendEmail(
       application.email,
       `Your Application — ${status}`,
-      `Hello ${application.applicantName},\n\nYour application for ${application.program.name} is ${statusText[status]}.\n\n— Runyenjes Technical & Vocational College`
+      `Hello ${application.applicantName},\n\nYour application for ${application.program.name} is ${statusText[status]}.\n\n— ${instName}`
     );
 
     if (status === 'ADMITTED') {
@@ -159,7 +191,7 @@ requireRole('REGISTRAR', 'ADMIN'),
       });
 
       if (!existingUser) {
-        const admissionNumber = await generateAdmissionNumber();
+        // admissionNumber was validated and set before the status update (see above)
 
         const result = await prisma.$transaction(async (tx) => {
           const student = await tx.user.create({
@@ -228,7 +260,7 @@ requireRole('REGISTRAR', 'ADMIN'),
         sendEmail(
           student.email,
           'Your Admission Number & Login Details',
-          `Hello ${student.name},\n\nCongratulations! Your admission number is: ${student.admissionNumber}\n\nUse this together with your email (${student.email}) to log in as a Student on the Runyenjes platform.\n\n— Runyenjes Technical & Vocational College`
+          `Hello ${student.name},\n\nCongratulations! Your admission number is: ${student.admissionNumber}\n\nUse this together with your email (${student.email}) to log in as a Student on the ${instName} portal.\n\n— ${instName}`
         );
 
         return res.json({

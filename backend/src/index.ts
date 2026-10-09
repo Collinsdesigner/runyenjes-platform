@@ -141,7 +141,7 @@ app.use(
 app.get('/', (_, res) => {
   res.json({
     status: 'ok',
-    message: 'Runyenjes backend is running',
+    message: 'Backend is running',
   });
 });
 

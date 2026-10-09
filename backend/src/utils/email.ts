@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { getInstitutionName } from './institution';
 
 let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
 
@@ -26,8 +27,9 @@ export async function sendEmail(to: string, subject: string, text: string) {
     return;
   }
   try {
+    const fromName = (await getInstitutionName()).replace(/"/g, '');
     await t.sendMail({
-      from: `"Runyenjes Technical & Vocational College" <${process.env.EMAIL_USER}>`,
+      from: `"${fromName}" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text,

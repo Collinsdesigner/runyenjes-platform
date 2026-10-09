@@ -28,6 +28,7 @@ export default function AdminSettings() {
     mpesaPaybill: '',
     mpesaAccountNumber: '',
     intakeOptions: '',
+    admissionNumberExample: '',
   });
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function AdminSettings() {
           mpesaPaybill: data.mpesaPaybill || '',
           mpesaAccountNumber: data.mpesaAccountNumber || '',
           intakeOptions: data.intakeOptions || '',
+          admissionNumberExample: data.admissionNumberExample || '',
         })
       )
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings'))
@@ -218,6 +220,17 @@ export default function AdminSettings() {
                 placeholder="Whatever's worth putting on the public About page right now. Leave both fields blank to hide this card."
                 value={form.highlightsBody}
                 onChange={(e) => set('highlightsBody', e.target.value)}
+              />
+            </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="text-gray-500 dark:text-gray-400">
+                Admission number example (shown as a hint when admitting students; numbers are typed by the registrar)
+              </span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. 2859 or ADM/2026/0123"
+                value={form.admissionNumberExample}
+                onChange={(e) => set('admissionNumberExample', e.target.value)}
               />
             </label>
             {/* SITE_SETTINGS_PAYMENT_V1 -- M-Pesa details & intake options shown on the public Apply page */}

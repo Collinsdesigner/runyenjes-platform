@@ -38,6 +38,7 @@ model SiteSettings {
   mpesaPaybill        String?
   mpesaAccountNumber  String?
   intakeOptions       String?
+  admissionNumberExample String?
   updatedAt        DateTime @default(now()) @updatedAt
 }
 
