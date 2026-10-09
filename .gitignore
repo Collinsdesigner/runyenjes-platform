@@ -7,3 +7,5 @@ uploads/
 *.backup-*
 *.backup
 backend/prisma/private/
+backend/*.py
+frontend/*.py
