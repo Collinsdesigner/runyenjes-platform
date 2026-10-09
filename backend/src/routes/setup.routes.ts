@@ -217,6 +217,13 @@ const completeSchema = z.object({
     email: z.string().trim().email().max(200),
     password: z.string().min(8).max(128),
   }),
+  academic: z
+    .object({
+      departmentName: z.string().trim().min(2).max(150),
+      programmeName: z.string().trim().min(2).max(200),
+      level: z.string().trim().max(100).optional(),
+    })
+    .optional(),
 });
 
 type CompleteBody = z.infer<typeof completeSchema>;
@@ -295,6 +302,21 @@ router.post(
               passwordChangedAt: new Date(),
             },
           });
+
+          if (d.academic) {
+            const dept = await tx.department.upsert({
+              where: { name: d.academic.departmentName },
+              update: {},
+              create: { name: d.academic.departmentName },
+            });
+            await tx.program.create({
+              data: {
+                departmentId: dept.id,
+                name: d.academic.programmeName,
+                level: d.academic.level || null,
+              },
+            });
+          }
         },
         { timeout: 20000, maxWait: 10000 }
       );

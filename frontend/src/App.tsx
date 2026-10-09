@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { api } from './api/client';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Setup from './pages/Setup';
 import Apply from './pages/Apply';
 import AboutRTVC from './pages/AboutRTVC';
 import Admissions from './pages/Admissions';
@@ -86,6 +87,14 @@ export default function App() {
   useEffect(() => {
     api('/settings')
       .then((settings) => {
+        // SETUP_REDIRECT_V1: a fresh install has no SiteSettings row yet, so
+        // the server reports configured:false. Send the installer to the wizard.
+        if (settings && settings.configured === false && window.location.pathname !== '/setup') {
+          window.location.replace('/setup');
+          return;
+        }
+        // SETTINGS_TITLE_V1: browser tab title comes from settings
+        if (settings?.institutionName) document.title = settings.institutionName;
         const personalAccent = localStorage.getItem('runyenjes_personal_accent');
         if (personalAccent) {
           document.documentElement.style.setProperty('--color-primary', personalAccent);
@@ -108,6 +117,7 @@ export default function App() {
           <Route path="/about-rtvc" element={<AboutRTVC />} />
 
           <Route path="/login" element={<Login />} />
+          <Route path="/setup" element={<Setup />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/admissions" element={<Admissions />} />
           <Route path="/groups" element={<Groups />} />

@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { MODULE_KEYS } from '../config/modules';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -29,6 +30,25 @@ router.get('/', async (_req, res) => {
   } catch (error) {
     console.error('Settings fetch failed:', error);
     res.status(500).json({ message: 'Could not load settings.' });
+  }
+});
+
+// Logged-in members only. Returns the external-system link cards this user's
+// role may see. Administrators see all of them.
+router.get('/external-systems', requireAuth, async (req, res) => {
+  try {
+    const role = req.user?.role;
+    const systems = await prisma.externalSystem.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    });
+    const visible =
+      role === 'ADMIN' ? systems : systems.filter((s) => s.visibleToRoles.some((r) => r === role));
+    res.json(
+      visible.map((s) => ({ id: s.id, name: s.name, url: s.url, visibleToRoles: s.visibleToRoles }))
+    );
+  } catch (error) {
+    console.error('External systems fetch failed:', error);
+    res.status(500).json({ message: 'Could not load external systems.' });
   }
 });
 
