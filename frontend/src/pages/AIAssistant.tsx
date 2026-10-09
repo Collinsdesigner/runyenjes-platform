@@ -213,7 +213,7 @@ export default function AIAssistant() {
             >
               ☰
             </button>
-            <h1 className="font-bold text-rgreen">RTVC AI Assistance</h1>
+            <h1 className="font-bold text-rgreen">AI Assistant</h1>
           </div>
           <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline dark:text-gray-400">
             Back to Home

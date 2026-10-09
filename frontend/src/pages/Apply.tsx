@@ -178,7 +178,7 @@ export default function Apply() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-950">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow p-6 dark:bg-gray-900">
-        <h1 className="text-lg font-bold text-rgreen mb-1">Apply to Runyenjes</h1>
+        <h1 className="text-lg font-bold text-rgreen mb-1">Apply for admission</h1>
         <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
           Fill this in to apply — no account needed yet.
         </p>

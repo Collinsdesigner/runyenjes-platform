@@ -64,7 +64,7 @@ export default function AboutRTVC() {
   if (!settings) {
     return (
       <div className="p-6">
-        Loading RTVC information...
+        Loading institution information...
       </div>
     );
   }

@@ -1,17 +1,16 @@
 // RUNYENJES-SETUP-V1
 // The one place that lists optional modules. To make a new module switchable,
 // add it here; nothing else in the setup flow needs to change.
-// Core modules (admissions, academics, users, announcements) are not listed
-// because the platform does not work without them.
+// Always on (not listed): admissions, academics and learning materials, users,
+// announcements, student requests, the AI assistant, groups and notebook.
 
 export const MODULES = [
-  { key: 'finance', label: 'Finance', description: 'Invoices, fee payments and balances' },
-  { key: 'hr', label: 'Human Resources', description: 'Staff profiles and leave requests' },
-  { key: 'library', label: 'Library', description: 'Library catalogue and resources' },
-  { key: 'examinations', label: 'Examinations', description: 'Exams and result recording' },
-  { key: 'stores', label: 'Stores / Inventory', description: 'Item catalogue and stock movements' },
-  { key: 'procurement', label: 'Procurement', description: 'Purchase requests and approvals' },
-  { key: 'alumni', label: 'Alumni', description: 'Alumni profiles and graduation' },
+  { key: 'finance', label: 'Finance', description: 'Finance portal: invoices, fee payments and approvals' },
+  { key: 'hr', label: 'Human Resources', description: 'HR portal: staff profiles, leave requests and staff self-service' },
+  { key: 'examinations', label: 'Examinations', description: 'Examinations portal: exams and result recording' },
+  { key: 'stores', label: 'Stores / Inventory', description: 'Stores portal: inventory items and stock movements' },
+  { key: 'procurement', label: 'Procurement', description: 'Procurement portal: purchase requests and approvals' },
+  { key: 'alumni', label: 'Alumni', description: 'Alumni portal and graduating students to alumni' },
   { key: 'jobs', label: 'Job Connection', description: 'Job board for staff and alumni' },
 ] as const;
 

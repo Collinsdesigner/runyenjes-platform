@@ -341,11 +341,11 @@ export default function PortalLayout({
 
   const institutionName =
     settings?.institutionName ||
-    'Runyenjes Technical & Vocational College';
+    'Institution';
 
   const shortName =
     settings?.shortName ||
-    'Runyenjes';
+    'Portal';
 
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden dark:bg-gray-950">

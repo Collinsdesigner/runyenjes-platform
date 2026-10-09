@@ -990,7 +990,7 @@ async function handleLogoUpload(file: File) {
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
                 rows={6}
-                placeholder={`Jane Wanjiku, jane.wanjiku@gmail.com, RTVC/2025/00110, 0712345678\nBrian Otieno, brian.otieno@gmail.com, RTVC/2025/00111, 0723456789`}
+                placeholder={`Jane Wanjiku, jane.wanjiku@gmail.com, ADM/2025/00110, 0712345678\nBrian Otieno, brian.otieno@gmail.com, ADM/2025/00111, 0723456789`}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono dark:border-gray-600"
               />
               <button

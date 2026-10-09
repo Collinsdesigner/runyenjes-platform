@@ -648,7 +648,7 @@ export default function Home() {
   }
 
   // Logged-out guest: standalone public page, no sidebar to fit into.
-  const instName = settings?.shortName || settings?.institutionName || 'Runyenjes';
+  const instName = settings?.shortName || settings?.institutionName || 'Institution';
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
