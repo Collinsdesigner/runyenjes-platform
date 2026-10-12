@@ -1,4 +1,4 @@
-// ABOUT_RTVC_REBUILD_V1
+// ABOUT_PAGE_REBUILD_V1
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
@@ -37,12 +37,12 @@ interface Department {
   programs: Program[];
 }
 
-export default function AboutRTVC() {
+export default function AboutInstitution() {
   const navigate = useNavigate();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [programsLoading, setProgramsLoading] = useState(true);
-  // ABOUT_RTVC_SHOW_MORE_V1
+  // ABOUT_PAGE_SHOW_MORE_V1
   const [showAllDepartments, setShowAllDepartments] = useState(false);
   const [expandedProgrammes, setExpandedProgrammes] = useState<Record<string, boolean>>({});
   const DEPARTMENT_PREVIEW_COUNT = 5;
@@ -156,7 +156,7 @@ export default function AboutRTVC() {
           </p>
         </section>
 
-        {/* ABOUT_RTVC_HIGHLIGHTS_CARD_V1 -- admin-filled via Settings, hidden entirely when empty */}
+        {/* ABOUT_PAGE_HIGHLIGHTS_CARD_V1 -- admin-filled via Settings, hidden entirely when empty */}
         {settings.highlightsBody && (
           <section className="bg-white rounded-xl shadow p-6 dark:bg-gray-900">
             <h2 className="text-xl font-bold mb-4" style={{ color: primary }}>

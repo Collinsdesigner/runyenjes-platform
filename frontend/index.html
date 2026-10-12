@@ -14,6 +14,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Institution Portal</title>
+    <script>
+      // institution_colors: apply the school's remembered colors before first paint
+      try {
+        var c = JSON.parse(localStorage.getItem('institution_colors') || 'null');
+        var accent = localStorage.getItem('runyenjes_personal_accent');
+        var root = document.documentElement.style;
+        if (accent) root.setProperty('--color-primary', accent);
+        else if (c && c.primary) root.setProperty('--color-primary', c.primary);
+        if (c && c.secondary) root.setProperty('--color-secondary', c.secondary);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -667,7 +667,7 @@ export default function Home() {
             Browser
           </button>
           <button
-            onClick={() => navigate('/about-rtvc')}
+            onClick={() => navigate('/about')}
             className="font-bold text-rgreen"
           >
             About {instName}
@@ -706,7 +706,7 @@ export default function Home() {
                   📝 Apply Now
                 </button>
                 <button
-                  onClick={() => navigate('/about-rtvc')}
+                  onClick={() => navigate('/about')}
                   className="w-full text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg px-3 py-2 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   🏫 About {instName}
@@ -748,7 +748,7 @@ export default function Home() {
                 {settings?.email && <p>✉ {settings.email}</p>}
               </div>
               <button
-                onClick={() => navigate('/about-rtvc')}
+                onClick={() => navigate('/about')}
                 className="text-xs text-rgreen font-medium mt-3 block mx-auto"
               >
                 Learn more →

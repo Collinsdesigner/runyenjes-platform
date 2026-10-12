@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Setup from './pages/Setup';
 import Apply from './pages/Apply';
-import AboutRTVC from './pages/AboutRTVC';
+import AboutInstitution from './pages/AboutInstitution';
 import Admissions from './pages/Admissions';
 import Groups from './pages/Groups';
 import GroupChat from './pages/GroupChat';
@@ -95,6 +95,17 @@ export default function App() {
         }
         // SETTINGS_TITLE_V1: browser tab title comes from settings
         if (settings?.institutionName) document.title = settings.institutionName;
+        // institution_colors: remembered so index.html can apply them before first paint
+        if (settings?.primaryColor) {
+          try {
+            localStorage.setItem(
+              'institution_colors',
+              JSON.stringify({ primary: settings.primaryColor, secondary: settings.secondaryColor || null })
+            );
+          } catch {
+            // storage unavailable: the colors still apply once settings load
+          }
+        }
         const personalAccent = localStorage.getItem('runyenjes_personal_accent');
         if (personalAccent) {
           document.documentElement.style.setProperty('--color-primary', personalAccent);
@@ -114,7 +125,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
 
-          <Route path="/about-rtvc" element={<AboutRTVC />} />
+          <Route path="/about" element={<AboutInstitution />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/setup" element={<Setup />} />

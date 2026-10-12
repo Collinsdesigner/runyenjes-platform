@@ -1074,7 +1074,7 @@ async function handleLogoUpload(file: File) {
   <input
     value={settingsForm.physicalLocation ?? ''}
     onChange={(e) => setSettingsForm({ ...settingsForm, physicalLocation: e.target.value })}
-    placeholder="Example: Karurumo Location, Kavai Village, Embu County, Kenya"
+    placeholder="Example: Village or street, town, county"
     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm dark:border-gray-600"
   />
 </div>

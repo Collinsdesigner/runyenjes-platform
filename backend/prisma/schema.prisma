@@ -1,4 +1,4 @@
-// Runyenjes Technical & Vocational College — Database Schema
+// Institution Platform — Database Schema
 // This file is the single source of truth for every table in the system.
 
 generator client {
