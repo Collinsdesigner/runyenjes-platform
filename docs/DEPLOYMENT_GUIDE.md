@@ -89,7 +89,7 @@ Things to know:
 | `FRONTEND_URL` | Yes | Your website's address, for example `https://yourschool.vercel.app`. Exactly as typed in the browser, `https`, no trailing slash. You can only fill this in after Step 6, so deploy once without it, then add it and redeploy |
 | `SETUP_TOKEN` | Strongly recommended | Any random string. It stops a stranger from finishing your setup before you do. You remove it after setup |
 | `NODE_ENV` | Recommended | `production` |
-| `EXAM_CARD_MIN_PAID_PERCENT` | Optional | A number from 0 to 100: the share of a student's fees that must be paid before they can get an exam card. If you leave it empty, the built-in default applies |
+| `EXAM_CARD_MIN_PAID_PERCENT` | Optional | A number from 0 to 100: the share of a student's fees that must be paid before they can get an exam card. If you leave it empty, the default is 100, which means fees must be paid in full |
 
 Render sets `PORT` itself. Do not add it.
 
