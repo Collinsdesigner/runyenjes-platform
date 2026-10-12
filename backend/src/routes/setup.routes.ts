@@ -134,8 +134,17 @@ router.get('/readiness', requireSetupOpen, requireSetupToken, async (_req, res) 
     env.GROQ_API_KEY
       ? { key: 'ai', label: 'AI assistant (Groq)', status: 'pass' }
       : {
-          key: 'ai', label: 'AI assistant (Groq)', status: 'warn',
-          fix: 'Optional: set GROQ_API_KEY to enable AI features.',
+          key: 'ai', label: 'AI assistant (Groq)', status: 'fail',
+          fix: 'Set GROQ_API_KEY (create a key at console.groq.com). The AI assistant is part of the platform.',
+        }
+  );
+
+  checks.push(
+    process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD
+      ? { key: 'email', label: 'Notification email (Gmail)', status: 'pass' }
+      : {
+          key: 'email', label: 'Notification email (Gmail)', status: 'fail',
+          fix: 'Set EMAIL_USER and EMAIL_APP_PASSWORD (an institutional Gmail address and its app password).',
         }
   );
 
