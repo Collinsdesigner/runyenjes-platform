@@ -9,7 +9,7 @@ import { prisma } from '../lib/prisma';
 import { env } from '../config/env';
 import { validate } from '../middleware/validate';
 import { uploadImage } from '../services/media.service';
-import { MODULES, MODULE_KEYS } from '../config/modules';
+import { MODULES, MODULE_KEYS, MODULE_AUDIENCE, normalizeModules } from '../config/modules';
 
 const router = Router();
 
@@ -211,6 +211,7 @@ const completeSchema = z.object({
     logoPublicId: z.string().trim().max(300).optional(),
   }),
   modules: z.record(z.string(), z.boolean()).default({}),
+  moduleLinks: z.record(z.string(), z.string()).default({}),
   externalSystems: z
     .array(
       z.object({
@@ -247,11 +248,29 @@ router.post(
 
     const unknownModules = Object.keys(d.modules).filter((k) => !MODULE_KEYS.includes(k));
     if (unknownModules.length > 0) {
-      return res.status(400).json({ message: `Unknown module(s): ${unknownModules.join(', ')}` });
+      return res.status(400).json({ message: `Unknown module(s): ${unknownModules.join(', ')}
+
+    const okUrl = (v: string) => {
+      try {
+        const u = new URL(v.trim());
+        return u.protocol === 'http:' || u.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    };
+    const badLink = Object.entries(d.moduleLinks).find(
+      ([k, v]) => v.trim() && (!MODULE_KEYS.includes(k) || !okUrl(v))
+    );
+    if (badLink) {
+      return res
+        .status(400)
+        .json({ message: 'The address for each system must start with http:// or https://.' });
+    }` });
     }
 
     try {
       const passwordHash = await bcrypt.hash(d.admin.password, 12);
+      const modulesNormalized = normalizeModules(d.modules);
 
       await prisma.$transaction(
         async (tx) => {
@@ -285,7 +304,7 @@ router.post(
 
           await tx.moduleSetting.deleteMany();
           await tx.moduleSetting.createMany({
-            data: MODULE_KEYS.map((key) => ({ key, enabled: d.modules[key] ?? true })),
+            data: MODULE_KEYS.map((key) => ({ key, enabled: modulesNormalized[key] })),
           });
 
           await tx.externalSystem.deleteMany();
@@ -296,6 +315,22 @@ router.post(
                 url: s.url,
                 visibleToRoles: s.visibleToRoles.length > 0 ? s.visibleToRoles : DEFAULT_LINK_ROLES,
                 sortOrder: i,
+              })),
+            });
+          }
+
+          // Link cards for areas the institution runs on its own system.
+          const ownLinks = MODULES.filter(
+            (mod) => !modulesNormalized[mod.key] && (d.moduleLinks[mod.key] || '').trim()
+          );
+          if (ownLinks.length > 0) {
+            await tx.externalSystem.createMany({
+              data: ownLinks.map((mod, i) => ({
+                name: mod.label,
+                url: d.moduleLinks[mod.key].trim(),
+                moduleKey: mod.key,
+                visibleToRoles: MODULE_AUDIENCE[mod.key] as Role[],
+                sortOrder: 100 + i,
               })),
             });
           }

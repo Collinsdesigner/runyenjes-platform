@@ -1096,6 +1096,7 @@ model ExternalSystem {
   name           String
   url            String
   visibleToRoles Role[]
+  moduleKey      String?
   sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
 }

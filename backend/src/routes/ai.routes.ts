@@ -1,3 +1,4 @@
+import { isModuleEnabled } from '../middleware/modules';
 import { getInstitutionName } from '../utils/institution';
 import { Router } from 'express';
 import dns from 'dns';
@@ -948,6 +949,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
     systemPrompt:
       'You help TVET college leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
     build: async () => {
+      const financeOn = await isModuleEnabled('finance');
       const [students, staffCounts, departments, programmes, units, admissionsByStatus, outstandingInvoices] = await Promise.all([
         prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
         prisma.user.groupBy({
@@ -972,7 +974,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
         return sum + (Number(inv.amount) - paid);
       }, 0);
 
-      return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
+      return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}${financeOn ? `\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}` : ''}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
     },
   },
   teacher_early_warning_summary: {
@@ -1040,6 +1042,16 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   },
 };
 
+// Quick actions that depend on an area an institution may run on its own system.
+const ASSIST_ACTION_MODULES: Record<string, string> = {
+  student_fees: 'finance',
+  finance_outstanding_invoices: 'finance',
+  hr_pending_leave: 'hr',
+  stores_low_stock: 'stores',
+  procurement_pending_requests: 'procurement',
+  alumni_career_tips: 'alumni',
+};
+
 // ---------- Role-specific one-click AI assist actions ----------
 router.post('/assist', requireAuth, async (req, res) => {
   const { action } = req.body;
@@ -1051,6 +1063,13 @@ router.post('/assist', requireAuth, async (req, res) => {
   const allowed = actionDef.roles.includes(req.user!.role) || req.user!.role === 'ADMIN';
   if (!allowed) {
     return res.status(403).json({ error: 'This assistant action is not available for your role' });
+  }
+
+  const moduleKey = ASSIST_ACTION_MODULES[action];
+  if (moduleKey && !(await isModuleEnabled(moduleKey))) {
+    return res.status(403).json({
+      error: "This assistant action is not available because that area is handled in your institution's own system.",
+    });
   }
 
   try {

@@ -19,12 +19,19 @@ interface NavSection {
   items: NavItem[];
 }
 
+interface ExternalLink {
+  id: string;
+  name: string;
+  url: string;
+}
+
 interface SiteSettings {
   institutionName: string;
   shortName: string;
   logoUrl: string | null;
   primaryColor: string;
   secondaryColor: string;
+  modules?: Record<string, boolean>;
 }
 
 /*
@@ -191,6 +198,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Reports', path: '/admin/reports', icon: '📊' },
         { label: 'Audit Log', path: '/admin/audit-log', icon: '📜' },
         { label: 'Settings', path: '/admin/settings', icon: '⚙' },
+        { label: 'Modules and Systems', path: '/admin/modules', icon: '🧩' },
       ],
     },
   ],
@@ -285,15 +293,40 @@ const STAFF_SELF_SERVICE_ROLES = [
   'SUPPORT_STAFF',
 ];
 
+// Which sidebar items belong to an area an institution may run on its own system.
+const MODULE_PATHS: Record<string, string[]> = {
+  finance: ['/finance', '/admin/finance', '/student/fees'],
+  hr: ['/hr', '/workers'],
+  stores: ['/stores'],
+  procurement: ['/procurement'],
+  alumni: ['/alumni', '/admin/alumni', '/jobs'],
+};
+
+function moduleForPath(path: string): string | null {
+  for (const [key, prefixes] of Object.entries(MODULE_PATHS)) {
+    if (prefixes.some((p) => path === p || path.startsWith(p + '/'))) return key;
+  }
+  return null;
+}
+
 export default function PortalLayout({
   title,
   children,
 }: PortalLayoutProps) {
-  const { user, logout, toggleDarkMode } = useAuth();
+  const { user, token, logout, toggleDarkMode } = useAuth();
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [externalSystems, setExternalSystems] = useState<ExternalLink[]>([]);
+
+  // Link cards to systems this institution runs elsewhere (already filtered by role on the server).
+  useEffect(() => {
+    if (!token) return;
+    api('/settings/external-systems', { token })
+      .then((list) => setExternalSystems(Array.isArray(list) ? list : []))
+      .catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     api('/settings')
@@ -326,13 +359,25 @@ export default function PortalLayout({
     return null;
   }
 
-  const sections: NavSection[] = [
+  const allSections: NavSection[] = [
     ...(roleSections[user.role] ?? []),
     ...(STAFF_SELF_SERVICE_ROLES.includes(user.role)
       ? [{ title: 'My Work', items: [{ label: 'Staff Self-Service', path: '/workers', icon: '🧾' }, { label: 'Job Board', path: '/jobs', icon: '💼' }] }]
       : []),
     ...commonSections,
   ];
+
+  // Hide items of areas this institution runs on its own system.
+  const moduleState = settings?.modules;
+  const sections: NavSection[] = allSections
+    .map((s) => ({
+      ...s,
+      items: s.items.filter((item) => {
+        const area = moduleForPath(item.path);
+        return !area || !moduleState || moduleState[area] !== false;
+      }),
+    }))
+    .filter((s) => s.items.length > 0);
 
   function handleLogout() {
     logout();
@@ -446,6 +491,27 @@ export default function PortalLayout({
             </div>
           ))}
 
+          {externalSystems.length > 0 && (
+            <div className="mb-5">
+              <div className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                Other systems
+              </div>
+              <div className="space-y-1">
+                {externalSystems.map((s) => (
+                  <a
+                    key={s.id}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <span className="w-5 text-center shrink-0">{'\u2197'}</span>
+                    <span className="truncate">{s.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Sign out */}

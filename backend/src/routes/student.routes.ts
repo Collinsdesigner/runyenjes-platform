@@ -1,3 +1,4 @@
+import { isModuleEnabled, requireModule } from '../middleware/modules';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -43,7 +44,7 @@ router.get('/academics', requireAuth, requireRole('STUDENT'), async (req, res) =
 });
 
 // ---------- Fees & Payments: my invoices + payments ----------
-router.get('/fees', requireAuth, requireRole('STUDENT'), async (req, res) => {
+router.get('/fees', requireAuth, requireRole('STUDENT'), requireModule('finance'), async (req, res) => {
   const invoices = await prisma.invoice.findMany({
     where: { studentId: req.user!.userId },
     include: { payments: true, term: true },
@@ -165,7 +166,8 @@ async function loadExamCardContext(studentId: string) {
   const paid = invoices.reduce((s, i) => s + i.payments.reduce((ps, p) => ps + Number(p.amount), 0), 0);
   const balance = Math.max(0, billed - paid);
   // Nothing billed for this term means nothing is owed, so the fee check passes.
-  const paidPercent = billed > 0 ? (paid / billed) * 100 : 100;
+  const financeOn = await isModuleEnabled('finance');
+  const paidPercent = !financeOn ? 100 : billed > 0 ? (paid / billed) * 100 : 100;
 
   const status = { ...blank, termName: term.name, paidPercent, balance };
 
@@ -216,10 +218,11 @@ router.get('/documents/overview', requireAuth, requireRole('STUDENT'), async (re
     });
 
     const { status } = await loadExamCardContext(studentId);
+    const financeShown = await isModuleEnabled('finance');
 
     res.json({
       resultTerms: resultTerms.map((t) => ({ id: t.id, name: t.name })),
-      payments: payments.map((p) => ({
+      payments: (financeShown ? payments : []).map((p) => ({
         id: p.id,
         receiptNo: receiptNumber(p.id),
         paidAt: p.paidAt,
@@ -285,7 +288,7 @@ router.get('/documents/results-slip', requireAuth, requireRole('STUDENT'), async
   }
 });
 
-router.get('/documents/fee-statement', requireAuth, requireRole('STUDENT'), async (req, res) => {
+router.get('/documents/fee-statement', requireAuth, requireRole('STUDENT'), requireModule('finance'), async (req, res) => {
   try {
     const studentId = req.user!.userId;
     const invoices = await prisma.invoice.findMany({
@@ -334,7 +337,7 @@ router.get('/documents/fee-statement', requireAuth, requireRole('STUDENT'), asyn
   }
 });
 
-router.get('/documents/receipt/:paymentId', requireAuth, requireRole('STUDENT'), async (req, res) => {
+router.get('/documents/receipt/:paymentId', requireAuth, requireRole('STUDENT'), requireModule('finance'), async (req, res) => {
   try {
     const studentId = req.user!.userId;
     const payment = await prisma.feePayment.findUnique({

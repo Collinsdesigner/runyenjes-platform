@@ -1,7 +1,7 @@
 // RUNYENJES-SETUP-V1
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { MODULE_KEYS } from '../config/modules';
+import { MODULE_KEYS, normalizeModules } from '../config/modules';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -26,7 +26,7 @@ router.get('/', async (_req, res) => {
       if (row.key in modules) modules[row.key] = row.enabled;
     }
 
-    res.json({ ...(settings ?? {}), configured: !!settings, modules });
+    res.json({ ...(settings ?? {}), configured: !!settings, modules: normalizeModules(modules) });
   } catch (error) {
     console.error('Settings fetch failed:', error);
     res.status(500).json({ message: 'Could not load settings.' });
@@ -44,7 +44,7 @@ router.get('/external-systems', requireAuth, async (req, res) => {
     const visible =
       role === 'ADMIN' ? systems : systems.filter((s) => s.visibleToRoles.some((r) => r === role));
     res.json(
-      visible.map((s) => ({ id: s.id, name: s.name, url: s.url, visibleToRoles: s.visibleToRoles }))
+      visible.map((s) => ({ id: s.id, name: s.name, url: s.url, visibleToRoles: s.visibleToRoles, moduleKey: s.moduleKey }))
     );
   } catch (error) {
     console.error('External systems fetch failed:', error);

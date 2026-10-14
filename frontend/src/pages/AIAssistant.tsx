@@ -38,6 +38,16 @@ const QUICK_ACTIONS: Record<string, { action: string; label: string; icon: strin
 };
 
 
+// Quick actions that depend on an area an institution may run on its own system.
+const QUICK_ACTION_MODULES: Record<string, string> = {
+  student_fees: 'finance',
+  finance_outstanding_invoices: 'finance',
+  hr_pending_leave: 'hr',
+  stores_low_stock: 'stores',
+  procurement_pending_requests: 'procurement',
+  alumni_career_tips: 'alumni',
+};
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -59,6 +69,20 @@ export default function AIAssistant() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [modules, setModules] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    api('/settings')
+      .then((s) => setModules((s && s.modules) || {}))
+      .catch(() => {});
+  }, []);
+
+  function visibleQuickActions(role: string) {
+    return (QUICK_ACTIONS[role] ?? []).filter((qa) => {
+      const area = QUICK_ACTION_MODULES[qa.action];
+      return !area || modules[area] !== false;
+    });
+  }
   const bottomRef = useRef<HTMLDivElement>(null);
 
   async function loadConversations() {
@@ -224,10 +248,10 @@ export default function AIAssistant() {
           <div className="flex-1 space-y-3 overflow-y-auto mb-3">
             {messages.length === 0 && !activeId && (
               <div className="mt-6 space-y-4">
-                {(QUICK_ACTIONS[user.role] ?? []).length > 0 && (
+                {visibleQuickActions(user.role).length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-400 text-center dark:text-gray-500">Quick actions for your role:</p>
-                    {(QUICK_ACTIONS[user.role] ?? []).map((qa) => (
+                    {visibleQuickActions(user.role).map((qa) => (
                       <button
                         key={qa.action}
                         onClick={() => handleQuickAction(qa.action, `${qa.icon} ${qa.label}`)}

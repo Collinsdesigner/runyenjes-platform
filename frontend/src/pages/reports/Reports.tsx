@@ -146,12 +146,14 @@ export default function Reports() {
                 {data.departments} / {data.programmes} / {data.units}
               </div>
             </div>
+            {data.outstandingInvoiceCount !== null && data.outstandingInvoiceCount !== undefined && (
             <div className="bg-white border border-gray-200 rounded-lg p-5 dark:bg-gray-900 dark:border-gray-700">
               <div className="text-xs text-gray-500 dark:text-gray-400">Outstanding Invoices</div>
               <div className="text-2xl font-bold text-gray-900 mt-1 dark:text-gray-100">
                 {data.outstandingInvoiceCount} (KES {data.outstandingBalance})
               </div>
             </div>
+            )}
 
             <div className="bg-white border border-gray-200 rounded-lg p-5 md:col-span-2 dark:bg-gray-900 dark:border-gray-700">
               <div className="font-semibold text-gray-900 mb-3 dark:text-gray-100">Staff by Role</div>

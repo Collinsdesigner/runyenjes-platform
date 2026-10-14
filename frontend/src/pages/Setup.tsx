@@ -106,6 +106,7 @@ export default function Setup() {
   const [logoError, setLogoError] = useState('');
 
   const [modules, setModules] = useState<Record<string, boolean>>({});
+  const [moduleLinks, setModuleLinks] = useState<Record<string, string>>({});
   const [links, setLinks] = useState<LinkRow[]>([]);
 
   const [admin, setAdmin] = useState({ name: '', email: '', password: '', confirm: '' });
@@ -199,6 +200,11 @@ export default function Setup() {
     setLinks((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
   }
 
+  // Choosing "our own system" for Stores also moves Procurement, which works with Stores.
+  function chooseOwn(key: string) {
+    setModules((prev) => ({ ...prev, [key]: false, ...(key === 'stores' ? { procurement: false } : {}) }));
+  }
+
   function validateStep(s: number): string {
     if (s === 0) {
       if (!readiness) return 'Run the checks first.';
@@ -210,6 +216,13 @@ export default function Setup() {
       if (!inst.address.trim()) return 'Enter the postal or physical address.';
       if (inst.phone.trim().length < 5) return 'Enter a phone number.';
       if (!isEmail(inst.email)) return 'Enter a valid institution email.';
+    }
+    if (s === 3) {
+      for (const [k, v] of Object.entries(moduleLinks)) {
+        if (modules[k] === false && v.trim() && !isHttpUrl(v)) {
+          return 'The address for each system must start with http:// or https://.';
+        }
+      }
     }
     if (s === 4) {
       for (const l of links) {
@@ -263,6 +276,7 @@ export default function Setup() {
         logoPublicId: logo?.publicId,
       },
       modules,
+      moduleLinks: Object.fromEntries(Object.entries(moduleLinks).filter(([k, v]) => modules[k] === false && v.trim())),
       externalSystems: links
         .filter((l) => l.name.trim() && l.url.trim())
         .map((l) => ({
@@ -566,27 +580,64 @@ export default function Setup() {
         {step === 3 && (
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-              Switch off any area your institution already runs on its own system, so there is no
-              duplicate source of truth. Admissions, academics, users and announcements are always on.
-              You can change this later.
+              For each area below, choose whether your institution uses this platform's version or
+              already runs it on another system. If you use another system, we hide ours so there is
+              no duplicate, and you can add the address of your system so people can open it from here.
+              Admissions, academics, examinations, learning materials and announcements are always
+              provided by this platform. You can change all of this later in Admin, Modules and Systems.
             </p>
-            <ul className="space-y-2">
-              {status.modules.map((m) => (
-                <li key={m.key}>
-                  <label className="flex items-start gap-3 text-sm text-gray-800 dark:text-gray-100">
-                    <input
-                      type="checkbox"
-                      className="mt-1"
-                      checked={modules[m.key] ?? true}
-                      onChange={(e) => setModules((prev) => ({ ...prev, [m.key]: e.target.checked }))}
-                    />
-                    <span>
-                      <span className="font-medium">{m.label}</span>
-                      <span className="block text-gray-500 dark:text-gray-400">{m.description}</span>
-                    </span>
-                  </label>
-                </li>
-              ))}
+            <ul className="space-y-3">
+              {status.modules.map((m) => {
+                const own = modules[m.key] === false;
+                const locked = m.key === 'procurement' && modules['stores'] === false;
+                const link = moduleLinks[m.key] ?? '';
+                return (
+                  <li key={m.key} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{m.label}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{m.description}</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <button
+                        type="button"
+                        disabled={locked}
+                        className={!own ? primaryBtn : secondaryBtn}
+                        onClick={() => setModules((prev) => ({ ...prev, [m.key]: true }))}
+                      >
+                        Use this platform's
+                      </button>
+                      <button
+                        type="button"
+                        className={own ? primaryBtn : secondaryBtn}
+                        onClick={() => chooseOwn(m.key)}
+                      >
+                        We use our own system
+                      </button>
+                    </div>
+                    {locked && (
+                      <p className="text-sm text-gray-500 mt-2 dark:text-gray-400">
+                        Procurement works with Stores, so it is handled elsewhere too.
+                      </p>
+                    )}
+                    {own && (
+                      <div className="mt-2">
+                        <label className={labelCls}>
+                          Address of that system (optional)
+                          <input
+                            className={inputCls}
+                            placeholder="https://"
+                            value={link}
+                            onChange={(e) => setModuleLinks((prev) => ({ ...prev, [m.key]: e.target.value }))}
+                          />
+                        </label>
+                        {link.trim().toLowerCase().startsWith('http://') && (
+                          <p className="text-sm text-amber-600 mt-1">
+                            This address is not encrypted (http). Use https if you can.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -729,7 +780,7 @@ export default function Setup() {
               Colors: {primary} and {secondary}. Logo: {logo ? 'uploaded' : 'none'}.
             </p>
             <p>
-              Modules off:{' '}
+              Handled in their own system:{' '}
               {status.modules.filter((m) => modules[m.key] === false).map((m) => m.label).join(', ') || 'none'}
             </p>
             <p>
