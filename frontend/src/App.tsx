@@ -5,6 +5,7 @@ import { api } from './api/client';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Setup from './pages/Setup';
+import DeploymentGuide from './pages/DeploymentGuide';
 import ModuleGate from './components/ModuleGate';
 import AdminModules from './pages/admin/AdminModules';
 import Apply from './pages/Apply';
@@ -91,7 +92,7 @@ export default function App() {
       .then((settings) => {
         // SETUP_REDIRECT_V1: a fresh install has no SiteSettings row yet, so
         // the server reports configured:false. Send the installer to the wizard.
-        if (settings && settings.configured === false && window.location.pathname !== '/setup') {
+        if (settings && settings.configured === false && !['/setup', '/deployment-guide'].includes(window.location.pathname)) {
           window.location.replace('/setup');
           return;
         }
@@ -131,6 +132,7 @@ export default function App() {
 
           <Route path="/login" element={<Login />} />
           <Route path="/setup" element={<Setup />} />
+          <Route path="/deployment-guide" element={<DeploymentGuide />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/admissions" element={<Admissions />} />
           <Route path="/groups" element={<Groups />} />

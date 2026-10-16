@@ -1,6 +1,6 @@
 # Deployment Guide
 
-How to install this platform for your institution. Allow two to three hours the first time. You do not need to be a programmer, but you need to be comfortable creating online accounts and copying values between websites.
+How to install this platform for your institution. Allow two to three hours the first time. You do not need to be a programmer, but you need to be comfortable creating online accounts and copying values between websites. This guide is also available inside the app: the first step of the setup wizard links to it.
 
 ---
 
@@ -35,6 +35,8 @@ You will collect several secret values along the way (passwords and keys). Keep 
 1. Create an account at neon.tech and create a new project. Choose the region closest to your users.
 2. Open the project's **Connect** dialog and copy the connection string. It starts with `postgresql://` and contains your password. Use the pooled version (the host name contains `-pooler`).
 3. Save it. You will call it `DATABASE_URL`.
+
+A Neon database that has been idle can take several seconds to wake up, and the first connection may fail with a message that the database cannot be reached. If that happens, wait a minute and try again. To make the first connection more patient, add `&connect_timeout=30` to the very end of the connection string.
 
 ## 4. Step 2: Media storage (Cloudinary)
 
@@ -132,7 +134,9 @@ After switching, the old `vercel.app` address stops working for sign-in, because
 
 1. Open your website address. A fresh installation sends you to the setup wizard automatically (`/setup`).
 2. **Step 1 (Check):** enter your `SETUP_TOKEN` if you set one, then run the checks. Each item shows OK, WARN or FAIL, with a one-line fix for anything that fails. You cannot continue while any check shows FAIL. Fix it on Render, wait for the redeploy, and run the checks again.
-3. Complete the remaining steps: institution details, logo and colors, modules, external systems, the first administrator account, and an optional first department and programme.
+3. Complete the remaining steps: institution details, logo and colors, areas you run on another system, other external systems, the first administrator account, and an optional first department and programme.
+   - **Areas (the Modules step):** for each of Finance, Human Resources, Stores, Procurement and Alumni (which includes the job board), choose *Use this platform's* (the default) or *We use our own system*. Choose the second only if your institution already runs that area on another system, so there is no duplicate. You can enter the address of that system, and it appears as a link card for the people who would otherwise use that area. Procurement works with Stores, so it follows Stores.
+   - You can change all of this later (see Step 9).
 4. Press **Finish setup**, then sign in with the administrator account you created.
 5. **Remove `SETUP_TOKEN` from Render.** The wizard locks itself permanently once an administrator exists, but removing the token is good practice.
 6. **Create a second administrator account** (Admin, Users) right away. If you have only one and forget its password, you can be locked out.
@@ -145,6 +149,15 @@ In the Admin portal:
 - **Settings:** set the M-Pesa Paybill and account number, the intake dates shown on the Apply page, the "Admission number example" hint, and the About page highlights.
 - **Users and Staff:** create the accounts for your registrar, finance officer, teachers and so on.
 - **Admission numbers are typed by the registrar** when admitting a student. The system never generates them, so use whatever format your institution already uses.
+
+**Areas you run on another system.** In Admin, open **Modules and Systems** at any time to switch Finance, Human Resources, Stores, Procurement or Alumni to *We use our own system*, or back. When an area is switched off:
+- Its menu items disappear. The people who used it see a short page saying it is handled in your institution's own system, with a button to open that system if you entered its address.
+- Its backend refuses requests, so nothing can be entered there by accident.
+- When Finance is off, student fee pages and receipts, finance figures in Reports and in the AI summaries, and the Finance approval step on new clearance and graduation requests are left out.
+- **Nothing is deleted.** Switching an area back on restores everything.
+- Admissions, academics, examinations, learning materials and announcements cannot be switched off.
+
+Limits to know about: requests that were already waiting for a Finance approval when Finance is switched off stay waiting. An administrator can still change an existing account to a role of a switched-off area; that person simply sees the "handled in your own system" page. The platform never reads or writes data in your other system. It only links to it.
 
 Then test the whole chain once with your own details:
 1. Submit a test application from the public Apply page, using your own email address.
@@ -196,7 +209,12 @@ You would publish a port on your router and run a web server (for example Caddy 
 
 ### 12.5 Adding it to the platform
 
-Enter the name and the `https://` address in the setup wizard, or later in Admin settings, and choose who may see it: administrators only, staff only (the default), or everyone. It appears as a link card for those users, and opens in a new tab.
+There are two ways:
+
+1. **For an area this platform also offers** (Finance, Human Resources, Stores, Procurement, Alumni), enter the address when you choose *We use our own system* in the wizard's Modules step, or later in Admin, Modules and Systems. The card is shown to the people who would otherwise use that area.
+2. **For any other system**, add it under **Other systems** (the wizard's Systems step, or Admin, Modules and Systems) with a name, the `https://` address, and who may see it: administrators only, staff only (the default), or everyone.
+
+Cards appear in the sidebar under **Other systems** and open in a new tab.
 
 ### 12.6 Safety checklist for a published system
 
@@ -242,7 +260,7 @@ Your records live in Neon. Plan for the day something goes wrong:
 | The wizard says **Cannot reach the server** | `VITE_API_URL` on Vercel is wrong, or the Render service is asleep. Wait a minute and reload. Check you redeployed Vercel after changing the variable |
 | A page shows 404 after refreshing | `frontend/vercel.json` is missing from your deployment |
 | Render build fails with an error about `tsc` or TypeScript | Use the build command exactly as written, including `--include=dev` |
-| Wizard check **FAIL: Database connection** | `DATABASE_URL` is wrong. Neon can also take a few seconds to wake after being idle, so retry once |
+| Wizard check **FAIL: Database connection** | `DATABASE_URL` is wrong. Neon can also take a few seconds to wake after being idle, so retry once, and add `&connect_timeout=30` to the end of the connection string |
 | Wizard check **FAIL: Media storage** | One of the three Cloudinary values is missing or mistyped |
 | Wizard check **FAIL: AI assistant** | `GROQ_API_KEY` is missing |
 | Wizard check **FAIL: Notification email** | `EMAIL_USER` or `EMAIL_APP_PASSWORD` is missing |

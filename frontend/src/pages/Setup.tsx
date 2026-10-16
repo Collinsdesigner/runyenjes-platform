@@ -331,6 +331,13 @@ export default function Setup() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Check that the backend is running and that VITE_API_URL points to it.
           </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Stuck? The{' '}
+              <a href="/deployment-guide" target="_blank" rel="noopener noreferrer" className="underline">
+                Deployment Guide
+              </a>
+              explains each step.
+            </p>
           <button className={primaryBtn} onClick={() => window.location.reload()}>
             Try again
           </button>
@@ -397,6 +404,13 @@ export default function Setup() {
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               These checks confirm your database, media storage and security settings are ready
               before you continue.
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Need help setting up the services (database, media, AI, email)? Read the{' '}
+              <a href="/deployment-guide" target="_blank" rel="noopener noreferrer" className="underline">
+                Deployment Guide
+              </a>
+              .
             </p>
 
             {status.tokenRequired && (
