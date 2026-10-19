@@ -5,6 +5,7 @@ import {
   getReadiness,
   uploadSetupLogo,
   completeSetup,
+  sendTestEmail,
   SetupApiError,
   type SetupStatus,
   type Readiness,
@@ -85,6 +86,8 @@ export default function Setup() {
   const [readiness, setReadiness] = useState<Readiness | null>(null);
   const [checking, setChecking] = useState(false);
   const [checkError, setCheckError] = useState('');
+  const [testMsg, setTestMsg] = useState('');
+  const [testBusy, setTestBusy] = useState(false);
 
   const [inst, setInst] = useState({
     institutionName: '',
@@ -162,6 +165,19 @@ export default function Setup() {
       }
     } finally {
       setChecking(false);
+    }
+  }
+
+  async function runTestEmail() {
+    setTestBusy(true);
+    setTestMsg('');
+    try {
+      const res = await sendTestEmail(token || null);
+      setTestMsg(res.message || 'Test email sent.');
+    } catch (err) {
+      setTestMsg(err instanceof Error ? err.message : 'The test email could not be sent.');
+    } finally {
+      setTestBusy(false);
     }
   }
 
@@ -435,6 +451,15 @@ export default function Setup() {
             </button>
 
             {checkError && <p className="text-sm text-red-600 mt-3">{checkError}</p>}
+
+            {readiness && (
+              <div className="mt-3">
+                <button type="button" className={secondaryBtn} onClick={runTestEmail} disabled={testBusy}>
+                  {testBusy ? 'Sending...' : 'Send a test email'}
+                </button>
+                {testMsg && <p className="text-sm mt-2 text-gray-700 dark:text-gray-200">{testMsg}</p>}
+              </div>
+            )}
 
             {readiness && (
               <ul className="mt-4 space-y-2">

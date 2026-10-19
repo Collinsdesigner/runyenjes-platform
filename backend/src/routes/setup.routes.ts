@@ -1,3 +1,4 @@
+import { isEmailConfigured, sendEmailChecked, emailTestRecipient } from '../utils/email';
 // RUNYENJES-SETUP-V1
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
@@ -140,15 +141,41 @@ router.get('/readiness', requireSetupOpen, requireSetupToken, async (_req, res) 
   );
 
   checks.push(
-    process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD
-      ? { key: 'email', label: 'Notification email (Gmail)', status: 'pass' }
+    isEmailConfigured()
+      ? { key: 'email', label: 'Notification email', status: 'pass' }
       : {
-          key: 'email', label: 'Notification email (Gmail)', status: 'fail',
-          fix: 'Set EMAIL_USER and EMAIL_APP_PASSWORD (an institutional Gmail address and its app password).',
+          key: 'email', label: 'Notification email', status: 'fail',
+          fix: 'Set EMAIL_USER and EMAIL_PASSWORD, plus EMAIL_HOST and EMAIL_PORT unless you use Gmail. See the Deployment Guide, Step 4.',
         }
   );
 
   res.json({ ready: !checks.some((c) => c.status === 'fail'), checks });
+});
+
+// ---------- POST /setup/test-email ----------
+// Sends one test message to the portal's own mailbox. The recipient is never
+// taken from the request, so this cannot be used to send mail to other people.
+router.post('/test-email', requireSetupOpen, requireSetupToken, async (_req, res) => {
+  if (!isEmailConfigured()) {
+    return res
+      .status(400)
+      .json({ message: 'Email is not configured yet. Set the email values on your server first.' });
+  }
+  const to = emailTestRecipient();
+  if (!to) {
+    return res.status(400).json({
+      message: 'Set EMAIL_FROM to the address emails should come from (the email user name is not an address).',
+    });
+  }
+  const result = await sendEmailChecked(
+    to,
+    'Test email from your new platform',
+    'If you can read this, email is working. You can ignore this message.'
+  );
+  if (!result.ok) {
+    return res.status(502).json({ message: 'The test email could not be sent: ' + result.error });
+  }
+  res.json({ message: 'Test email sent to ' + to + '. Check that mailbox, and its spam folder.' });
 });
 
 // ---------- POST /setup/logo ----------

@@ -92,3 +92,7 @@ export function completeSetup(payload: unknown, token: string | null) {
     token
   );
 }
+
+export function sendTestEmail(token: string | null): Promise<{ message: string }> {
+  return call('/setup/test-email', { method: 'POST' }, token);
+}

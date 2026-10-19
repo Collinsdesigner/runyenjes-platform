@@ -15,7 +15,7 @@ Each institution runs its own separate copy. Nothing is shared with any other sc
 | **Vercel** | The frontend (the website people open) | Yes |
 | **Cloudinary** | Stored images and documents (logo, student documents, letters) | Yes |
 | **Groq** | The AI assistant, unit tutor, quizzes and AI summaries | Yes |
-| **Gmail** | Notification emails to applicants and students | Yes |
+| **An email account** (any SMTP provider) | Notification emails to applicants and students | Yes |
 | **A domain name** | Your own web address, such as `portal.yourschool.ac.ke` | Strongly recommended |
 
 All of these have free plans you can start on. Free plans have limits: for example, a free Render service goes to sleep after a period of inactivity and takes up to a minute to wake on the next visit. For a real school with daily use, plan to move the backend and database to paid plans.
@@ -54,18 +54,39 @@ The AI assistant, the unit tutor, the quiz generator, grading suggestions, timet
 
 Free usage has rate limits. If many students use the AI at the same time and it starts to slow down or return errors, check Groq's current plans and limits.
 
-## 6. Step 4: Email (Gmail)
+## 6. Step 4: Email
 
-The platform emails applicants (application status, payment verification) and new students (their admission details).
+The platform emails applicants (application status, payment verification) and new students (their admission details). It sends through any mail provider that offers **SMTP**, the standard way programs send email, so you are not tied to one provider.
+
+You need five values from your provider: a **server name** (host), a **port**, a **user name**, a **password**, and the **address the emails come from**. Choose one of these:
+
+- **Your institution's existing email** (Google Workspace, Zoho, or the mail that came with your website hosting). Use a dedicated address such as `admissions@yourschool.ac.ke`. Your provider's help pages list its SMTP settings, usually under "SMTP", "outgoing mail server" or "email client settings".
+- **Gmail** (instructions below).
+- **A sending service such as Brevo (it has a free plan), Mailgun or SendGrid.** This is often the most reliable choice for a school, because these services are built for notification email and their messages are less likely to land in spam. You verify your domain once and they give you the five values.
+- **Microsoft 365** can work, but Microsoft has been restricting the password sign-in that SMTP needs, so confirm with your administrator that sending is allowed before choosing it.
+
+Typical settings (always confirm on your provider's own help page, because these change):
+
+| Provider | `EMAIL_HOST` | `EMAIL_PORT` |
+|---|---|---|
+| Gmail or Google Workspace | `smtp.gmail.com` | `465` |
+| Zoho Mail | `smtp.zoho.com` | `465` |
+| Brevo | `smtp-relay.brevo.com` | `587` |
+| Your own hosting (cPanel) | usually `mail.yourdomain.com` | `465` or `587` |
+
+Port 465 uses a secure connection from the start and 587 upgrades to one; the platform handles both.
+
+**If you choose Gmail or Google Workspace:**
 
 1. Use a Gmail or Google Workspace address that belongs to the institution, for example `admissions@yourschool.ac.ke`. Do not use a staff member's personal address.
 2. Sign in to that Google account and turn on **2-Step Verification** (Google Account, then Security).
 3. Create an **app password**: in the same Security area, search for **App passwords** (it appears only after 2-Step Verification is on; on a Workspace account your Google administrator may need to allow it). Name it "portal", press Generate, and copy the 16-letter code. Remove any spaces when you paste it later.
-4. Save two values: `EMAIL_USER` (the full address) and `EMAIL_APP_PASSWORD` (the 16-letter code). Never use the account's normal password.
+4. Your values are `EMAIL_HOST` = `smtp.gmail.com`, `EMAIL_PORT` = `465`, `EMAIL_USER` = the full address, and `EMAIL_PASSWORD` = the 16-letter code. Never use the account's normal password.
 
 Things to know:
 - Gmail limits how many messages an account can send per day. Use one address dedicated to the portal, and check Google's current limits for your account type.
-- The platform currently sends through Gmail or Google Workspace only. Other mail providers are not supported.
+- Any provider that offers SMTP works. Gmail is only one example.
+- If your provider's user name is not an email address (some sending services work this way), also set `EMAIL_FROM` to the address emails should come from.
 - Messages show the institution's name as the sender name.
 
 ## 7. Step 5: Backend (Render)
@@ -86,8 +107,11 @@ Things to know:
 | `CLOUDINARY_API_KEY` | Yes | From Step 2 |
 | `CLOUDINARY_API_SECRET` | Yes | From Step 2 |
 | `GROQ_API_KEY` | Yes | From Step 3 |
-| `EMAIL_USER` | Yes | From Step 4 |
-| `EMAIL_APP_PASSWORD` | Yes | From Step 4 |
+| `EMAIL_HOST` | Yes | Your provider's SMTP server, for example `smtp.gmail.com` (Step 4) |
+| `EMAIL_PORT` | Yes | `465` or `587` (Step 4) |
+| `EMAIL_USER` | Yes | The SMTP user name, usually the full email address (Step 4) |
+| `EMAIL_PASSWORD` | Yes | The SMTP password or app password (Step 4). The older name `EMAIL_APP_PASSWORD` is still accepted |
+| `EMAIL_FROM` | Only if needed | The address emails come from, if it differs from `EMAIL_USER` |
 | `FRONTEND_URL` | Yes | Your website's address, for example `https://yourschool.vercel.app`. Exactly as typed in the browser, `https`, no trailing slash. You can only fill this in after Step 6, so deploy once without it, then add it and redeploy |
 | `SETUP_TOKEN` | Strongly recommended | Any random string. It stops a stranger from finishing your setup before you do. You remove it after setup |
 | `NODE_ENV` | Recommended | `production` |
@@ -133,7 +157,7 @@ After switching, the old `vercel.app` address stops working for sign-in, because
 ## 10. Step 8: Run the setup wizard
 
 1. Open your website address. A fresh installation sends you to the setup wizard automatically (`/setup`).
-2. **Step 1 (Check):** enter your `SETUP_TOKEN` if you set one, then run the checks. Each item shows OK, WARN or FAIL, with a one-line fix for anything that fails. You cannot continue while any check shows FAIL. Fix it on Render, wait for the redeploy, and run the checks again.
+2. **Step 1 (Check):** enter your `SETUP_TOKEN` if you set one, then run the checks. Each item shows OK, WARN or FAIL, with a one-line fix for anything that fails. You cannot continue while any check shows FAIL. Fix it on Render, wait for the redeploy, and run the checks again. Once the checks pass, press **Send a test email**: it sends one message to the portal's own mailbox, so you can confirm that email really works before you continue.
 3. Complete the remaining steps: institution details, logo and colors, areas you run on another system, other external systems, the first administrator account, and an optional first department and programme.
    - **Areas (the Modules step):** for each of Finance, Human Resources, Stores, Procurement and Alumni (which includes the job board), choose *Use this platform's* (the default) or *We use our own system*. Choose the second only if your institution already runs that area on another system, so there is no duplicate. You can enter the address of that system, and it appears as a link card for the people who would otherwise use that area. Procurement works with Stores, so it follows Stores.
    - You can change all of this later (see Step 9).
@@ -263,13 +287,14 @@ Your records live in Neon. Plan for the day something goes wrong:
 | Wizard check **FAIL: Database connection** | `DATABASE_URL` is wrong. Neon can also take a few seconds to wake after being idle, so retry once, and add `&connect_timeout=30` to the end of the connection string |
 | Wizard check **FAIL: Media storage** | One of the three Cloudinary values is missing or mistyped |
 | Wizard check **FAIL: AI assistant** | `GROQ_API_KEY` is missing |
-| Wizard check **FAIL: Notification email** | `EMAIL_USER` or `EMAIL_APP_PASSWORD` is missing |
+| Wizard check **FAIL: Notification email** | `EMAIL_USER` or `EMAIL_PASSWORD` is missing (and `EMAIL_HOST` if you do not use Gmail) |
+| The test email fails | The message names the cause. Usually the host, port, user name or password is wrong, or your provider needs an app password or has blocked the sign-in |
 | Wizard check **FAIL: Login security key** | `JWT_SECRET` is missing or shorter than 32 characters |
 | Wizard says **That setup token is not correct** | The token you typed differs from `SETUP_TOKEN` on Render |
 | Visiting `/setup` sends you to the home page | Setup is already complete. This is expected and permanent |
 | Logo upload fails | Check the Cloudinary values and that the image is under 5 MB |
 | Letters or PDFs show an access error | Enable "Allow delivery of PDF and ZIP files" in Cloudinary (Step 2) |
-| Emails are not arriving | Check the two email values. Check the spam folder. Make sure you used an app password, not the normal password. The Render logs show send errors |
+| Emails are not arriving | Check the email values (host, port, user, password). Check the spam folder. With Gmail, make sure you used an app password, not the normal password. The Render logs show send errors |
 | The AI assistant gives errors | The Groq key is wrong, or you reached Groq's rate limit |
 | Your new domain shows an error | The DNS record is missing or not yet active (Vercel's Domains page shows the status), or `FRONTEND_URL` still has the old address |
 | Everything is slow on the first visit of the day | A free-plan service is waking up. A paid plan removes this |

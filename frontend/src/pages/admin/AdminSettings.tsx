@@ -238,7 +238,7 @@ export default function AdminSettings() {
               <span className="text-gray-500 dark:text-gray-400">M-Pesa Paybill number</span>
               <input
                 className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
-                placeholder="e.g. 247247"
+                placeholder="e.g. 123456"
                 value={form.mpesaPaybill}
                 onChange={(e) => set('mpesaPaybill', e.target.value)}
               />
@@ -247,7 +247,7 @@ export default function AdminSettings() {
               <span className="text-gray-500 dark:text-gray-400">M-Pesa account number</span>
               <input
                 className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
-                placeholder="e.g. 0190274872116"
+                placeholder="e.g. 1234567890"
                 value={form.mpesaAccountNumber}
                 onChange={(e) => set('mpesaAccountNumber', e.target.value)}
               />
