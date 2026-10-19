@@ -12,7 +12,7 @@ export const REQUEST_TYPE_LABELS: Record<RequestType, string> = {
 
 export const REQUEST_TYPE_DESCRIPTIONS: Record<RequestType, string> = {
   PROGRAMME_CHANGE: 'Ask the Registrar to move you to a different programme.',
-  CLEARANCE: 'Get cleared by Finance and the Registrar — required before you can request graduation.',
+  CLEARANCE: 'Get cleared by the relevant offices — required before you can request graduation.',
   GRADUATION: 'Request graduation clearance. You need an approved Clearance Request first.',
   ACADEMIC_REQUISITION: 'Request a specific academic document, e.g. a transcript or reference letter.',
 };

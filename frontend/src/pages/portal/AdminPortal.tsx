@@ -33,7 +33,7 @@ export default function AdminPortal() {
             Administration Dashboard
           </h2>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-            Manage the college's people, academics and operations.
+            Manage your institution's people, academics and operations.
           </p>
         </div>
 

@@ -89,7 +89,7 @@ export default function AdminSettings() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Institution Settings</h2>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-            Renaming the college, changing colors, or updating contact info happens here — no code change needed.
+            Renaming the institution, changing colors, or updating contact info happens here — no code change needed.
           </p>
         </div>
 
