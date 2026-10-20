@@ -155,6 +155,7 @@ export default function OfficialDocuments() {
           </div>
 
           {/* Receipts */}
+          {financeOn && (
           <div className="px-4 py-4">
             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Payment Receipts</div>
             {overview.payments.length === 0 ? (
@@ -184,6 +185,7 @@ export default function OfficialDocuments() {
               </div>
             )}
           </div>
+          )}
         </div>
       )}
     </section>
