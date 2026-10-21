@@ -395,7 +395,7 @@ router.post('/departments/:departmentId/programs', async (req, res) => {
       name,
       level: level || null,
       entryRequirements: entryRequirements || null,
-      examBody: examBody || 'TVET CDACC',
+      examBody: examBody || null,
       isShortCourse: Boolean(isShortCourse),
     },
   });
@@ -565,7 +565,7 @@ router.post('/programs/:id/fee', async (req, res) => {
 });
 
 // ---------- Update site settings (name, branding, contact info) ----------
-// This is what makes the blueprint's promise real: renaming the college,
+// This is what makes the blueprint's promise real: renaming the institution,
 // changing colors, or updating contact info is a form edit here, not a
 // code change or redeployment.
 // SITE_SETTINGS_HIGHLIGHTS_V1

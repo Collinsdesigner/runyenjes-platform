@@ -312,7 +312,7 @@ teacher will do that separately.`;
 
   try {
     const reply = await callGroq(
-      'You are a supportive TVET tutor giving draft feedback, not a grader. Be specific and encouraging.',
+      'You are a supportive tutor giving draft feedback, not a grader. Be specific and encouraging.',
       prompt,
       600
     );
@@ -390,7 +390,7 @@ router.post(
 Topic: ${topic}
 
 Draft a short learning material description/summary (a few paragraphs) a teacher could use as
-lecture notes or a resource description for this topic. Keep it practical and TVET-appropriate.`
+lecture notes or a resource description for this topic. Keep it practical and appropriate.`
         : `Unit: ${unit.name}
 Topic: ${topic}
 
@@ -400,7 +400,7 @@ students should do. Respond with ONLY valid JSON in exactly this shape:
 
     try {
       const reply = await callGroq(
-        'You help TVET teachers draft course content quickly. Keep it practical and clear.',
+        'You help teachers draft course content quickly. Keep it practical and clear.',
         prompt,
         800
       );
@@ -664,7 +664,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_class_performance: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher understand how their classes are performing. Identify trends and flag students who may need extra support. Be concise.',
+      'You help a teacher understand how their classes are performing. Identify trends and flag students who may need extra support. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no performance data to summarize.';
@@ -702,7 +702,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   registrar_pending_applications: {
     roles: ['REGISTRAR'],
     systemPrompt:
-      'You help a TVET registrar triage pending admissions applications. Prioritize what needs attention first (e.g. oldest, payment issues). Be concise.',
+      'You help a registrar triage pending admissions applications. Prioritize what needs attention first (e.g. oldest, payment issues). Be concise.',
     build: async () => {
       const applications = await prisma.application.findMany({
         where: { status: 'SUBMITTED' },
@@ -860,7 +860,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_unit_results_summary: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher understand exam/assessment results across the units they teach. Identify trends and flag students who may need extra support. Be concise.',
+      'You help a teacher understand exam/assessment results across the units they teach. Identify trends and flag students who may need extra support. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no results data to summarize.';
@@ -891,7 +891,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_attendance_patterns: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher spot attendance patterns across the units they teach. Flag students with frequent absences and any noticeable trends. Be concise.',
+      'You help a teacher spot attendance patterns across the units they teach. Flag students with frequent absences and any noticeable trends. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no attendance data to summarize.';
@@ -980,7 +980,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_early_warning_summary: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher decide how to support students flagged as at-risk across attendance, ' +
+      'You help a teacher decide how to support students flagged as at-risk across attendance, ' +
       'assignments, and results. Be concise, practical, and encouraging -- suggest concrete next steps ' +
       '(e.g. who to check in with first, what kind of support each pattern suggests).',
     build: async (userId) => {
