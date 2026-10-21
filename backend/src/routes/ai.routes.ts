@@ -17,7 +17,7 @@ const MODEL = 'openai/gpt-oss-120b';
 
 const SYSTEM_PROMPT = `You are the {{INSTITUTION}} study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,
-summarizing notes, and general TVET-related academic help. Be clear, concise, and encouraging.
+summarizing notes, and general academic help. Be clear, concise, and encouraging.
 If asked something completely unrelated to school/learning, you can still help, but gently
 steer back toward being a helpful study companion. Keep answers reasonably short unless the
 person asks for more detail.`;
@@ -270,7 +270,7 @@ Respond with ONLY valid JSON (no markdown, no commentary), in exactly this shape
 
   try {
     const reply = await callGroq(
-      'You generate exam-quality multiple-choice quizzes for TVET students. Respond with ONLY valid JSON, nothing else.',
+      'You generate exam-quality multiple-choice quizzes for students. Respond with ONLY valid JSON, nothing else.',
       prompt,
       1500
     );
@@ -496,7 +496,7 @@ Propose a Monday-Saturday (dayOfWeek 1-6), 08:00-17:00 class schedule for each u
 
   try {
     const reply = await callGroq(
-      'You create conflict-free weekly class timetables for a TVET college. Respond with ONLY valid JSON, nothing else.',
+      'You create conflict-free weekly class timetables for an institution. Respond with ONLY valid JSON, nothing else.',
       prompt,
       1800
     );
@@ -609,7 +609,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_deadlines: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You help a TVET student stay on top of their coursework. Summarize and prioritize what needs attention, keep it short and actionable.',
+      'You help a student stay on top of their coursework. Summarize and prioritize what needs attention, keep it short and actionable.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there are no tracked deadlines.';
@@ -642,7 +642,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_fees: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You explain fee/billing situations to a TVET student in plain, reassuring, non-alarming language. Be factual and clear about what they owe and what to do next.',
+      'You explain fee/billing situations to a student in plain, reassuring, non-alarming language. Be factual and clear about what they owe and what to do next.',
     build: async (userId) => {
       const invoices = await prisma.invoice.findMany({
         where: { studentId: userId },
@@ -723,7 +723,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   admin_stats_summary: {
     roles: ['ADMIN'],
     systemPrompt:
-      'You give a TVET college administrator a brief narrative summary of institution stats, with 2-3 suggested action items. Be concise and practical.',
+      'You give an institution administrator a brief narrative summary of institution stats, with 2-3 suggested action items. Be concise and practical.',
     build: async () => {
       const [students, teachers, departments, pendingApplications] = await Promise.all([
         prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
@@ -846,7 +846,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   alumni_career_tips: {
     roles: ['ALUMNI'],
     systemPrompt:
-      'You give a TVET college graduate practical, encouraging career development advice for the trade/field they trained in.',
+      'You give an institution graduate practical, encouraging career development advice for the trade/field they trained in.',
     build: async (userId) => {
       const profile = await prisma.alumniProfile.findUnique({ where: { userId } });
       const details = profile
@@ -927,7 +927,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_results_summary: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You help a TVET student understand their own exam results. Be encouraging, clear, and specific about strengths and areas to improve.',
+      'You help a student understand their own exam results. Be encouraging, clear, and specific about strengths and areas to improve.',
     build: async (userId) => {
       const results = await prisma.examResult.findMany({
         where: { studentId: userId },
@@ -947,7 +947,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   institution_reports_summary: {
     roles: ['REGISTRAR', 'ADMIN'],
     systemPrompt:
-      'You help TVET college leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
+      'You help institution leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
     build: async () => {
       const financeOn = await isModuleEnabled('finance');
       const [students, staffCounts, departments, programmes, units, admissionsByStatus, outstandingInvoices] = await Promise.all([
@@ -1105,11 +1105,11 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
   },
   draft_announcement: {
     systemPrompt:
-      'Turn the following rough bullet points into a clear, professional announcement for a TVET college community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
+      'Turn the following rough bullet points into a clear, professional announcement for an institution community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
   },
   draft_letter: {
     systemPrompt:
-      'Turn the following rough notes into a clear, formal letter/certificate body for a TVET college ' +
+      'Turn the following rough notes into a clear, formal letter/certificate body for an institution ' +
       'registrar to issue to a student. Keep it professional and appropriately formal. Do not invent facts ' +
       'not implied by the input. Do not include a greeting/salutation or signature block -- just the body ' +
       'text itself.',

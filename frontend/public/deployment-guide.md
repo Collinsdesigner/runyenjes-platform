@@ -18,7 +18,7 @@ Each institution runs its own separate copy. Nothing is shared with any other sc
 | **An email account** (any SMTP provider) | Notification emails to applicants and students | Yes |
 | **A domain name** | Your own web address, such as `portal.yourschool.ac.ke` | Strongly recommended |
 
-All of these have free plans you can start on. Free plans have limits: for example, a free Render service goes to sleep after a period of inactivity and takes up to a minute to wake on the next visit. For a real school with daily use, plan to move the backend and database to paid plans.
+All of these have free plans you can start on. Free plans have limits: for example, a free Render service goes to sleep after a period of inactivity and takes up to a minute to wake on the next visit. For a real school with daily use, plan to move the backend and database to paid plans. Free plans can also come with conditions, for example some are meant for personal or non-commercial use only. Read each service's current terms before relying on a free plan for a real institution.
 
 You will collect several secret values along the way (passwords and keys). Keep them in a password manager. Never paste them into chat, email or a public document, and never commit them to the code repository.
 
@@ -26,7 +26,7 @@ You will collect several secret values along the way (passwords and keys). Keep 
 
 1. Get your copy of the code from whoever supplied it, as a clean export (not a clone with someone else's history).
 2. Create a **private** GitHub repository and upload the code to it. Render and Vercel deploy from there. Keep it private.
-3. **Never run `prisma migrate dev` or `prisma migrate reset` on your live database.** They are developer commands: if the database differs from the migration history, `migrate dev` offers to reset it, which deletes every record, and `migrate reset` does so outright. In production only `prisma migrate deploy` is used; it applies existing updates and never deletes data. The Render build command in this guide already does this for you.
+3. **Never run `prisma migrate dev` or `prisma migrate reset` on your live database.** They are developer commands: if the database differs from the migration history, `migrate dev` offers to reset it, which deletes every record, and `migrate reset` does so outright. In production only `prisma migrate deploy` is used; it applies existing updates and never deletes data. The Render build command in this guide already does this for you. As a further safety measure, the project's own developer scripts (`npm run prisma:migrate` and `npm run prisma:studio`) refuse to run against a remote database. To apply updates by hand, use `npm run migrate:deploy`.
 4. **Do not upgrade Prisma to a new major version.** Prisma's command line prints a notice offering to "update to 8.0.0" or similar; ignore it. This platform has only been tested with Prisma 5.22.0.
 5. There is no data to load into a new installation. The setup wizard (Step 8) does the first-time setup for you.
 
