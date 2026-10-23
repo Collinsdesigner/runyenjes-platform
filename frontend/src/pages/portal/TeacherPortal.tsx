@@ -57,7 +57,7 @@ export default function TeacherPortal() {
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">{card.title}</h3>
                   <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{card.description}</p>
-                  <p className="text-sm text-rgreen font-medium mt-3">Open \u2192</p>
+                  <p className="text-sm text-rgreen font-medium mt-3">Open →</p>
                 </div>
               </div>
             </button>
