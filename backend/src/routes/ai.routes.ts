@@ -15,12 +15,32 @@ const router = Router();
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'openai/gpt-oss-120b';
 
+// AI_STYLE_RULES_V1
+// Shared answer-style rules for every AI feature.
+const PLAIN_TEXT_RULES =
+  'Formatting: write plain text only. Do not use markdown: no asterisks for bold or italics, no # headings, ' +
+  'no tables and no code fences. Use short paragraphs, and simple lines starting with "- " or "1." for lists.';
+
+// The model is only told the institution's name, so it must not guess anything else about it.
+const INSTITUTION_FACTS_RULE =
+  'About the institution itself you know only its name. Never state or guess anything else about it, such as ' +
+  'its type, ownership, location, programmes, history, size or any abbreviation of its name. If asked, say that ' +
+  'you only know its name and suggest asking the institution office or its website.';
+
+function withStyleRules(prompt: string): string {
+  return prompt.includes(PLAIN_TEXT_RULES) ? prompt : `${prompt}\n\n${PLAIN_TEXT_RULES}`;
+}
+
 const SYSTEM_PROMPT = `You are the {{INSTITUTION}} study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,
 summarizing notes, and general academic help. Be clear, concise, and encouraging.
 If asked something completely unrelated to school/learning, you can still help, but gently
 steer back toward being a helpful study companion. Keep answers reasonably short unless the
-person asks for more detail.`;
+person asks for more detail.
+
+${PLAIN_TEXT_RULES}
+
+${INSTITUTION_FACTS_RULE}`;
 
 // Shared helper: call Groq with a system prompt + a single user message,
 // used by the stateless AI Learning endpoints below. Returns the reply
@@ -39,7 +59,7 @@ async function callGroq(systemPrompt: string, userMessage: string, maxTokens = 1
     body: JSON.stringify({
       model: MODEL,
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: withStyleRules(systemPrompt) },
         { role: 'user', content: userMessage },
       ],
       temperature: 0.6,
@@ -205,7 +225,7 @@ ${unitContext}`;
       body: JSON.stringify({
         model: MODEL,
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: withStyleRules(systemPrompt) },
           ...history.map((h) => ({ role: h.role, content: h.content })),
         ],
         temperature: 0.6,
@@ -1105,7 +1125,7 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
   },
   draft_announcement: {
     systemPrompt:
-      'Turn the following rough bullet points into a clear, professional announcement for an institution community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
+      'Turn the following rough bullet points into a clear, professional announcement for an institution community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input. Never write bracketed placeholders such as [Date], [Time] or [Venue]: if a detail was not provided, leave that line out entirely and do not mention it.',
   },
   draft_letter: {
     systemPrompt:
