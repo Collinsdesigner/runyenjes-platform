@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
 
 type Mode = 'student' | 'staff';
 
@@ -14,6 +15,14 @@ export default function Login() {
 
   const { studentLogin, staffLogin } = useAuth();
   const navigate = useNavigate();
+
+  // Institution name comes from settings, never hardcoded.
+  const [instName, setInstName] = useState('');
+  useEffect(() => {
+    api('/settings')
+      .then((s) => setInstName(s?.institutionName || ''))
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,7 +53,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 dark:bg-gray-950">
       <div className="w-full max-w-sm bg-white rounded-lg shadow p-6 dark:bg-gray-900">
         <h1 className="text-xl font-bold text-rgreen text-center mb-1">
-          Runyenjes Technical & Vocational College
+          {instName}
         </h1>
 
         <p className="text-sm text-gray-500 text-center mb-6 dark:text-gray-400">
@@ -95,7 +104,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
-              placeholder="you@runyenjestechnical.ac.ke"
+              placeholder="you@example.com"
             />
           </div>
 
@@ -111,7 +120,7 @@ export default function Login() {
                 value={admissionNumber}
                 onChange={(e) => setAdmissionNumber(e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rgreen dark:border-gray-600"
-                placeholder="e.g. RTVC/2026/00123"
+                placeholder="Your admission number"
               />
             </div>
           ) : (

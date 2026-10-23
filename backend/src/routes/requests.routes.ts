@@ -1,3 +1,4 @@
+import { isModuleEnabled } from '../middleware/modules';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -18,6 +19,10 @@ router.post('/', requireAuth, requireRole('STUDENT', 'ALUMNI'), async (req, res)
   }
 
   const workflow = getWorkflow(type);
+  // When Finance is handled in the institution's own system, there is no Finance
+  // approval stage to wait for.
+  const financeOn = await isModuleEnabled('finance');
+  const stageRoles = workflow.stages.filter((r) => financeOn || r !== 'FINANCE_OFFICER');
 
   if (type === 'GRADUATION') {
     const approvedClearance = await prisma.request.findFirst({
@@ -38,7 +43,7 @@ router.post('/', requireAuth, requireRole('STUDENT', 'ALUMNI'), async (req, res)
       status: 'PENDING',
       currentStage: 0,
       stages: {
-        create: workflow.stages.map((role, order) => ({
+        create: stageRoles.map((role, order) => ({
           order,
           approverRole: role,
           status: 'PENDING',

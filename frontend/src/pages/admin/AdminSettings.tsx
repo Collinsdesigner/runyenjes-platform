@@ -28,6 +28,7 @@ export default function AdminSettings() {
     mpesaPaybill: '',
     mpesaAccountNumber: '',
     intakeOptions: '',
+    admissionNumberExample: '',
   });
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function AdminSettings() {
           mpesaPaybill: data.mpesaPaybill || '',
           mpesaAccountNumber: data.mpesaAccountNumber || '',
           intakeOptions: data.intakeOptions || '',
+          admissionNumberExample: data.admissionNumberExample || '',
         })
       )
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings'))
@@ -87,7 +89,7 @@ export default function AdminSettings() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Institution Settings</h2>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-            Renaming the college, changing colors, or updating contact info happens here — no code change needed.
+            Renaming the institution, changing colors, or updating contact info happens here — no code change needed.
           </p>
         </div>
 
@@ -220,12 +222,23 @@ export default function AdminSettings() {
                 onChange={(e) => set('highlightsBody', e.target.value)}
               />
             </label>
+            <label className="text-sm sm:col-span-2">
+              <span className="text-gray-500 dark:text-gray-400">
+                Admission number example (shown as a hint when admitting students; numbers are typed by the registrar)
+              </span>
+              <input
+                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
+                placeholder="e.g. 2859 or ADM/2026/0123"
+                value={form.admissionNumberExample}
+                onChange={(e) => set('admissionNumberExample', e.target.value)}
+              />
+            </label>
             {/* SITE_SETTINGS_PAYMENT_V1 -- M-Pesa details & intake options shown on the public Apply page */}
             <label className="text-sm">
               <span className="text-gray-500 dark:text-gray-400">M-Pesa Paybill number</span>
               <input
                 className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
-                placeholder="e.g. 247247"
+                placeholder="e.g. 123456"
                 value={form.mpesaPaybill}
                 onChange={(e) => set('mpesaPaybill', e.target.value)}
               />
@@ -234,7 +247,7 @@ export default function AdminSettings() {
               <span className="text-gray-500 dark:text-gray-400">M-Pesa account number</span>
               <input
                 className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600"
-                placeholder="e.g. 0190274872116"
+                placeholder="e.g. 1234567890"
                 value={form.mpesaAccountNumber}
                 onChange={(e) => set('mpesaAccountNumber', e.target.value)}
               />

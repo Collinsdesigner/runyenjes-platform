@@ -4,8 +4,12 @@ import { AuthProvider } from './context/AuthContext';
 import { api } from './api/client';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Setup from './pages/Setup';
+import DeploymentGuide from './pages/DeploymentGuide';
+import ModuleGate from './components/ModuleGate';
+import AdminModules from './pages/admin/AdminModules';
 import Apply from './pages/Apply';
-import AboutRTVC from './pages/AboutRTVC';
+import AboutInstitution from './pages/AboutInstitution';
 import Admissions from './pages/Admissions';
 import Groups from './pages/Groups';
 import GroupChat from './pages/GroupChat';
@@ -86,6 +90,25 @@ export default function App() {
   useEffect(() => {
     api('/settings')
       .then((settings) => {
+        // SETUP_REDIRECT_V1: a fresh install has no SiteSettings row yet, so
+        // the server reports configured:false. Send the installer to the wizard.
+        if (settings && settings.configured === false && !['/setup', '/deployment-guide'].includes(window.location.pathname)) {
+          window.location.replace('/setup');
+          return;
+        }
+        // SETTINGS_TITLE_V1: browser tab title comes from settings
+        if (settings?.institutionName) document.title = settings.institutionName;
+        // institution_colors: remembered so index.html can apply them before first paint
+        if (settings?.primaryColor) {
+          try {
+            localStorage.setItem(
+              'institution_colors',
+              JSON.stringify({ primary: settings.primaryColor, secondary: settings.secondaryColor || null })
+            );
+          } catch {
+            // storage unavailable: the colors still apply once settings load
+          }
+        }
         const personalAccent = localStorage.getItem('runyenjes_personal_accent');
         if (personalAccent) {
           document.documentElement.style.setProperty('--color-primary', personalAccent);
@@ -105,9 +128,11 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
 
-          <Route path="/about-rtvc" element={<AboutRTVC />} />
+          <Route path="/about" element={<AboutInstitution />} />
 
           <Route path="/login" element={<Login />} />
+          <Route path="/setup" element={<Setup />} />
+          <Route path="/deployment-guide" element={<DeploymentGuide />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/admissions" element={<Admissions />} />
           <Route path="/groups" element={<Groups />} />
@@ -118,26 +143,27 @@ export default function App() {
           <Route path="/library/:programId" element={<LibraryUnits />} />
           <Route path="/library/units/:unitId/tutor" element={<UnitTutor />} />
          <Route path="/admin" element={<AdminPortal />} />
-                <Route path="/alumni" element={<AlumniPortal />} />
-                <Route path="/admin/alumni" element={<AdminAlumni />} />
-                <Route path="/jobs" element={<JobBoard />} />
+                <Route path="/alumni" element={<ModuleGate moduleKey="alumni"><AlumniPortal /></ModuleGate>} />
+                <Route path="/admin/alumni" element={<ModuleGate moduleKey="alumni"><AdminAlumni /></ModuleGate>} />
+                <Route path="/jobs" element={<ModuleGate moduleKey="alumni"><JobBoard /></ModuleGate>} />
                 <Route path="/registrar/announcements" element={<Announcements />} />
                 <Route path="/announcements" element={<Announcements />} />
                 <Route path="/notebook" element={<Notebook />} />
                 <Route path="/registrar/reports" element={<Reports />} />
                 <Route path="/admin/reports" element={<Reports />} />
                 <Route path="/admin/communication" element={<Announcements />} />
-                <Route path="/workers" element={<WorkersPortal />} />
-                <Route path="/procurement" element={<ProcurementPortal />} />
-                <Route path="/procurement/requests" element={<ProcurementRequests />} />
+                <Route path="/workers" element={<ModuleGate moduleKey="hr"><WorkersPortal /></ModuleGate>} />
+                <Route path="/procurement" element={<ModuleGate moduleKey="procurement"><ProcurementPortal /></ModuleGate>} />
+                <Route path="/procurement/requests" element={<ModuleGate moduleKey="procurement"><ProcurementRequests /></ModuleGate>} />
                 <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/modules" element={<AdminModules />} />
                 <Route path="/admin/admissions" element={<AdminAdmissions />} />
                 <Route path="/admin/library" element={<AdminLibrary />} />
                 <Route path="/admin/students" element={<AdminStudents />} />
                 <Route path="/admin/staff" element={<AdminStaff />} />
                 <Route path="/admin/bulk-import" element={<AdminBulkImport />} />
                 <Route path="/admin/academic" element={<AdminAcademic />} />
-                <Route path="/admin/finance" element={<AdminFinance />} />
+                <Route path="/admin/finance" element={<ModuleGate moduleKey="finance"><AdminFinance /></ModuleGate>} />
           <Route path="/browser" element={<Browser />} />
          <Route path="/profile" element={<Profile />} />
          <Route path="/portal" element={<PortalRedirect />} />
@@ -155,7 +181,7 @@ export default function App() {
                 <Route path="/teacher/results" element={<TeacherResults />} />
                 <Route path="/student/assignments" element={<StudentAssignments />} />
                 <Route path="/student/academics" element={<StudentAcademics />} />
-                <Route path="/student/fees" element={<StudentFees />} />
+                <Route path="/student/fees" element={<ModuleGate moduleKey="finance"><StudentFees /></ModuleGate>} />
                 <Route path="/student/results" element={<StudentResults />} />
                 <Route path="/student/records" element={<StudentRecords />} />
          <Route path="/security" element={<Security />} />
@@ -170,18 +196,18 @@ export default function App() {
          <Route path="/ai" element={<AIAssistant />} />
 
                 <Route path="/registrar/timetable" element={<RegistrarTimetable />} />
-                <Route path="/finance" element={<FinancePortal />} />
-                <Route path="/finance/invoices" element={<FinanceInvoices />} />
-                <Route path="/hr" element={<HrPortal />} />
-                <Route path="/hr/staff" element={<HrStaff />} />
+                <Route path="/finance" element={<ModuleGate moduleKey="finance"><FinancePortal /></ModuleGate>} />
+                <Route path="/finance/invoices" element={<ModuleGate moduleKey="finance"><FinanceInvoices /></ModuleGate>} />
+                <Route path="/hr" element={<ModuleGate moduleKey="hr"><HrPortal /></ModuleGate>} />
+                <Route path="/hr/staff" element={<ModuleGate moduleKey="hr"><HrStaff /></ModuleGate>} />
                 <Route path="/examinations" element={<ExaminationsPortal />} />
                 <Route path="/examinations/results" element={<ExaminationsResults />} />
-                <Route path="/stores" element={<StoresPortal />} />
-                <Route path="/stores/items" element={<StoresInventory />} />
+                <Route path="/stores" element={<ModuleGate moduleKey="stores"><StoresPortal /></ModuleGate>} />
+                <Route path="/stores/items" element={<ModuleGate moduleKey="stores"><StoresInventory /></ModuleGate>} />
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/audit-log" element={<AdminAuditLog />} />
                 <Route path="/student/requests" element={<StudentRequests />} />
-                <Route path="/finance/approvals" element={<FinanceApprovals />} />
+                <Route path="/finance/approvals" element={<ModuleGate moduleKey="finance"><FinanceApprovals /></ModuleGate>} />
                 <Route path="/registrar/approvals" element={<RegistrarApprovals />} />
 </Routes>
       </BrowserRouter>

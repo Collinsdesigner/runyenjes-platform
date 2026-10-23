@@ -1,3 +1,4 @@
+import { useModules } from '../../hooks/useModules';
 import { useEffect, useState } from 'react';
 import { api, downloadFile } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -31,6 +32,9 @@ const BTN = 'bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg disab
 
 export default function OfficialDocuments() {
   const { token } = useAuth();
+  // When Finance is handled in the institution's own system, there are no fee documents here.
+  const modules = useModules();
+  const financeOn = !modules || modules.finance !== false;
 
   const [overview, setOverview] = useState<Overview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,7 +69,7 @@ export default function OfficialDocuments() {
     <section className="bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="font-semibold text-gray-900 dark:text-gray-100">Official Documents</div>
-        <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Download your results slip, fee statement, receipts and exam card as PDF.</p>
+        <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">{financeOn ? 'Download your results slip, fee statement, receipts and exam card as PDF.' : 'Download your results slip and exam card as PDF.'}</p>
       </div>
 
       {error && (
@@ -111,6 +115,7 @@ export default function OfficialDocuments() {
           </div>
 
           {/* Fee statement */}
+          {financeOn && (
           <div className="px-4 py-4 flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Fee Statement</div>
@@ -125,6 +130,7 @@ export default function OfficialDocuments() {
               {busy === 'fees' ? 'Preparing...' : 'Download'}
             </button>
           </div>
+          )}
 
           {/* Exam card */}
           <div className="px-4 py-4 flex items-center justify-between gap-3 flex-wrap">
@@ -149,6 +155,7 @@ export default function OfficialDocuments() {
           </div>
 
           {/* Receipts */}
+          {financeOn && (
           <div className="px-4 py-4">
             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Payment Receipts</div>
             {overview.payments.length === 0 ? (
@@ -178,6 +185,7 @@ export default function OfficialDocuments() {
               </div>
             )}
           </div>
+          )}
         </div>
       )}
     </section>

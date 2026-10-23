@@ -1,4 +1,4 @@
-// Runyenjes Technical & Vocational College — Database Schema
+// Institution Platform — Database Schema
 // This file is the single source of truth for every table in the system.
 
 generator client {
@@ -38,6 +38,7 @@ model SiteSettings {
   mpesaPaybill        String?
   mpesaAccountNumber  String?
   intakeOptions       String?
+  admissionNumberExample String?
   updatedAt        DateTime @default(now()) @updatedAt
 }
 
@@ -1095,6 +1096,7 @@ model ExternalSystem {
   name           String
   url            String
   visibleToRoles Role[]
+  moduleKey      String?
   sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
 }

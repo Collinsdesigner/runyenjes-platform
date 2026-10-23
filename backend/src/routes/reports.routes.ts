@@ -1,3 +1,4 @@
+import { isModuleEnabled } from '../middleware/modules';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -6,6 +7,7 @@ const router = Router();
 
 // ---------- Institution reporting overview (Registrar + Admin) ----------
 router.get('/overview', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (req, res) => {
+  const financeOn = await isModuleEnabled('finance');
   const [students, staffCounts, departments, programmes, units, admissionsByStatus, outstandingInvoices] =
     await Promise.all([
       prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
@@ -36,8 +38,8 @@ router.get('/overview', requireAuth, requireRole('REGISTRAR', 'ADMIN'), async (r
     programmes,
     units,
     admissionsByStatus: admissionsByStatus.map((a) => ({ status: a.status, count: a._count.status })),
-    outstandingInvoiceCount: outstandingInvoices.length,
-    outstandingBalance,
+    outstandingInvoiceCount: financeOn ? outstandingInvoices.length : null,
+    outstandingBalance: financeOn ? outstandingBalance : null,
   });
 });
 

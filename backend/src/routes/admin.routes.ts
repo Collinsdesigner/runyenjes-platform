@@ -1,3 +1,6 @@
+import { MODULES, MODULE_KEYS, MODULE_AUDIENCE, normalizeModules } from '../config/modules';
+import { clearModuleCache } from '../middleware/modules';
+import { Role as RoleEnum } from '@prisma/client';
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import multer from 'multer';
@@ -392,7 +395,7 @@ router.post('/departments/:departmentId/programs', async (req, res) => {
       name,
       level: level || null,
       entryRequirements: entryRequirements || null,
-      examBody: examBody || 'TVET CDACC',
+      examBody: examBody || null,
       isShortCourse: Boolean(isShortCourse),
     },
   });
@@ -562,7 +565,7 @@ router.post('/programs/:id/fee', async (req, res) => {
 });
 
 // ---------- Update site settings (name, branding, contact info) ----------
-// This is what makes the blueprint's promise real: renaming the college,
+// This is what makes the blueprint's promise real: renaming the institution,
 // changing colors, or updating contact info is a form edit here, not a
 // code change or redeployment.
 // SITE_SETTINGS_HIGHLIGHTS_V1
@@ -586,6 +589,7 @@ router.patch('/settings', async (req, res) => {
     mpesaPaybill,
     mpesaAccountNumber,
     intakeOptions,
+    admissionNumberExample,
   } = req.body;
 
   const settingsBefore = await prisma.siteSettings.findUnique({ where: { id: 1 } });
@@ -611,6 +615,7 @@ router.patch('/settings', async (req, res) => {
       ...(mpesaPaybill !== undefined && { mpesaPaybill }),
       ...(mpesaAccountNumber !== undefined && { mpesaAccountNumber }),
       ...(intakeOptions !== undefined && { intakeOptions }),
+      ...(admissionNumberExample !== undefined && { admissionNumberExample }),
     },
   });
 
@@ -701,6 +706,155 @@ router.post('/institution-logo', upload.single('logo'), async (req, res) => {
       error: 'Logo upload failed',
     });
   }
+});
+
+// ---------- Modules & external systems (admin only, via router.use above) ----------
+function isHttpUrlText(v: string): boolean {
+  try {
+    const u = new URL(v.trim());
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+const ALL_ROLE_VALUES = Object.values(RoleEnum) as RoleEnum[];
+const STAFF_ROLE_VALUES = ALL_ROLE_VALUES.filter((r) => r !== 'STUDENT' && r !== 'ALUMNI');
+
+router.get('/modules', async (_req, res) => {
+  const rows = await prisma.moduleSetting.findMany();
+  const links = await prisma.externalSystem.findMany({ where: { moduleKey: { not: null } } });
+  const state: Record<string, boolean> = Object.fromEntries(MODULE_KEYS.map((k) => [k, true]));
+  for (const r of rows) {
+    if (r.key in state) state[r.key] = r.enabled;
+  }
+  const normalized = normalizeModules(state);
+  res.json({
+    modules: MODULES.map((m) => ({
+      key: m.key,
+      label: m.label,
+      description: m.description,
+      enabled: normalized[m.key],
+      url: links.find((l) => l.moduleKey === m.key)?.url ?? '',
+    })),
+  });
+});
+
+router.put('/modules', async (req, res) => {
+  const items = Array.isArray(req.body?.modules) ? req.body.modules : null;
+  if (!items) return res.status(400).json({ error: 'A modules list is required.' });
+
+  const wanted: Record<string, boolean> = Object.fromEntries(MODULE_KEYS.map((k) => [k, true]));
+  const urls: Record<string, string> = {};
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    if (!it || typeof it.key !== 'string' || !MODULE_KEYS.includes(it.key)) {
+      return res.status(400).json({ error: 'Unknown module in the list.' });
+    }
+    wanted[it.key] = it.enabled !== false;
+    const url = typeof it.url === 'string' ? it.url.trim() : '';
+    if (url && !isHttpUrlText(url)) {
+      return res.status(400).json({ error: 'Each address must start with http:// or https://.' });
+    }
+    urls[it.key] = url;
+  }
+  const full = normalizeModules(wanted);
+  const before = await prisma.moduleSetting.findMany();
+
+  await prisma.$transaction(
+    async (tx) => {
+      for (const key of MODULE_KEYS) {
+        await tx.moduleSetting.upsert({
+          where: { key },
+          update: { enabled: full[key] },
+          create: { key, enabled: full[key] },
+        });
+        await tx.externalSystem.deleteMany({ where: { moduleKey: key } });
+        if (!full[key] && urls[key]) {
+          const mod = MODULES.find((m) => m.key === key)!;
+          await tx.externalSystem.create({
+            data: {
+              name: mod.label,
+              url: urls[key],
+              moduleKey: key,
+              visibleToRoles: MODULE_AUDIENCE[key] as RoleEnum[],
+              sortOrder: 100,
+            },
+          });
+        }
+      }
+    },
+    { timeout: 20000, maxWait: 10000 }
+  );
+
+  clearModuleCache();
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_MODULES',
+    entityType: 'ModuleSetting',
+    entityId: 'all',
+    before,
+    after: full,
+  });
+  res.json({ ok: true });
+});
+
+router.get('/external-systems', async (_req, res) => {
+  const systems = await prisma.externalSystem.findMany({
+    where: { moduleKey: null },
+    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+  });
+  res.json({
+    systems: systems.map((s) => ({
+      name: s.name,
+      url: s.url,
+      audience: s.visibleToRoles.includes('STUDENT' as RoleEnum)
+        ? 'everyone'
+        : s.visibleToRoles.length === 1 && s.visibleToRoles[0] === 'ADMIN'
+        ? 'admins'
+        : 'staff',
+    })),
+  });
+});
+
+router.put('/external-systems', async (req, res) => {
+  const items = Array.isArray(req.body?.systems) ? req.body.systems : null;
+  if (!items) return res.status(400).json({ error: 'A systems list is required.' });
+  if (items.length > 20) return res.status(400).json({ error: 'At most 20 systems.' });
+
+  const rows: { name: string; url: string; visibleToRoles: RoleEnum[]; sortOrder: number }[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    const name = String(it?.name ?? '').trim();
+    const url = String(it?.url ?? '').trim();
+    if (!name || name.length > 100 || !isHttpUrlText(url)) {
+      return res
+        .status(400)
+        .json({ error: 'Each system needs a name and an address starting with http:// or https://.' });
+    }
+    const audience = it?.audience;
+    rows.push({
+      name,
+      url,
+      visibleToRoles:
+        audience === 'everyone' ? ALL_ROLE_VALUES : audience === 'admins' ? (['ADMIN'] as RoleEnum[]) : STAFF_ROLE_VALUES,
+      sortOrder: i,
+    });
+  }
+
+  await prisma.$transaction([
+    prisma.externalSystem.deleteMany({ where: { moduleKey: null } }),
+    prisma.externalSystem.createMany({ data: rows }),
+  ]);
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_EXTERNAL_SYSTEMS',
+    entityType: 'ExternalSystem',
+    entityId: 'all',
+    before: null,
+    after: rows,
+  });
+  res.json({ ok: true });
 });
 
 export default router;

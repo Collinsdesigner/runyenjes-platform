@@ -1,3 +1,4 @@
+import AdmitButton from '../components/admissions/AdmitButton';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -95,6 +96,27 @@ export default function Admissions() {
     }
   }
 
+  // Admission numbers are typed by the registrar, never auto-generated.
+  async function admitApplication(id: string, admissionNumber: string): Promise<string | null> {
+    setLastAdmission(null);
+    try {
+      const result = await api(`/applications/${id}/status`, {
+        method: 'PATCH',
+        body: { status: 'ADMITTED', admissionNumber },
+        token,
+      });
+      if (result.student) {
+        setLastAdmission(
+          `${result.student.name} admitted — admission number: ${result.student.admissionNumber}`
+        );
+      }
+      await loadApplications();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Could not admit this applicant';
+    }
+  }
+
   async function verifyPayment(paymentId: string, status: 'verified' | 'rejected') {
     setBusyId(paymentId);
     try {
@@ -168,13 +190,12 @@ export default function Admissions() {
 
               {app.status !== 'ADMITTED' && (
                 <div className="flex gap-2 mt-3">
-                  <button
+                  <AdmitButton
+                    applicantName={app.applicantName}
                     disabled={busyId === app.id}
-                    onClick={() => updateStatus(app.id, 'ADMITTED')}
                     className="text-xs bg-rgreen text-white px-3 py-1.5 rounded-md disabled:opacity-50"
-                  >
-                    Admit
-                  </button>
+                    onAdmit={(n) => admitApplication(app.id, n)}
+                  />
                   {app.status !== 'WAITLISTED' && (
                     <button
                       disabled={busyId === app.id}

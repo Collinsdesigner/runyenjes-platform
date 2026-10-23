@@ -1,3 +1,4 @@
+import AdmitButton from '../../components/admissions/AdmitButton';
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
@@ -57,6 +58,24 @@ export default function AdminAdmissions() {
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update application');
+    }
+  }
+
+  // Admission numbers are typed by the registrar, never auto-generated.
+  async function admitApplication(id: string, admissionNumber: string): Promise<string | null> {
+    setError('');
+    setMessage('');
+    try {
+      await api(`/applications/${id}/status`, {
+        method: 'PATCH',
+        token,
+        body: { status: 'ADMITTED', admissionNumber },
+      });
+      setMessage(`Applicant admitted with admission number ${admissionNumber}`);
+      load();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Could not admit this applicant';
     }
   }
 
@@ -162,12 +181,11 @@ export default function AdminAdmissions() {
                   <td className="px-4 py-2 text-right space-x-2">
                     {a.status === 'SUBMITTED' && (
                       <>
-                        <button
+                        <AdmitButton
+                          applicantName={a.applicantName}
                           className="text-green-600 text-xs font-medium dark:text-green-400"
-                          onClick={() => handleStatus(a.id, 'ADMITTED')}
-                        >
-                          Admit
-                        </button>
+                          onAdmit={(n) => admitApplication(a.id, n)}
+                        />
                         <button
                           className="text-amber-600 text-xs font-medium"
                           onClick={() => handleStatus(a.id, 'WAITLISTED')}

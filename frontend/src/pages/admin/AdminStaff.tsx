@@ -1,3 +1,4 @@
+import { useModules, roleAvailable } from '../../hooks/useModules';
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
@@ -26,6 +27,7 @@ const STAFF_ROLES = [
 
 export default function AdminStaff() {
   const { token } = useAuth();
+  const modules = useModules();
   const [staff, setStaff] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -157,7 +159,7 @@ export default function AdminStaff() {
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              {STAFF_ROLES.map((r) => (
+              {STAFF_ROLES.filter((r) => roleAvailable(r, modules)).map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>

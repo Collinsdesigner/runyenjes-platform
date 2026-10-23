@@ -1,3 +1,4 @@
+import { isEmailConfigured, sendEmailChecked, emailTestRecipient } from '../utils/email';
 // RUNYENJES-SETUP-V1
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
@@ -9,7 +10,7 @@ import { prisma } from '../lib/prisma';
 import { env } from '../config/env';
 import { validate } from '../middleware/validate';
 import { uploadImage } from '../services/media.service';
-import { MODULES, MODULE_KEYS } from '../config/modules';
+import { MODULES, MODULE_KEYS, MODULE_AUDIENCE, normalizeModules } from '../config/modules';
 
 const router = Router();
 
@@ -134,12 +135,47 @@ router.get('/readiness', requireSetupOpen, requireSetupToken, async (_req, res) 
     env.GROQ_API_KEY
       ? { key: 'ai', label: 'AI assistant (Groq)', status: 'pass' }
       : {
-          key: 'ai', label: 'AI assistant (Groq)', status: 'warn',
-          fix: 'Optional: set GROQ_API_KEY to enable AI features.',
+          key: 'ai', label: 'AI assistant (Groq)', status: 'fail',
+          fix: 'Set GROQ_API_KEY (create a key at console.groq.com). The AI assistant is part of the platform.',
+        }
+  );
+
+  checks.push(
+    isEmailConfigured()
+      ? { key: 'email', label: 'Notification email', status: 'pass' }
+      : {
+          key: 'email', label: 'Notification email', status: 'fail',
+          fix: 'Set EMAIL_USER and EMAIL_PASSWORD, plus EMAIL_HOST and EMAIL_PORT unless you use Gmail. See the Deployment Guide, Step 4.',
         }
   );
 
   res.json({ ready: !checks.some((c) => c.status === 'fail'), checks });
+});
+
+// ---------- POST /setup/test-email ----------
+// Sends one test message to the portal's own mailbox. The recipient is never
+// taken from the request, so this cannot be used to send mail to other people.
+router.post('/test-email', requireSetupOpen, requireSetupToken, async (_req, res) => {
+  if (!isEmailConfigured()) {
+    return res
+      .status(400)
+      .json({ message: 'Email is not configured yet. Set the email values on your server first.' });
+  }
+  const to = emailTestRecipient();
+  if (!to) {
+    return res.status(400).json({
+      message: 'Set EMAIL_FROM to the address emails should come from (the email user name is not an address).',
+    });
+  }
+  const result = await sendEmailChecked(
+    to,
+    'Test email from your new platform',
+    'If you can read this, email is working. You can ignore this message.'
+  );
+  if (!result.ok) {
+    return res.status(502).json({ message: 'The test email could not be sent: ' + result.error });
+  }
+  res.json({ message: 'Test email sent to ' + to + '. Check that mailbox, and its spam folder.' });
 });
 
 // ---------- POST /setup/logo ----------
@@ -202,6 +238,7 @@ const completeSchema = z.object({
     logoPublicId: z.string().trim().max(300).optional(),
   }),
   modules: z.record(z.string(), z.boolean()).default({}),
+  moduleLinks: z.record(z.string(), z.string()).default({}),
   externalSystems: z
     .array(
       z.object({
@@ -217,6 +254,13 @@ const completeSchema = z.object({
     email: z.string().trim().email().max(200),
     password: z.string().min(8).max(128),
   }),
+  academic: z
+    .object({
+      departmentName: z.string().trim().min(2).max(150),
+      programmeName: z.string().trim().min(2).max(200),
+      level: z.string().trim().max(100).optional(),
+    })
+    .optional(),
 });
 
 type CompleteBody = z.infer<typeof completeSchema>;
@@ -231,11 +275,29 @@ router.post(
 
     const unknownModules = Object.keys(d.modules).filter((k) => !MODULE_KEYS.includes(k));
     if (unknownModules.length > 0) {
-      return res.status(400).json({ message: `Unknown module(s): ${unknownModules.join(', ')}` });
+      return res.status(400).json({ message: `Unknown module(s): ${unknownModules.join(', ')}
+
+    const okUrl = (v: string) => {
+      try {
+        const u = new URL(v.trim());
+        return u.protocol === 'http:' || u.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    };
+    const badLink = Object.entries(d.moduleLinks).find(
+      ([k, v]) => v.trim() && (!MODULE_KEYS.includes(k) || !okUrl(v))
+    );
+    if (badLink) {
+      return res
+        .status(400)
+        .json({ message: 'The address for each system must start with http:// or https://.' });
+    }` });
     }
 
     try {
       const passwordHash = await bcrypt.hash(d.admin.password, 12);
+      const modulesNormalized = normalizeModules(d.modules);
 
       await prisma.$transaction(
         async (tx) => {
@@ -269,7 +331,7 @@ router.post(
 
           await tx.moduleSetting.deleteMany();
           await tx.moduleSetting.createMany({
-            data: MODULE_KEYS.map((key) => ({ key, enabled: d.modules[key] ?? true })),
+            data: MODULE_KEYS.map((key) => ({ key, enabled: modulesNormalized[key] })),
           });
 
           await tx.externalSystem.deleteMany();
@@ -280,6 +342,22 @@ router.post(
                 url: s.url,
                 visibleToRoles: s.visibleToRoles.length > 0 ? s.visibleToRoles : DEFAULT_LINK_ROLES,
                 sortOrder: i,
+              })),
+            });
+          }
+
+          // Link cards for areas the institution runs on its own system.
+          const ownLinks = MODULES.filter(
+            (mod) => !modulesNormalized[mod.key] && (d.moduleLinks[mod.key] || '').trim()
+          );
+          if (ownLinks.length > 0) {
+            await tx.externalSystem.createMany({
+              data: ownLinks.map((mod, i) => ({
+                name: mod.label,
+                url: d.moduleLinks[mod.key].trim(),
+                moduleKey: mod.key,
+                visibleToRoles: MODULE_AUDIENCE[mod.key] as Role[],
+                sortOrder: 100 + i,
               })),
             });
           }
@@ -295,6 +373,21 @@ router.post(
               passwordChangedAt: new Date(),
             },
           });
+
+          if (d.academic) {
+            const dept = await tx.department.upsert({
+              where: { name: d.academic.departmentName },
+              update: {},
+              create: { name: d.academic.departmentName },
+            });
+            await tx.program.create({
+              data: {
+                departmentId: dept.id,
+                name: d.academic.programmeName,
+                level: d.academic.level || null,
+              },
+            });
+          }
         },
         { timeout: 20000, maxWait: 10000 }
       );

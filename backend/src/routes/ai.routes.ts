@@ -1,3 +1,5 @@
+import { isModuleEnabled } from '../middleware/modules';
+import { getInstitutionName } from '../utils/institution';
 import { Router } from 'express';
 import dns from 'dns';
 import { prisma } from '../lib/prisma';
@@ -13,9 +15,9 @@ const router = Router();
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'openai/gpt-oss-120b';
 
-const SYSTEM_PROMPT = `You are the Runyenjes Technical & Vocational College study assistant.
+const SYSTEM_PROMPT = `You are the {{INSTITUTION}} study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,
-summarizing notes, and general TVET-related academic help. Be clear, concise, and encouraging.
+summarizing notes, and general academic help. Be clear, concise, and encouraging.
 If asked something completely unrelated to school/learning, you can still help, but gently
 steer back toward being a helpful study companion. Keep answers reasonably short unless the
 person asks for more detail.`;
@@ -177,11 +179,13 @@ router.post('/chat', requireAuth, async (req, res) => {
 
   // If this conversation is scoped to a unit, ground the system prompt in
   // that unit's context (looked up fresh each time, cheap query).
-  let systemPrompt = SYSTEM_PROMPT;
+  const institutionName = await getInstitutionName();
+  const basePrompt = SYSTEM_PROMPT.replace('{{INSTITUTION}}', institutionName);
+  let systemPrompt = basePrompt;
   if (convo.unitId) {
     const unitContext = await buildUnitContext(convo.unitId);
     if (unitContext) {
-      systemPrompt = `${SYSTEM_PROMPT}
+      systemPrompt = `${basePrompt}
 
 You are specifically tutoring this student on the following unit. Ground your answers in this
 context where relevant, and reference the materials listed if they seem useful, but you may also
@@ -266,7 +270,7 @@ Respond with ONLY valid JSON (no markdown, no commentary), in exactly this shape
 
   try {
     const reply = await callGroq(
-      'You generate exam-quality multiple-choice quizzes for TVET students. Respond with ONLY valid JSON, nothing else.',
+      'You generate exam-quality multiple-choice quizzes for students. Respond with ONLY valid JSON, nothing else.',
       prompt,
       1500
     );
@@ -308,7 +312,7 @@ teacher will do that separately.`;
 
   try {
     const reply = await callGroq(
-      'You are a supportive TVET tutor giving draft feedback, not a grader. Be specific and encouraging.',
+      'You are a supportive tutor giving draft feedback, not a grader. Be specific and encouraging.',
       prompt,
       600
     );
@@ -386,7 +390,7 @@ router.post(
 Topic: ${topic}
 
 Draft a short learning material description/summary (a few paragraphs) a teacher could use as
-lecture notes or a resource description for this topic. Keep it practical and TVET-appropriate.`
+lecture notes or a resource description for this topic. Keep it practical and appropriate.`
         : `Unit: ${unit.name}
 Topic: ${topic}
 
@@ -396,7 +400,7 @@ students should do. Respond with ONLY valid JSON in exactly this shape:
 
     try {
       const reply = await callGroq(
-        'You help TVET teachers draft course content quickly. Keep it practical and clear.',
+        'You help teachers draft course content quickly. Keep it practical and clear.',
         prompt,
         800
       );
@@ -492,7 +496,7 @@ Propose a Monday-Saturday (dayOfWeek 1-6), 08:00-17:00 class schedule for each u
 
   try {
     const reply = await callGroq(
-      'You create conflict-free weekly class timetables for a TVET college. Respond with ONLY valid JSON, nothing else.',
+      'You create conflict-free weekly class timetables for an institution. Respond with ONLY valid JSON, nothing else.',
       prompt,
       1800
     );
@@ -605,7 +609,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_deadlines: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You help a TVET student stay on top of their coursework. Summarize and prioritize what needs attention, keep it short and actionable.',
+      'You help a student stay on top of their coursework. Summarize and prioritize what needs attention, keep it short and actionable.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there are no tracked deadlines.';
@@ -638,7 +642,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_fees: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You explain fee/billing situations to a TVET student in plain, reassuring, non-alarming language. Be factual and clear about what they owe and what to do next.',
+      'You explain fee/billing situations to a student in plain, reassuring, non-alarming language. Be factual and clear about what they owe and what to do next.',
     build: async (userId) => {
       const invoices = await prisma.invoice.findMany({
         where: { studentId: userId },
@@ -660,7 +664,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_class_performance: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher understand how their classes are performing. Identify trends and flag students who may need extra support. Be concise.',
+      'You help a teacher understand how their classes are performing. Identify trends and flag students who may need extra support. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no performance data to summarize.';
@@ -698,7 +702,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   registrar_pending_applications: {
     roles: ['REGISTRAR'],
     systemPrompt:
-      'You help a TVET registrar triage pending admissions applications. Prioritize what needs attention first (e.g. oldest, payment issues). Be concise.',
+      'You help a registrar triage pending admissions applications. Prioritize what needs attention first (e.g. oldest, payment issues). Be concise.',
     build: async () => {
       const applications = await prisma.application.findMany({
         where: { status: 'SUBMITTED' },
@@ -719,7 +723,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   admin_stats_summary: {
     roles: ['ADMIN'],
     systemPrompt:
-      'You give a TVET college administrator a brief narrative summary of institution stats, with 2-3 suggested action items. Be concise and practical.',
+      'You give an institution administrator a brief narrative summary of institution stats, with 2-3 suggested action items. Be concise and practical.',
     build: async () => {
       const [students, teachers, departments, pendingApplications] = await Promise.all([
         prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
@@ -842,7 +846,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   alumni_career_tips: {
     roles: ['ALUMNI'],
     systemPrompt:
-      'You give a TVET college graduate practical, encouraging career development advice for the trade/field they trained in.',
+      'You give an institution graduate practical, encouraging career development advice for the trade/field they trained in.',
     build: async (userId) => {
       const profile = await prisma.alumniProfile.findUnique({ where: { userId } });
       const details = profile
@@ -856,7 +860,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_unit_results_summary: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher understand exam/assessment results across the units they teach. Identify trends and flag students who may need extra support. Be concise.',
+      'You help a teacher understand exam/assessment results across the units they teach. Identify trends and flag students who may need extra support. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no results data to summarize.';
@@ -887,7 +891,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   teacher_attendance_patterns: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher spot attendance patterns across the units they teach. Flag students with frequent absences and any noticeable trends. Be concise.',
+      'You help a teacher spot attendance patterns across the units they teach. Flag students with frequent absences and any noticeable trends. Be concise.',
     build: async (userId) => {
       const term = await prisma.term.findFirst({ where: { isActive: true } });
       if (!term) return 'No active academic term right now, so there is no attendance data to summarize.';
@@ -923,7 +927,7 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   student_results_summary: {
     roles: ['STUDENT'],
     systemPrompt:
-      'You help a TVET student understand their own exam results. Be encouraging, clear, and specific about strengths and areas to improve.',
+      'You help a student understand their own exam results. Be encouraging, clear, and specific about strengths and areas to improve.',
     build: async (userId) => {
       const results = await prisma.examResult.findMany({
         where: { studentId: userId },
@@ -943,8 +947,9 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   institution_reports_summary: {
     roles: ['REGISTRAR', 'ADMIN'],
     systemPrompt:
-      'You help TVET college leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
+      'You help institution leadership understand institution-wide reporting figures. Give a brief narrative summary with 2-3 suggested action items. Be concise and practical.',
     build: async () => {
+      const financeOn = await isModuleEnabled('finance');
       const [students, staffCounts, departments, programmes, units, admissionsByStatus, outstandingInvoices] = await Promise.all([
         prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
         prisma.user.groupBy({
@@ -969,13 +974,13 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
         return sum + (Number(inv.amount) - paid);
       }, 0);
 
-      return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
+      return `Institution reporting figures:\n- Active students: ${students}\n- Active staff by role: ${staffLines || 'none'}\n- Departments: ${departments}, Programmes: ${programmes}, Units: ${units}\n- Applications by status: ${admissionLines || 'none'}${financeOn ? `\n- Outstanding invoices: ${outstandingInvoices.length}, total balance: KES ${outstandingBalance}` : ''}\n\nWrite a short narrative summary with 2-3 suggested action items.`;
     },
   },
   teacher_early_warning_summary: {
     roles: ['TEACHER'],
     systemPrompt:
-      'You help a TVET teacher decide how to support students flagged as at-risk across attendance, ' +
+      'You help a teacher decide how to support students flagged as at-risk across attendance, ' +
       'assignments, and results. Be concise, practical, and encouraging -- suggest concrete next steps ' +
       '(e.g. who to check in with first, what kind of support each pattern suggests).',
     build: async (userId) => {
@@ -1037,6 +1042,16 @@ const ASSIST_ACTIONS: Record<string, AssistAction> = {
   },
 };
 
+// Quick actions that depend on an area an institution may run on its own system.
+const ASSIST_ACTION_MODULES: Record<string, string> = {
+  student_fees: 'finance',
+  finance_outstanding_invoices: 'finance',
+  hr_pending_leave: 'hr',
+  stores_low_stock: 'stores',
+  procurement_pending_requests: 'procurement',
+  alumni_career_tips: 'alumni',
+};
+
 // ---------- Role-specific one-click AI assist actions ----------
 router.post('/assist', requireAuth, async (req, res) => {
   const { action } = req.body;
@@ -1048,6 +1063,13 @@ router.post('/assist', requireAuth, async (req, res) => {
   const allowed = actionDef.roles.includes(req.user!.role) || req.user!.role === 'ADMIN';
   if (!allowed) {
     return res.status(403).json({ error: 'This assistant action is not available for your role' });
+  }
+
+  const moduleKey = ASSIST_ACTION_MODULES[action];
+  if (moduleKey && !(await isModuleEnabled(moduleKey))) {
+    return res.status(403).json({
+      error: "This assistant action is not available because that area is handled in your institution's own system.",
+    });
   }
 
   try {
@@ -1083,11 +1105,11 @@ const TEXT_ASSIST_TASKS: Record<string, { systemPrompt: string; maxTokens?: numb
   },
   draft_announcement: {
     systemPrompt:
-      'Turn the following rough bullet points into a clear, professional announcement for a TVET college community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
+      'Turn the following rough bullet points into a clear, professional announcement for an institution community (students and staff). Keep it concise, warm, and easy to read. Do not invent details not implied by the input.',
   },
   draft_letter: {
     systemPrompt:
-      'Turn the following rough notes into a clear, formal letter/certificate body for a TVET college ' +
+      'Turn the following rough notes into a clear, formal letter/certificate body for an institution ' +
       'registrar to issue to a student. Keep it professional and appropriately formal. Do not invent facts ' +
       'not implied by the input. Do not include a greeting/salutation or signature block -- just the body ' +
       'text itself.',

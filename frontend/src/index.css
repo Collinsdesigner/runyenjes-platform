@@ -23,6 +23,6 @@ html.dark body {
    via JS (document.documentElement.style.setProperty), so every
    existing Tailwind class using these stays in sync automatically. */
 :root {
-  --color-primary: #0B7A2B;
-  --color-secondary: #5C0F00;
+  --color-primary: #0F766E;
+  --color-secondary: #374151;
 }

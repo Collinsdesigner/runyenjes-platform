@@ -104,7 +104,7 @@ export default function StudentPortal() {
           </h2>
 
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
-            Your academic and college workspace.
+            Your academic workspace.
           </p>
         </div>
 

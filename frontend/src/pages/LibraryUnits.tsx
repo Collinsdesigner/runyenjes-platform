@@ -193,7 +193,7 @@ export default function LibraryUnits() {
               {canManage && (
                 <div className="flex gap-2 mt-2">
                   <input
-                    placeholder="Paste link here (Drive, KNEC/CDACC page, etc.)"
+                    placeholder="Paste link here (Drive, an exam body page, etc.)"
                     value={materialDrafts[unit.id]?.url ?? ''}
                     onChange={(e) =>
                       setMaterialDrafts((prev) => ({

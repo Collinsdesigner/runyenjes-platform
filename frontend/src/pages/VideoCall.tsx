@@ -38,7 +38,7 @@ export default function VideoCall() {
 
         // Room name is tied to the group's own id — private and unique per class/department,
         // without us needing to run any video/signaling servers ourselves.
-        const roomName = `runyenjes-${groupId}`;
+        const roomName = `portal-${groupId}`;
 
         apiRef.current = new window.JitsiMeetExternalAPI('meet.jit.si', {
           roomName,
@@ -92,7 +92,7 @@ export default function VideoCall() {
         >
           ← Back to chat
         </button>
-        <span className="text-xs text-gray-400 dark:text-gray-500">Runyenjes Video Call</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">Video Call</span>
       </div>
 
       {error && (

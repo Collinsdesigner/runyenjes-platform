@@ -1,3 +1,4 @@
+import { useModules, roleAvailable } from '../../hooks/useModules';
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
@@ -31,6 +32,7 @@ const ALL_ROLES = [
 // been run yet.
 export default function AdminUsers() {
   const { token } = useAuth();
+  const modules = useModules();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -41,7 +43,7 @@ export default function AdminUsers() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [newUserRole, setNewUserRole] = useState('FINANCE_OFFICER');
+  const [newUserRole, setNewUserRole] = useState('TEACHER');
 
   const [roleEdits, setRoleEdits] = useState<Record<string, string>>({});
 
@@ -147,7 +149,7 @@ export default function AdminUsers() {
               value={newUserRole}
               onChange={(e) => setNewUserRole(e.target.value)}
             >
-              {ALL_ROLES.filter((r) => r !== 'STUDENT' && r !== 'ALUMNI').map((r) => (
+              {ALL_ROLES.filter((r) => r !== 'STUDENT' && r !== 'ALUMNI' && roleAvailable(r, modules)).map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>

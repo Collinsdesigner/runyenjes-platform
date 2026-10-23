@@ -208,7 +208,7 @@ export default function Continuation() {
                 <input
                   value={confirmInput}
                   onChange={(e) => setConfirmInput(e.target.value)}
-                  placeholder="e.g. RTVC/2026/00001"
+                  placeholder="Your admission number"
                   required
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-center dark:border-gray-600"
                 />

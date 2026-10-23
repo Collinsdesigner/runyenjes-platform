@@ -41,6 +41,7 @@ import lettersRoutes from './routes/letters.routes';
 import auditRoutes from './routes/audit.routes';
 import requestsRoutes from './routes/requests.routes';
 import { errorHandler } from './middleware/errorHandler';
+import { requireModule } from './middleware/modules';
 import morgan from 'morgan';
 
 import {
@@ -141,7 +142,7 @@ app.use(
 app.get('/', (_, res) => {
   res.json({
     status: 'ok',
-    message: 'Runyenjes backend is running',
+    message: 'Backend is running',
   });
 });
 
@@ -167,13 +168,13 @@ app.use('/profile', profileRoutes);
 app.use('/security', securityLimiter, securityRoutes);
 app.use('/ai', aiRoutes);
 app.use('/academic', academicRoutes);
-app.use('/finance', financeRoutes);
-app.use('/hr', hrRoutes);
+app.use('/finance', requireModule('finance'), financeRoutes);
+app.use('/hr', requireModule('hr'), hrRoutes);
 app.use('/examinations', examinationsRoutes);
-app.use('/stores', storesRoutes);
-app.use('/alumni', alumniRoutes);
-app.use('/procurement', procurementRoutes);
-app.use('/jobs', jobRoutes);
+app.use('/stores', requireModule('stores'), storesRoutes);
+app.use('/alumni', requireModule('alumni'), alumniRoutes);
+app.use('/procurement', requireModule('procurement'), procurementRoutes);
+app.use('/jobs', requireModule('alumni'), jobRoutes);
 app.use('/announcements', announcementsRoutes);
 app.use('/stories', storiesRoutes);
 app.use('/notes', notesRoutes);

@@ -17,7 +17,7 @@ interface ImportResult {
   skipped: { row: any; reason: string }[];
 }
 
-const SAMPLE_CSV = 'name,email,admissionNumber,phone\nJane Wanjiru,jane.wanjiru@example.com,RT/2024/001,0712345678';
+const SAMPLE_CSV = 'name,email,admissionNumber,phone\nJane Wanjiru,jane.wanjiru@example.com,2859,0712345678';
 
 export default function AdminBulkImport() {
   const { token } = useAuth();
