@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
+import NotificationBell from './NotificationBell';
 
 interface PortalLayoutProps {
   title: string;
@@ -568,13 +569,7 @@ export default function PortalLayout({
             </button>
 
             {/* Notifications */}
-            <button
-              type="button"
-              className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition dark:text-gray-400 dark:hover:bg-gray-700"
-              aria-label="Notifications"
-            >
-              🔔
-            </button>
+            <NotificationBell />
 
             {/* Profile */}
             <button
