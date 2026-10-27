@@ -23,17 +23,106 @@ const PLAIN_TEXT_RULES =
 
 // The model is only told the institution's name, so it must not guess anything else about it.
 const INSTITUTION_FACTS_RULE =
-  'About the institution itself you know only its name. Never state or guess anything else about it, such as ' +
-  'its type, ownership, location, programmes, history, size or any abbreviation of its name. If asked, say that ' +
-  'you only know its name and suggest asking the institution office or its website.';
+  'About the institution itself, use only the facts given in the COLLEGE FACTS section of this prompt, if there is one. ' +
+  'Never state or guess anything that is not listed there, such as fees, dates, staff names, history, size or any ' +
+  'abbreviation of its name. If something is not listed, say you do not have that information and suggest contacting ' +
+  'the college office, using the contact details listed if there are any.';
 
 function withStyleRules(prompt: string): string {
   return prompt.includes(PLAIN_TEXT_RULES) ? prompt : `${prompt}\n\n${PLAIN_TEXT_RULES}`;
 }
 
+// AI_PORTAL_KNOWLEDGE_V1
+// Plain-text clean-up: the model sometimes ignores the "no markdown" instruction, so strip the marks here.
+function cleanReply(text: string): string {
+  return String(text)
+    .replace(/\*\*([\s\S]+?)\*\*/g, '$1')
+    .replace(/__([\s\S]+?)__/g, '$1')
+    .replace(/^[ \t]{0,3}#{1,6}[ \t]+/gm, '')
+    .replace(/```[a-zA-Z]*\n?/g, '')
+    .replace(/`([^`\n]+)`/g, '$1')
+    .replace(/^[ \t]*\*[ \t]+/gm, '- ')
+    .replace(/\*\*/g, '');
+}
+
+// What each role sees in the left-hand menu (kept in step with PortalLayout.tsx).
+const PORTAL_GUIDE: Record<string, string> = {
+  STUDENT:
+    'The student menu on the left has: Dashboard; under Academics: My Academics, Learning Materials, Timetable, ' +
+    'Assignments, Results; under Student Services: Fees & Payments, My Documents & Letters, Request a Document. ' +
+    'Letters such as clearance or a results slip are asked for under Request a Document and appear in My Documents & Letters ' +
+    'once approved. The bell at the top shows announcements and decisions on requests. This AI Assistant is where chats are kept.',
+  TEACHER:
+    'The teacher menu on the left has: Dashboard; under Teaching: My Classes, My Units, Students, Attendance, Assignments, ' +
+    'Assessments, Results, Learning Materials, AI Content Generator, Early Warning (students falling behind).',
+  REGISTRAR:
+    'The registrar menu on the left has: Dashboard; Admissions, Student Records, Continuation; Academic Records, ' +
+    'Programmes & Departments, Manage Academic Structure, Timetable; Student Documents, Letters & Certificates, Approvals; ' +
+    'Announcements; Registrar Reports. The bell shows pending applications and requests waiting for the registrar.',
+  ADMIN:
+    'The administrator menu on the left has: Dashboard; Users, Students, Staff, Mass Import, Alumni; Academic, Admissions; ' +
+    'Finance, Library, Communication, Procurement; Reports, Audit Log; and further down Modules and Systems and Settings, ' +
+    'where areas can be switched on or off and the name, colours and contact details are set.',
+};
+
+let collegeFactsCache: { at: number; text: string } | null = null;
+
+// The only facts the assistant may state about the college: Settings plus the programme list.
+async function getCollegeFacts(): Promise<string> {
+  if (collegeFactsCache && Date.now() - collegeFactsCache.at < 5 * 60 * 1000) return collegeFactsCache.text;
+  const lines: string[] = [];
+  try {
+    const [s, programs] = await Promise.all([
+      prisma.siteSettings.findUnique({ where: { id: 1 } }),
+      prisma.program.findMany({ select: { name: true, level: true, isShortCourse: true }, orderBy: { name: 'asc' } }),
+    ]);
+    if (s) {
+      const add = (label: string, v?: string | null) => { if (v && v.trim()) lines.push(label + ': ' + v.trim()); };
+      add('Name', s.institutionName);
+      add('Tagline', s.tagline);
+      add('About', s.about);
+      add('Postal address', s.address);
+      add('Physical location', s.physicalLocation);
+      add('Phone', s.phone);
+      add('Email', s.email);
+      add('Website', s.website);
+      add('Map link', s.googleMapsUrl);
+    }
+    const levels = new Map<string, string[]>();
+    const short: string[] = [];
+    for (const p of programs as any[]) {
+      if (p.isShortCourse || !p.level) { short.push(p.name); continue; }
+      const arr = levels.get(p.name) || [];
+      arr.push(p.level);
+      levels.set(p.name, arr);
+    }
+    if (levels.size) {
+      lines.push('Programmes: ' + Array.from(levels.entries()).map(([n, l]) => n + ' (' + l.join(', ') + ')').join('; '));
+    }
+    if (short.length) lines.push('Short courses: ' + short.join(', '));
+  } catch (e) {
+    console.error('College facts lookup failed:', e);
+  }
+  const text = lines.join('\n');
+  collegeFactsCache = { at: Date.now(), text };
+  return text;
+}
+
+// Everything the assistant is told about this platform and this college, for the signed-in user's role.
+async function buildCollegeKnowledge(role?: string): Promise<string> {
+  const guide = (role && PORTAL_GUIDE[role]) || 'Each person signs in and sees only the menu for their own role, on the left.';
+  const facts = await getCollegeFacts();
+  return (
+    '\n\nPORTAL GUIDE (the person is signed in as ' + (role || 'a member') + '):\n' + guide +
+    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so.' +
+    (facts ? '\n\nCOLLEGE FACTS (the only facts you may state about the college):\n' + facts : '')
+  );
+}
+
 const SYSTEM_PROMPT = `You are the {{INSTITUTION}} study assistant.
 You help students and staff with study questions, explaining concepts from their coursework,
 summarizing notes, and general academic help. Be clear, concise, and encouraging.
+You also help people find their way around this platform, using the PORTAL GUIDE you are given.
 If asked something completely unrelated to school/learning, you can still help, but gently
 steer back toward being a helpful study companion. Keep answers reasonably short unless the
 person asks for more detail.
@@ -78,7 +167,7 @@ async function callGroq(systemPrompt: string, userMessage: string, maxTokens = 1
   }
 
   const data: any = await response.json();
-  return data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+  return cleanReply(data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.');
 }
 
 function handleGroqError(err: unknown, res: any) {
@@ -200,7 +289,8 @@ router.post('/chat', requireAuth, async (req, res) => {
   // If this conversation is scoped to a unit, ground the system prompt in
   // that unit's context (looked up fresh each time, cheap query).
   const institutionName = await getInstitutionName();
-  const basePrompt = SYSTEM_PROMPT.replace('{{INSTITUTION}}', institutionName);
+  const collegeKnowledge = await buildCollegeKnowledge((req.user as any)?.role);
+  const basePrompt = SYSTEM_PROMPT.replace('{{INSTITUTION}}', institutionName) + collegeKnowledge;
   let systemPrompt = basePrompt;
   if (convo.unitId) {
     const unitContext = await buildUnitContext(convo.unitId);
@@ -245,7 +335,7 @@ ${unitContext}`;
     }
 
     const data: any = await response.json();
-    const reply = data.choices?.[0]?.message?.content ?? 'Sorry, I could not generate a response.';
+    const reply = cleanReply(data.choices?.[0]?.message?.content ?? 'Sorry, I could not generate a response.');
 
     await prisma.aIMessage.create({
       data: { conversationId: convo.id, role: 'assistant', content: reply },
