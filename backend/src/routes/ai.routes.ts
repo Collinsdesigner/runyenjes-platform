@@ -113,12 +113,13 @@ async function getCollegeFacts(): Promise<string> {
 }
 
 // Everything the assistant is told about this platform and this college, for the signed-in user's role.
+// AI_GUIDE_TIGHTEN_V2
 async function buildCollegeKnowledge(role?: string): Promise<string> {
   const guide = (role && PORTAL_GUIDE[role]) || 'Each person signs in and sees only the menu for their own role, on the left.';
   const facts = await getCollegeFacts();
   return (
     '\n\nPORTAL GUIDE (the person is signed in as ' + (role || 'a member') + '):\n' + guide +
-    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments.' +
+    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments. When explaining a menu item, give its name and the purpose stated in the guide, nothing more: do not describe what is on the screen, what can be downloaded or uploaded, or what happens after an action, and do not invent steps, payment methods or office procedures. For fees, say only to open Fees & Payments, and for anything else about paying, to contact the college office using the contact details listed.' +
     (facts ? '\n\nCOLLEGE FACTS (the only facts you may state about the college):\n' + facts : '')
   );
 }
