@@ -22,9 +22,13 @@ const PLAIN_TEXT_RULES =
   'no tables and no code fences. Use short paragraphs, and simple lines starting with "- " or "1." for lists.';
 
 // The model is only told the institution's name, so it must not guess anything else about it.
+// AI_FACTS_TIGHTEN_V1
 const INSTITUTION_FACTS_RULE =
   'About the institution itself, use only the facts given in the COLLEGE FACTS section of this prompt, if there is one. ' +
-  'Never state or guess anything that is not listed there, such as fees, dates, staff names, history, size or any ' +
+  'State them exactly as written: do not explain, interpret or add to them. In particular, do not say what the programme ' +
+  'levels mean, do not group programmes into families or fields, do not name fields, departments or services that are ' +
+  'not listed (for example health), and do not describe the mission or goals beyond the About line. When asked about ' +
+  'programmes, list them exactly as given. Never state or guess fees, dates, staff names, history, size or any ' +
   'abbreviation of its name. If something is not listed, say you do not have that information and suggest contacting ' +
   'the college office, using the contact details listed if there are any.';
 
@@ -114,7 +118,7 @@ async function buildCollegeKnowledge(role?: string): Promise<string> {
   const facts = await getCollegeFacts();
   return (
     '\n\nPORTAL GUIDE (the person is signed in as ' + (role || 'a member') + '):\n' + guide +
-    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so.' +
+    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments.' +
     (facts ? '\n\nCOLLEGE FACTS (the only facts you may state about the college):\n' + facts : '')
   );
 }
