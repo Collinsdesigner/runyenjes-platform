@@ -46,6 +46,9 @@ export default function AdminUsers() {
   const [newUserRole, setNewUserRole] = useState('TEACHER');
 
   const [roleEdits, setRoleEdits] = useState<Record<string, string>>({});
+  // ADMIN_EDIT_NAME_FE_V1
+  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState('');
 
   async function load() {
     if (!token) return;
@@ -102,6 +105,24 @@ export default function AdminUsers() {
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update role');
+    }
+  }
+
+  async function handleNameSave(userId: string) {
+    setError('');
+    setMessage('');
+    const newName = nameDraft.trim();
+    if (newName.length < 2) {
+      setError('Name must be at least 2 characters');
+      return;
+    }
+    try {
+      await api(`/admin/users/${userId}/name`, { method: 'PATCH', token, body: { name: newName } });
+      setMessage('Name updated');
+      setEditingNameId(null);
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update name');
     }
   }
 
@@ -199,7 +220,29 @@ export default function AdminUsers() {
               )}
               {users.map((u) => (
                 <tr key={u.id} className="border-t border-gray-100 dark:border-gray-800">
-                  <td className="px-4 py-2">{u.name}</td>
+                  <td className="px-4 py-2">
+                    {editingNameId === u.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="border border-gray-300 rounded-lg px-2 py-1 text-sm dark:border-gray-600"
+                          value={nameDraft}
+                          onChange={(e) => setNameDraft(e.target.value)}
+                        />
+                        <button className="text-rgreen text-xs font-medium" onClick={() => handleNameSave(u.id)}>Save</button>
+                        <button className="text-gray-500 text-xs" onClick={() => setEditingNameId(null)}>Cancel</button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>{u.name}</span>
+                        <button
+                          className="text-rgreen text-xs font-medium"
+                          onClick={() => { setEditingNameId(u.id); setNameDraft(u.name); }}
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-2">{u.email}</td>
                   <td className="px-4 py-2">
                     <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800">{u.role}</span>
