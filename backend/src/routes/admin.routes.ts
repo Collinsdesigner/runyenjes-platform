@@ -9,6 +9,7 @@ import { requireAuth, requireRole } from '../middleware/auth';
 import { logAudit } from '../services/audit.service';
 import { uploadImage, deleteImage } from '../services/media.service';
 import { getVisitStats } from '../services/visitCounter.service';
+import * as zodLib from 'zod';
 
 const router = Router();
 
@@ -233,6 +234,34 @@ router.patch('/users/:id/role', async (req, res) => {
     entityId: id,
     before: { role: target.role },
     after: { role: user.role },
+  });
+
+  res.json(user);
+});
+
+// ADMIN_EDIT_NAME_V1
+// ---------- Change a user's display name (Admin only) ----------
+router.patch('/users/:id/name', async (req, res) => {
+  const { id } = req.params;
+  const parsed = zodLib.z.object({ name: zodLib.z.string().trim().min(2).max(100) }).safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Name must be 2 to 100 characters' });
+
+  const target = await prisma.user.findUnique({ where: { id } });
+  if (!target) return res.status(404).json({ error: 'User not found' });
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { name: parsed.data.name },
+    select: { id: true, name: true, email: true, role: true },
+  });
+
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'UPDATE_USER_NAME',
+    entityType: 'User',
+    entityId: id,
+    before: { name: target.name },
+    after: { name: user.name },
   });
 
   res.json(user);
