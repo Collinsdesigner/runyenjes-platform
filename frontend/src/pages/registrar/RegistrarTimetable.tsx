@@ -451,7 +451,7 @@ export default function RegistrarTimetable() {
                 <option value="">Select programme</option>
                 {options.programmes.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name}{p.level ? ` — Level ${p.level}` : ''}
+                    {p.name}{p.level ? ` — ${/^\d+$/.test(String(p.level)) ? 'Level ' : ''}${p.level}` : ''}
                   </option>
                 ))}
               </select>
@@ -609,7 +609,7 @@ export default function RegistrarTimetable() {
                     >
                       {programme.name}
                       {programme.level
-                        ? ` — Level ${programme.level}`
+                        ? ` — ${/^\d+$/.test(String(programme.level)) ? 'Level ' : ''}${programme.level}`
                         : ''}
                       {programme.department?.name
                         ? ` — ${programme.department.name}`
@@ -914,3 +914,4 @@ export default function RegistrarTimetable() {
     </PortalLayout>
   );
 }
+// LEVEL_LABEL_FIX_V1
