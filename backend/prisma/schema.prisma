@@ -90,6 +90,8 @@ model User {
   enrollments          Enrollment[]
   unitRegistrations    UnitRegistration[]
   teachingAssignments  UnitLecturer[]
+  poeEntries           PoeEntry[]            @relation("PoeStudent")
+  poeAssessed          PoeEntry[]            @relation("PoeAssessor")
 
   mustChangePassword Boolean   @default(false)
   passwordChangedAt  DateTime?
@@ -186,6 +188,7 @@ model ProgramFee {
 }
 
 model Unit {
+  poeEntries          PoeEntry[]
   id                  String             @id @default(uuid())
   programId           String
   program             Program            @relation(fields: [programId], references: [id])
@@ -1099,4 +1102,59 @@ model ExternalSystem {
   moduleKey      String?
   sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
+}
+
+// POE_SCHEMA_V1
+// Portfolio of Evidence: a student's proof of performing a task, marked by the unit's teacher.
+enum PoeStatus {
+  DRAFT
+  SUBMITTED
+  COMPETENT
+  NOT_YET_COMPETENT
+  RESUBMIT_REQUESTED
+}
+
+enum PoeMediaKind {
+  IMAGE
+  VIDEO
+}
+
+model PoeEntry {
+  id               String     @id @default(uuid())
+  studentId        String
+  student          User       @relation("PoeStudent", fields: [studentId], references: [id])
+  unitId           String
+  unit             Unit       @relation(fields: [unitId], references: [id])
+  title            String
+  description      String?
+  performedOn      DateTime
+  status           PoeStatus  @default(DRAFT)
+  submittedAt      DateTime?
+  assessedById     String?
+  assessedBy       User?      @relation("PoeAssessor", fields: [assessedById], references: [id])
+  assessedAt       DateTime?
+  assessorFeedback String?
+  media            PoeMedia[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([unitId, status])
+}
+
+model PoeMedia {
+  id              String       @id @default(uuid())
+  entryId         String
+  entry           PoeEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  kind            PoeMediaKind
+  publicId        String
+  url             String
+  thumbnailUrl    String?
+  bytes           Int
+  durationSeconds Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([entryId])
 }
