@@ -69,6 +69,29 @@ const PORTAL_GUIDE: Record<string, string> = {
     'where areas can be switched on or off and the name, colours and contact details are set.',
 };
 
+// AI_GUIDE_MENUS_V3
+// Staff menus exactly as shown in the portal. Purposes are given only where the dashboards state one.
+const WORKSPACE_ACCOUNT =
+  ' Under Workspace: Home Feed, AI Assistant (where chats are kept), Notebook, Announcements, Groups. Under Account: Profile, Security.';
+PORTAL_GUIDE.TEACHER =
+  'The teacher menu on the left has: Dashboard. Under Teaching: My Classes (manage your classes), My Units (manage assigned units), ' +
+  'Students (view your students), Attendance (record attendance), Assignments, Assessments, Results, Learning Materials, ' +
+  'AI Content Generator, Early Warning (students falling behind). Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT;
+PORTAL_GUIDE.REGISTRAR =
+  'The registrar menu on the left has: Dashboard. Under Admissions & Registration: Admissions (review applications, admit students, ' +
+  'reject applications and manage the admission process), Student Records (view and manage student registration information and ' +
+  'admission numbers), Continuation (manage student continuation and confirm students who report physically). ' +
+  'Under Academic Administration: Academic Records, Programmes & Departments, Manage Academic Structure, Timetable. ' +
+  'Under Documents: Student Documents, Letters & Certificates, Approvals. Under Communication: Announcements. ' +
+  'Under Reports: Registrar Reports. Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT +
+  ' The bell at the top shows pending applications and requests.';
+PORTAL_GUIDE.ADMIN =
+  'The administrator menu on the left has: Dashboard. Under Administration: Users, Students (manage student records), ' +
+  'Staff (manage staff accounts), Mass Import, Alumni. Under Academic: Academic, Admissions. ' +
+  'Under Operations: Finance, Library, Communication, Procurement. ' +
+  'Under Management: Reports, Audit Log, Settings (the name, colours and contact details are set here), ' +
+  'Modules and Systems (areas can be switched on or off here). Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT;
+
 // AI_LEVEL_SORT_V1
 // Order programme levels: Level 1..6 by number; CPA Foundation, Intermediate, Advanced; anything else last.
 function levelRank(l: string): number {
@@ -134,7 +157,7 @@ async function buildCollegeKnowledge(role?: string): Promise<string> {
   const facts = await getCollegeFacts();
   return (
     '\n\nPORTAL GUIDE (the person is signed in as ' + (role || 'a member') + '):\n' + guide +
-    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments. When explaining a menu item, give its name and the purpose stated in the guide, nothing more: do not describe what is on the screen, what can be downloaded or uploaded, or what happens after an action, and do not invent steps, buttons, options or actions that the guide does not name (for example an Approve button), payment methods or office procedures. For fees, say only to open Fees & Payments, and for anything else about paying, to contact the college office using the contact details listed.' +
+    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments. When explaining a menu item, give its name and the purpose stated in the guide, nothing more: do not describe what is on the screen, what can be downloaded or uploaded, or what happens after an action, if the guide gives no purpose for a menu item, give only its name and where it is, and do not invent steps, buttons, options or actions that the guide does not name (for example an Approve button), payment methods or office procedures. For fees, say only to open Fees & Payments, and for anything else about paying, to contact the college office using the contact details listed.' +
     (facts ? '\n\nCOLLEGE FACTS (the only facts you may state about the college):\n' + facts : '')
   );
 }
