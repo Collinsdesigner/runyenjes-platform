@@ -55,7 +55,7 @@ const PORTAL_GUIDE: Record<string, string> = {
     'The student menu on the left has: Dashboard; under Academics: My Academics, Learning Materials, Timetable, ' +
     'Assignments, Results; under Student Services: Fees & Payments, My Documents & Letters, Request a Document. ' +
     'Letters such as clearance or a results slip are asked for under Request a Document and appear in My Documents & Letters ' +
-    'once approved. The bell at the top shows announcements and decisions on requests. This AI Assistant is where chats are kept.',
+    'once approved. The bell at the top shows announcements and decisions on requests. Under Workspace: Home Feed, AI Assistant (where chats are kept), Notebook, Announcements, Groups; under Account: Profile, Security.',
   TEACHER:
     'The teacher menu on the left has: Dashboard; under Teaching: My Classes, My Units, Students, Attendance, Assignments, ' +
     'Assessments, Results, Learning Materials, AI Content Generator, Early Warning (students falling behind).',
@@ -68,6 +68,21 @@ const PORTAL_GUIDE: Record<string, string> = {
     'Finance, Library, Communication, Procurement; Reports, Audit Log; and further down Modules and Systems and Settings, ' +
     'where areas can be switched on or off and the name, colours and contact details are set.',
 };
+
+// AI_LEVEL_SORT_V1
+// Order programme levels: Level 1..6 by number; CPA Foundation, Intermediate, Advanced; anything else last.
+function levelRank(l: string): number {
+  const m = /(\d+)/.exec(l);
+  if (m) return Number(m[1]);
+  const t = l.toLowerCase();
+  if (t.includes('foundation')) return 101;
+  if (t.includes('intermediate')) return 102;
+  if (t.includes('advanced')) return 103;
+  return 200;
+}
+function sortLevels(arr: string[]): string[] {
+  return [...arr].sort((x, y) => levelRank(x) - levelRank(y) || x.localeCompare(y));
+}
 
 let collegeFactsCache: { at: number; text: string } | null = null;
 
@@ -101,7 +116,7 @@ async function getCollegeFacts(): Promise<string> {
       levels.set(p.name, arr);
     }
     if (levels.size) {
-      lines.push('Programmes: ' + Array.from(levels.entries()).map(([n, l]) => n + ' (' + l.join(', ') + ')').join('; '));
+      lines.push('Programmes: ' + Array.from(levels.entries()).map(([n, l]) => n + ' (' + sortLevels(l).join(', ') + ')').join('; '));
     }
     if (short.length) lines.push('Short courses: ' + short.join(', '));
   } catch (e) {
@@ -119,7 +134,7 @@ async function buildCollegeKnowledge(role?: string): Promise<string> {
   const facts = await getCollegeFacts();
   return (
     '\n\nPORTAL GUIDE (the person is signed in as ' + (role || 'a member') + '):\n' + guide +
-    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments. When explaining a menu item, give its name and the purpose stated in the guide, nothing more: do not describe what is on the screen, what can be downloaded or uploaded, or what happens after an action, and do not invent steps, payment methods or office procedures. For fees, say only to open Fees & Payments, and for anything else about paying, to contact the college office using the contact details listed.' +
+    '\nWhen asked how to do something, name the exact menu item to open. If you are not sure it exists, say so. Describe only what the guide says each menu item is for: do not add features, file types or abilities that are not mentioned in it, such as videos or online payments. When explaining a menu item, give its name and the purpose stated in the guide, nothing more: do not describe what is on the screen, what can be downloaded or uploaded, or what happens after an action, and do not invent steps, buttons, options or actions that the guide does not name (for example an Approve button), payment methods or office procedures. For fees, say only to open Fees & Payments, and for anything else about paying, to contact the college office using the contact details listed.' +
     (facts ? '\n\nCOLLEGE FACTS (the only facts you may state about the college):\n' + facts : '')
   );
 }
