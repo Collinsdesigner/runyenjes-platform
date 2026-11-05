@@ -79,6 +79,7 @@ import StoresInventory from './pages/stores/StoresInventory';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminAuditLog from './pages/admin/AdminAuditLog';
 import StudentRequests from './pages/student/StudentRequests';
+import StudentPoe from './pages/student/StudentPoe';
 import FinanceApprovals from './pages/finance/FinanceApprovals';
 import RegistrarApprovals from './pages/registrar/RegistrarApprovals';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
@@ -183,6 +184,7 @@ export default function App() {
                 <Route path="/student/academics" element={<StudentAcademics />} />
                 <Route path="/student/fees" element={<ModuleGate moduleKey="finance"><StudentFees /></ModuleGate>} />
                 <Route path="/student/results" element={<StudentResults />} />
+                <Route path="/student/poe" element={<StudentPoe />} />
                 <Route path="/student/records" element={<StudentRecords />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />

@@ -53,7 +53,7 @@ function cleanReply(text: string): string {
 const PORTAL_GUIDE: Record<string, string> = {
   STUDENT:
     'The student menu on the left has: Dashboard; under Academics: My Academics, Learning Materials, Timetable, ' +
-    'Assignments, Results; under Student Services: Fees & Payments, My Documents & Letters, Request a Document. ' +
+    'Assignments, Results, My POE (add photo or video evidence of tasks you performed, for your teacher to mark); under Student Services: Fees & Payments, My Documents & Letters, Request a Document. ' +
     'Letters such as clearance or a results slip are asked for under Request a Document and appear in My Documents & Letters ' +
     'once approved. The bell at the top shows announcements and decisions on requests. Under Workspace: Home Feed, AI Assistant (where chats are kept), Notebook, Announcements, Groups; under Account: Profile, Security.',
   TEACHER:

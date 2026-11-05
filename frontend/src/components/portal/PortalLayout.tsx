@@ -78,6 +78,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Timetable', path: '/student/timetable', icon: '▦' },
         { label: 'Assignments', path: '/student/assignments', icon: '✓' },
         { label: 'Results', path: '/student/results', icon: '📊' },
+        { label: 'My POE', path: '/student/poe', icon: '📸' },
       ],
     },
     {
