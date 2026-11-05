@@ -41,6 +41,7 @@ import documentsRoutes from './routes/documents.routes';
 import lettersRoutes from './routes/letters.routes';
 import auditRoutes from './routes/audit.routes';
 import requestsRoutes from './routes/requests.routes';
+import poeRoutes from './routes/poe.routes'; // POE_ROUTES_V1
 import { errorHandler } from './middleware/errorHandler';
 import { requireModule } from './middleware/modules';
 import morgan from 'morgan';
@@ -188,6 +189,7 @@ app.use('/documents', documentsRoutes);
 app.use('/letters', lettersRoutes);
 app.use('/audit', auditRoutes);
 app.use('/requests', requestsRoutes);
+app.use('/poe', poeRoutes);
 
 /**
  * =========================
