@@ -50,6 +50,7 @@ import TeacherContentGenerator from './pages/teacher/TeacherContentGenerator';
 import TeacherEarlyWarning from './pages/teacher/TeacherEarlyWarning';
 import TeacherAssessments from './pages/teacher/TeacherAssessments';
 import TeacherResults from './pages/teacher/TeacherResults';
+import TeacherPoe from './pages/teacher/TeacherPoe';
 import StudentAssignments from './pages/student/StudentAssignments';
 import StudentAcademics from './pages/student/StudentAcademics';
 import StudentFees from './pages/student/StudentFees';
@@ -180,6 +181,7 @@ export default function App() {
                 <Route path="/teacher/early-warning" element={<TeacherEarlyWarning />} />
                 <Route path="/teacher/assessments" element={<TeacherAssessments />} />
                 <Route path="/teacher/results" element={<TeacherResults />} />
+                <Route path="/teacher/poe" element={<TeacherPoe />} />
                 <Route path="/student/assignments" element={<StudentAssignments />} />
                 <Route path="/student/academics" element={<StudentAcademics />} />
                 <Route path="/student/fees" element={<ModuleGate moduleKey="finance"><StudentFees /></ModuleGate>} />
