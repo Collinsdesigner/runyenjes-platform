@@ -13,7 +13,7 @@ interface UnitOpt { id: string; name: string }
 
 const MAX_IMAGE = 5 * 1024 * 1024;
 const MAX_VIDEO = 50 * 1024 * 1024;
-const MAX_SECONDS = 60;
+const MAX_SECONDS = 180;
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -89,7 +89,7 @@ export default function StudentPoe() {
     if (isVideo) {
       if (file.size > MAX_VIDEO) throw new Error(`${file.name}: video is larger than 50 MB`);
       const d = await videoSeconds(file);
-      if (d > MAX_SECONDS) throw new Error(`${file.name}: video is longer than 60 seconds`);
+      if (d > MAX_SECONDS) throw new Error(`${file.name}: video is longer than 3 minutes`);
     } else {
       blob = await compressImage(file);
       if (blob.size > MAX_IMAGE) throw new Error(`${file.name}: photo is still larger than 5 MB`);
@@ -175,7 +175,7 @@ export default function StudentPoe() {
       <div className="space-y-6 max-w-3xl">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Portfolio of Evidence</h2>
-          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Record a task you performed with photos or one short video (up to 60 seconds). Your teacher marks it.</p>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Record a task you performed with photos or one short video (up to 3 minutes). Your teacher marks it.</p>
         </div>
 
         {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300">{error}</div>}
