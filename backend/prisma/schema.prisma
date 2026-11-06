@@ -1117,6 +1117,7 @@ enum PoeStatus {
 enum PoeMediaKind {
   IMAGE
   VIDEO
+  DOCUMENT // POE_DOCS_V1
 }
 
 model PoeEntry {
@@ -1144,6 +1145,7 @@ model PoeEntry {
 }
 
 model PoeMedia {
+  fileName        String?
   id              String       @id @default(uuid())
   entryId         String
   entry           PoeEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
