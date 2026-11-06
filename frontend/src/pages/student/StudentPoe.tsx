@@ -4,7 +4,7 @@ import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
-interface Media { id: string; kind: 'IMAGE' | 'VIDEO'; url: string; thumbnailUrl?: string | null }
+interface Media { id: string; kind: 'IMAGE' | 'VIDEO' | 'DOCUMENT'; url: string; fileName?: string | null; thumbnailUrl?: string | null }
 interface Entry {
   id: string; title: string; description?: string | null; performedOn: string; status: string;
   assessorFeedback?: string | null; unit: { id: string; name: string }; media: Media[];
@@ -12,6 +12,9 @@ interface Entry {
 interface UnitOpt { id: string; name: string }
 
 const MAX_IMAGE = 5 * 1024 * 1024;
+const MAX_DOC = 10 * 1024 * 1024;
+const DOC_EXT = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
+const fileExt = (n: string) => (n.split('.').pop() || '').toLowerCase();
 const MAX_VIDEO = 50 * 1024 * 1024;
 const MAX_SECONDS = 180;
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -85,9 +88,13 @@ export default function StudentPoe() {
 
   async function uploadAndAttach(entryId: string, file: File) {
     const isVideo = file.type.startsWith('video/');
+    const isDoc = !isVideo && !file.type.startsWith('image/');
     let blob: Blob = file;
     let seconds: number | undefined;
-    if (isVideo) {
+    if (isDoc) {
+      if (!DOC_EXT.includes(fileExt(file.name))) throw new Error(`${file.name}: allowed documents are PDF, Word, Excel, PowerPoint or text`);
+      if (file.size > MAX_DOC) throw new Error(`${file.name}: document is larger than 10 MB`);
+    } else if (isVideo) {
       if (file.size > MAX_VIDEO) throw new Error(`${file.name}: video is larger than 50 MB`);
       const d = await videoSeconds(file);
       if (d > MAX_SECONDS) throw new Error(`${file.name}: video is longer than 3 minutes`);
@@ -95,9 +102,9 @@ export default function StudentPoe() {
       blob = await compressImage(file);
       if (blob.size > MAX_IMAGE) throw new Error(`${file.name}: photo is still larger than 5 MB`);
     }
-    const sig = await api('/poe/upload-signature', { method: 'POST', token, body: { kind: isVideo ? 'VIDEO' : 'IMAGE' } });
+    const sig = await api('/poe/upload-signature', { method: 'POST', token, body: { kind: isVideo ? 'VIDEO' : isDoc ? 'DOCUMENT' : 'IMAGE' } });
     const form = new FormData();
-    form.append('file', blob, isVideo ? file.name : 'photo.jpg');
+    form.append('file', blob, isVideo || isDoc ? file.name : 'photo.jpg');
     form.append('api_key', sig.apiKey);
     form.append('timestamp', String(sig.timestamp));
     form.append('folder', sig.folder);
@@ -109,7 +116,8 @@ export default function StudentPoe() {
     await api(`/poe/entries/${entryId}/media`, {
       method: 'POST', token,
       body: {
-        kind: isVideo ? 'VIDEO' : 'IMAGE',
+        kind: isVideo ? 'VIDEO' : isDoc ? 'DOCUMENT' : 'IMAGE',
+        fileName: isDoc ? file.name : undefined,
         publicId: up.public_id,
         url: up.secure_url,
         thumbnailUrl: isVideo ? String(up.secure_url).replace(/\.[^./]+$/, '.jpg') : undefined,
@@ -195,8 +203,8 @@ export default function StudentPoe() {
           <label className="block text-xs text-gray-500">Date performed
             <input type="date" className={input} value={performedOn} onChange={(e) => setPerformedOn(e.target.value)} />
           </label>
-          <label className="block text-xs text-gray-500">Photos or one short video
-            <input type="file" accept="image/*,video/*" multiple className="block w-full text-sm mt-1"
+          <label className="block text-xs text-gray-500">Photos, one short video or documents (PDF, Word, Excel, PowerPoint, text)
+            <input type="file" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" multiple className="block w-full text-sm mt-1"
               onChange={(e) => setFiles(Array.from(e.target.files || []))} />
           </label>
           {files.length > 0 && <p className="text-xs text-gray-500">{files.length} file(s) chosen</p>}
@@ -223,7 +231,9 @@ export default function StudentPoe() {
                 <div className="flex flex-wrap gap-2">
                   {en.media.map((m) => m.kind === 'IMAGE'
                     ? <a key={m.id} href={m.url} target="_blank" rel="noreferrer"><img src={m.url} alt="" className="h-20 w-20 object-cover rounded" /></a>
-                    : <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">Video</a>)}
+                    : m.kind === 'DOCUMENT'
+                      ? <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="h-20 w-32 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs text-center p-1 break-all">{m.fileName || 'Document'}</a>
+                      : <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">Video</a>)}
                 </div>
                 {en.status === 'SUBMITTED' && (
                   <div className="pt-1"><button className="text-xs text-red-600" onClick={() => handleDelete(en.id)}>Withdraw and delete</button></div>
@@ -232,7 +242,7 @@ export default function StudentPoe() {
                   <div className="flex flex-wrap items-center gap-3 pt-1">
                     <label className="text-xs text-rgreen font-medium cursor-pointer">
                       Add files
-                      <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleAdd(en.id, e.target.files)} />
+                      <input type="file" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" multiple className="hidden" onChange={(e) => handleAdd(en.id, e.target.files)} />
                     </label>
                     <button className="text-xs text-rgreen font-medium" onClick={() => handleSubmit(en.id)}>Submit</button>
                     <button className="text-xs text-red-600" onClick={() => handleDelete(en.id)}>Delete</button>

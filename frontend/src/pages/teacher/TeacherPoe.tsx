@@ -4,7 +4,7 @@ import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
-interface Media { id: string; kind: 'IMAGE' | 'VIDEO'; url: string }
+interface Media { id: string; kind: 'IMAGE' | 'VIDEO' | 'DOCUMENT'; url: string; fileName?: string | null }
 interface Entry {
   id: string; title: string; description?: string | null; performedOn: string; status?: string;
   assessedAt?: string | null; assessorFeedback?: string | null;
@@ -90,7 +90,9 @@ export default function TeacherPoe() {
             <div className="space-y-3">
               {selected.media.map((m) => m.kind === 'IMAGE'
                 ? <a key={m.id} href={m.url} target="_blank" rel="noreferrer"><img src={m.url} alt="" className="max-h-80 rounded" /></a>
-                : <video key={m.id} src={m.url} controls className="max-h-80 w-full rounded" />)}
+                : m.kind === 'DOCUMENT'
+                  ? <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="block border border-gray-300 rounded-lg p-3 text-sm text-rgreen dark:border-gray-600">Open document: {m.fileName || 'file'}</a>
+                  : <video key={m.id} src={m.url} controls className="max-h-80 w-full rounded" />)}
             </div>
             {readOnly ? (
               <div className="text-sm space-y-1">
