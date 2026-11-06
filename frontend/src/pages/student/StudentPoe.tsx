@@ -223,6 +223,9 @@ export default function StudentPoe() {
                     ? <a key={m.id} href={m.url} target="_blank" rel="noreferrer"><img src={m.url} alt="" className="h-20 w-20 object-cover rounded" /></a>
                     : <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">Video</a>)}
                 </div>
+                {en.status === 'SUBMITTED' && (
+                  <div className="pt-1"><button className="text-xs text-red-600" onClick={() => handleDelete(en.id)}>Withdraw and delete</button></div>
+                )}
                 {editable && (
                   <div className="flex flex-wrap items-center gap-3 pt-1">
                     <label className="text-xs text-rgreen font-medium cursor-pointer">

@@ -126,7 +126,7 @@ router.delete('/entries/:id/media/:mediaId', requireAuth, requireRole('STUDENT')
 router.delete('/entries/:id', requireAuth, requireRole('STUDENT'), async (req, res) => {
   const entry = await prisma.poeEntry.findUnique({ where: { id: req.params.id }, include: { media: true } });
   if (!entry || entry.studentId !== req.user!.userId) return res.status(404).json({ error: 'Entry not found' });
-  if (!EDITABLE.includes(entry.status)) return res.status(409).json({ error: 'Submitted entries cannot be deleted' });
+  if (![...EDITABLE, 'SUBMITTED'].includes(entry.status)) return res.status(409).json({ error: 'Entries that have been marked cannot be deleted' });
   await prisma.poeEntry.delete({ where: { id: entry.id } });
   for (const m of entry.media) {
     try {
@@ -158,5 +158,56 @@ router.post('/entries/:id/submit', requireAuth, requireRole('STUDENT'), async (r
   res.json(updated);
 });
 
+// POE_TEACHER_V1
+async function teacherUnitIds(userId: string): Promise<string[]> {
+  const rows = await prisma.unitLecturer.findMany({ where: { lecturerId: userId }, select: { unitId: true } });
+  return Array.from(new Set(rows.map((r) => r.unitId)));
+}
+
+const assessSchema = z.object({
+  decision: z.enum(['COMPETENT', 'NOT_YET_COMPETENT', 'RESUBMIT_REQUESTED']),
+  feedback: z.string().trim().max(2000).optional(),
+});
+
+router.get('/pending', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const ids = await teacherUnitIds(req.user!.userId);
+  const entries = await prisma.poeEntry.findMany({
+    where: { unitId: { in: ids }, status: 'SUBMITTED' },
+    orderBy: { submittedAt: 'asc' },
+    include: {
+      media: true,
+      unit: { select: { id: true, name: true } },
+      student: { select: { id: true, name: true, admissionNumber: true } },
+    },
+  });
+  res.json({ entries });
+});
+
+router.post('/entries/:id/assess', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const parsed = assessSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Invalid decision' });
+  const { decision, feedback } = parsed.data;
+  if (decision !== 'COMPETENT' && !feedback) return res.status(400).json({ error: 'Please write feedback for the student' });
+  const entry = await prisma.poeEntry.findUnique({ where: { id: req.params.id } });
+  if (!entry) return res.status(404).json({ error: 'Entry not found' });
+  const ids = await teacherUnitIds(req.user!.userId);
+  if (!ids.includes(entry.unitId)) return res.status(403).json({ error: 'You are not assigned to this unit' });
+  if (entry.status !== 'SUBMITTED') return res.status(409).json({ error: 'This entry is not waiting for marking' });
+  const updated = await prisma.poeEntry.update({
+    where: { id: entry.id },
+    data: { status: decision, assessedById: req.user!.userId, assessedAt: new Date(), assessorFeedback: feedback || null },
+  });
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'POE_ASSESSED',
+    entityType: 'PoeEntry',
+    entityId: entry.id,
+    before: { status: entry.status },
+    after: { status: updated.status, feedback: feedback || null },
+  });
+  res.json(updated);
+});
+
 export default router;
+
 

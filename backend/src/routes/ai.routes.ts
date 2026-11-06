@@ -76,7 +76,7 @@ const WORKSPACE_ACCOUNT =
 PORTAL_GUIDE.TEACHER =
   'The teacher menu on the left has: Dashboard. Under Teaching: My Classes (manage your classes), My Units (manage assigned units), ' +
   'Students (view your students), Attendance (record attendance), Assignments, Assessments, Results, Learning Materials, ' +
-  'AI Content Generator, Early Warning (students falling behind). Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT;
+  'AI Content Generator, Early Warning (students falling behind), POE Marking (review the photo and video evidence students submit and mark it Competent or Not yet competent). Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT;
 PORTAL_GUIDE.REGISTRAR =
   'The registrar menu on the left has: Dashboard. Under Admissions & Registration: Admissions (review applications, admit students, ' +
   'reject applications and manage the admission process), Student Records (view and manage student registration information and ' +
