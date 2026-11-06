@@ -61,6 +61,7 @@ export default function StudentPoe() {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [entryMsg, setEntryMsg] = useState<{ id: string; text: string; ok: boolean } | null>(null);
 
   const [unitId, setUnitId] = useState('');
   const [title, setTitle] = useState('');
@@ -151,20 +152,20 @@ export default function StudentPoe() {
   async function handleAdd(entryId: string, list: FileList | null) {
     if (!list || list.length === 0) return;
     setError(''); setMessage('');
-    try { await addFiles(entryId, Array.from(list)); } catch (err) { setError(err instanceof Error ? err.message : 'Upload failed'); }
+    try { await addFiles(entryId, Array.from(list)); } catch (err) { setEntryMsg({ id: entryId, text: err instanceof Error ? err.message : 'Upload failed', ok: false }); }
     setBusy(''); load();
   }
 
   async function handleSubmit(entryId: string) {
     setError(''); setMessage('');
-    try { await api(`/poe/entries/${entryId}/submit`, { method: 'POST', token }); setMessage('Evidence submitted.'); }
-    catch (err) { setError(err instanceof Error ? err.message : 'Could not submit'); }
+    try { await api(`/poe/entries/${entryId}/submit`, { method: 'POST', token }); setEntryMsg({ id: entryId, text: 'Evidence submitted.', ok: true }); }
+    catch (err) { setEntryMsg({ id: entryId, text: err instanceof Error ? err.message : 'Could not submit', ok: false }); }
     load();
   }
 
   async function handleDelete(entryId: string) {
     if (!window.confirm('Delete this entry and its files?')) return;
-    try { await api(`/poe/entries/${entryId}`, { method: 'DELETE', token }); } catch (err) { setError(err instanceof Error ? err.message : 'Could not delete'); }
+    try { await api(`/poe/entries/${entryId}`, { method: 'DELETE', token }); } catch (err) { setEntryMsg({ id: entryId, text: err instanceof Error ? err.message : 'Could not delete', ok: false }); }
     load();
   }
 
@@ -216,6 +217,7 @@ export default function StudentPoe() {
                   </div>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 h-fit">{STATUS_LABEL[en.status] || en.status}</span>
                 </div>
+                {entryMsg && entryMsg.id === en.id && <p className={'text-sm ' + (entryMsg.ok ? 'text-green-700' : 'text-red-600')}>{entryMsg.text}</p>}
                 {en.description && <p className="text-sm text-gray-600 dark:text-gray-300">{en.description}</p>}
                 {en.assessorFeedback && <p className="text-sm bg-yellow-50 border border-yellow-200 rounded p-2 dark:bg-yellow-950 dark:border-yellow-800">Teacher feedback: {en.assessorFeedback}</p>}
                 <div className="flex flex-wrap gap-2">

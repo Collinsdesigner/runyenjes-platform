@@ -183,6 +183,26 @@ router.get('/pending', requireAuth, requireRole('TEACHER'), async (req, res) => 
   res.json({ entries });
 });
 
+// POE_MARKED_V1
+router.get('/marked', requireAuth, requireRole('TEACHER'), async (req, res) => {
+  const ids = await teacherUnitIds(req.user!.userId);
+  const entries = await prisma.poeEntry.findMany({
+    where: {
+      unitId: { in: ids },
+      assessedById: req.user!.userId,
+      status: { in: ['COMPETENT', 'NOT_YET_COMPETENT', 'RESUBMIT_REQUESTED'] },
+    },
+    orderBy: { assessedAt: 'desc' },
+    take: 200,
+    include: {
+      media: true,
+      unit: { select: { id: true, name: true } },
+      student: { select: { id: true, name: true, admissionNumber: true } },
+    },
+  });
+  res.json({ entries });
+});
+
 router.post('/entries/:id/assess', requireAuth, requireRole('TEACHER'), async (req, res) => {
   const parsed = assessSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Invalid decision' });
