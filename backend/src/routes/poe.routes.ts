@@ -12,7 +12,7 @@ const router = Router();
 // The student's phone calls this, then uploads straight to Cloudinary with the result.
 // Limits (5 MB image, 50 MB or 60 s video) are checked again when the evidence is attached.
 router.post('/upload-signature', requireAuth, requireRole('STUDENT'), (req, res) => {
-  const kind = req.body?.kind === 'VIDEO' ? 'video' : 'image';
+  const kind = req.body?.kind === 'VIDEO' ? 'video' : req.body?.kind === 'DOCUMENT' ? 'raw' : 'image';
   const timestamp = Math.round(Date.now() / 1000);
   const folder = `poe/${req.user!.userId}`;
   const signature = cloudinary.utils.api_sign_request({ timestamp, folder }, process.env.CLOUDINARY_API_SECRET || '');
@@ -31,6 +31,8 @@ const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const MAX_VIDEO_SECONDS = 180;
 const MAX_MEDIA_PER_ENTRY = 6;
+const MAX_DOC_BYTES = 10 * 1024 * 1024;
+const DOC_EXT = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
 const EDITABLE = ['DRAFT', 'RESUBMIT_REQUESTED'];
 
 const entrySchema = z.object({
@@ -41,7 +43,8 @@ const entrySchema = z.object({
 });
 
 const mediaSchema = z.object({
-  kind: z.enum(['IMAGE', 'VIDEO']),
+  kind: z.enum(['IMAGE', 'VIDEO', 'DOCUMENT']),
+  fileName: z.string().trim().max(200).optional(),
   publicId: z.string().min(1),
   url: z.string().url(),
   thumbnailUrl: z.string().url().optional(),
@@ -97,6 +100,11 @@ router.post('/entries/:id/media', requireAuth, requireRole('STUDENT'), async (re
     return res.status(400).json({ error: 'File is not from the college storage' });
   }
   if (m.kind === 'IMAGE' && m.bytes > MAX_IMAGE_BYTES) return res.status(400).json({ error: 'Photo is larger than 5 MB' });
+  if (m.kind === 'DOCUMENT') {
+    const ext = (m.fileName || '').split('.').pop()?.toLowerCase() || '';
+    if (!DOC_EXT.includes(ext)) return res.status(400).json({ error: 'Allowed documents: PDF, Word, Excel, PowerPoint or text' });
+    if (m.bytes > MAX_DOC_BYTES) return res.status(400).json({ error: 'Document is larger than 10 MB' });
+  }
   if (m.kind === 'VIDEO') {
     if (m.bytes > MAX_VIDEO_BYTES) return res.status(400).json({ error: 'Video is larger than 50 MB' });
     if ((m.durationSeconds ?? 0) > MAX_VIDEO_SECONDS) return res.status(400).json({ error: 'Video is longer than 3 minutes' });
@@ -116,7 +124,7 @@ router.delete('/entries/:id/media/:mediaId', requireAuth, requireRole('STUDENT')
   if (!EDITABLE.includes(media.entry.status)) return res.status(409).json({ error: 'This entry can no longer be changed' });
   await prisma.poeMedia.delete({ where: { id: media.id } });
   try {
-    await cloudinary.uploader.destroy(media.publicId, { resource_type: media.kind === 'VIDEO' ? 'video' : 'image' });
+    await cloudinary.uploader.destroy(media.publicId, { resource_type: media.kind === 'VIDEO' ? 'video' : media.kind === 'DOCUMENT' ? 'raw' : 'image' });
   } catch (e) {
     console.error('POE media cleanup failed:', e);
   }
