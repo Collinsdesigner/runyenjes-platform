@@ -29,7 +29,7 @@ router.post('/upload-signature', requireAuth, requireRole('STUDENT'), (req, res)
 // POE_STUDENT_V1
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
-const MAX_VIDEO_SECONDS = 60;
+const MAX_VIDEO_SECONDS = 180;
 const MAX_MEDIA_PER_ENTRY = 6;
 const EDITABLE = ['DRAFT', 'RESUBMIT_REQUESTED'];
 
@@ -99,7 +99,7 @@ router.post('/entries/:id/media', requireAuth, requireRole('STUDENT'), async (re
   if (m.kind === 'IMAGE' && m.bytes > MAX_IMAGE_BYTES) return res.status(400).json({ error: 'Photo is larger than 5 MB' });
   if (m.kind === 'VIDEO') {
     if (m.bytes > MAX_VIDEO_BYTES) return res.status(400).json({ error: 'Video is larger than 50 MB' });
-    if ((m.durationSeconds ?? 0) > MAX_VIDEO_SECONDS) return res.status(400).json({ error: 'Video is longer than 60 seconds' });
+    if ((m.durationSeconds ?? 0) > MAX_VIDEO_SECONDS) return res.status(400).json({ error: 'Video is longer than 3 minutes' });
     if (entry.media.some((x) => x.kind === 'VIDEO')) return res.status(400).json({ error: 'Only one video per entry' });
   }
   if (entry.media.length >= MAX_MEDIA_PER_ENTRY) return res.status(400).json({ error: 'Maximum 6 files per entry' });
