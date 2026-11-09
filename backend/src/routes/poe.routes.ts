@@ -4,6 +4,7 @@ import cloudinary from '../services/media.service';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { logAudit } from '../services/audit.service';
+import { buildPoePortfolioPdf } from '../services/poe-pdf.service';
 import * as zodLib from 'zod';
 const z = zodLib.z;
 
@@ -236,6 +237,86 @@ router.post('/entries/:id/assess', requireAuth, requireRole('TEACHER'), async (r
   res.json(updated);
 });
 
+// POE_ADMIN_V1
+const VIEW_ROLES = ['REGISTRAR', 'ADMIN', 'EXAM_OFFICER'];
+const POE_STATUSES = ['DRAFT', 'SUBMITTED', 'COMPETENT', 'NOT_YET_COMPETENT', 'RESUBMIT_REQUESTED'];
+
+router.get('/admin/filters', requireAuth, requireRole(...VIEW_ROLES), async (_req, res) => {
+  const [programmes, units] = await Promise.all([
+    prisma.program.findMany({ select: { id: true, name: true, level: true }, orderBy: { name: 'asc' } }),
+    prisma.unit.findMany({ select: { id: true, name: true, programId: true }, orderBy: { name: 'asc' } }),
+  ]);
+  res.json({ programmes, units });
+});
+
+router.get('/admin/entries', requireAuth, requireRole(...VIEW_ROLES), async (req, res) => {
+  const { programId, unitId, status, q } = req.query as Record<string, string | undefined>;
+  const where: any = {};
+  if (unitId) where.unitId = unitId;
+  if (programId) where.unit = { programId };
+  if (status && POE_STATUSES.includes(status)) where.status = status;
+  if (q && q.trim()) {
+    where.student = {
+      OR: [
+        { name: { contains: q.trim(), mode: 'insensitive' } },
+        { admissionNumber: { contains: q.trim(), mode: 'insensitive' } },
+      ],
+    };
+  }
+  const entries = await prisma.poeEntry.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    take: 300,
+    include: {
+      media: true,
+      unit: { select: { id: true, name: true } },
+      student: { select: { id: true, name: true, admissionNumber: true } },
+      assessedBy: { select: { name: true } },
+    },
+  });
+  res.json({ entries });
+});
+
+router.get('/admin/student/:studentId', requireAuth, requireRole(...VIEW_ROLES), async (req, res) => {
+  const student = await prisma.user.findUnique({
+    where: { id: req.params.studentId },
+    select: { id: true, name: true, admissionNumber: true },
+  });
+  if (!student) return res.status(404).json({ error: 'Student not found' });
+  const entries = await prisma.poeEntry.findMany({
+    where: { studentId: student.id },
+    orderBy: { performedOn: 'desc' },
+    include: { media: true, unit: { select: { id: true, name: true } }, assessedBy: { select: { name: true } } },
+  });
+  res.json({ student, entries });
+});
+
+router.get('/admin/student/:studentId/pdf', requireAuth, requireRole(...VIEW_ROLES), async (req, res) => {
+  const student = await prisma.user.findUnique({
+    where: { id: req.params.studentId },
+    select: { id: true, name: true, admissionNumber: true },
+  });
+  if (!student) return res.status(404).json({ error: 'Student not found' });
+  const entries = await prisma.poeEntry.findMany({
+    where: { studentId: student.id, status: { not: 'DRAFT' } },
+    orderBy: { performedOn: 'asc' },
+    include: { media: true, unit: { select: { name: true } }, assessedBy: { select: { name: true } } },
+  });
+  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const pdf = await buildPoePortfolioPdf(settings?.institutionName || 'Institution', student, entries as any);
+  await logAudit({
+    actorId: req.user!.userId,
+    action: 'POE_PORTFOLIO_EXPORTED',
+    entityType: 'User',
+    entityId: student.id,
+    after: { entries: entries.length },
+  });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="portfolio-${student.admissionNumber || student.id}.pdf"`);
+  res.send(pdf);
+});
+
 export default router;
+
 
 
