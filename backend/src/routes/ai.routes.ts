@@ -83,7 +83,7 @@ PORTAL_GUIDE.REGISTRAR =
   'admission numbers), Continuation (manage student continuation and confirm students who report physically). ' +
   'Under Academic Administration: Academic Records, Programmes & Departments, Manage Academic Structure, Timetable. ' +
   'Under Documents: Student Documents, Letters & Certificates, Approvals. Under Communication: Announcements. ' +
-  'Under Reports: Registrar Reports. Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT +
+  'Under Reports: Registrar Reports. Student POE (view the photo, video and document evidence students submit and download a student portfolio as a PDF) is also in the menu. Under My Work: Staff Self-Service, Job Board.' + WORKSPACE_ACCOUNT +
   ' The bell at the top shows pending applications and requests.';
 PORTAL_GUIDE.ADMIN =
   'The administrator menu on the left has: Dashboard. Under Administration: Users, Students (manage student records), ' +

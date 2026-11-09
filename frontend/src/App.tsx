@@ -83,6 +83,7 @@ import StudentRequests from './pages/student/StudentRequests';
 import StudentPoe from './pages/student/StudentPoe';
 import FinanceApprovals from './pages/finance/FinanceApprovals';
 import RegistrarApprovals from './pages/registrar/RegistrarApprovals';
+import PoeStudents from './pages/poe/PoeStudents';
 // ShortCourses removed for now — redundant with department programs (see pages/ShortCourses.tsx if ever needed again)
 
 export default function App() {
@@ -213,6 +214,7 @@ export default function App() {
                 <Route path="/student/requests" element={<StudentRequests />} />
                 <Route path="/finance/approvals" element={<ModuleGate moduleKey="finance"><FinanceApprovals /></ModuleGate>} />
                 <Route path="/registrar/approvals" element={<RegistrarApprovals />} />
+                <Route path="/poe/students" element={<PoeStudents />} />
 </Routes>
       </BrowserRouter>
     </AuthProvider>

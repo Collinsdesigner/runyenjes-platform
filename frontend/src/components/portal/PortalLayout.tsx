@@ -138,6 +138,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Programmes & Departments', path: '/registrar/programmes', icon: '🏛️' },
         { label: 'Manage Academic Structure', path: '/registrar/structure', icon: '🛠' },
         { label: 'Timetable', path: '/registrar/timetable', icon: '▦' },
+        { label: 'Student POE', path: '/poe/students', icon: '📸' },
       ],
     },
     {
@@ -177,6 +178,7 @@ const roleSections: Record<string, NavSection[]> = {
         { label: 'Staff', path: '/admin/staff', icon: '👨‍🏫' },
         { label: 'Mass Import', path: '/admin/bulk-import', icon: '📥' },
         { label: 'Alumni', path: '/admin/alumni', icon: '🎓' },
+        { label: 'Student POE', path: '/poe/students', icon: '📸' },
       ],
     },
     {
@@ -238,7 +240,7 @@ const roleSections: Record<string, NavSection[]> = {
     },
     {
       title: 'Examinations',
-      items: [{ label: 'Exams & Results', path: '/examinations/results', icon: '📊' }],
+      items: [{ label: 'Exams & Results', path: '/examinations/results', icon: '📊' }, { label: 'Student POE', path: '/poe/students', icon: '📸' }],
     },
   ],
 
