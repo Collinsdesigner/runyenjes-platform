@@ -182,12 +182,12 @@ export default function App() {
                 <Route path="/teacher/early-warning" element={<TeacherEarlyWarning />} />
                 <Route path="/teacher/assessments" element={<TeacherAssessments />} />
                 <Route path="/teacher/results" element={<TeacherResults />} />
-                <Route path="/teacher/poe" element={<TeacherPoe />} />
+                <Route path="/teacher/poe" element={<ModuleGate moduleKey="poe"><TeacherPoe /></ModuleGate>} /> {/* POE_MODULE_V1 */}
                 <Route path="/student/assignments" element={<StudentAssignments />} />
                 <Route path="/student/academics" element={<StudentAcademics />} />
                 <Route path="/student/fees" element={<ModuleGate moduleKey="finance"><StudentFees /></ModuleGate>} />
                 <Route path="/student/results" element={<StudentResults />} />
-                <Route path="/student/poe" element={<StudentPoe />} />
+                <Route path="/student/poe" element={<ModuleGate moduleKey="poe"><StudentPoe /></ModuleGate>} />
                 <Route path="/student/records" element={<StudentRecords />} />
          <Route path="/security" element={<Security />} />
          <Route path="/registrar" element={<RegistrarPortal />} />
@@ -214,7 +214,7 @@ export default function App() {
                 <Route path="/student/requests" element={<StudentRequests />} />
                 <Route path="/finance/approvals" element={<ModuleGate moduleKey="finance"><FinanceApprovals /></ModuleGate>} />
                 <Route path="/registrar/approvals" element={<RegistrarApprovals />} />
-                <Route path="/poe/students" element={<PoeStudents />} />
+                <Route path="/poe/students" element={<ModuleGate moduleKey="poe"><PoeStudents /></ModuleGate>} />
 </Routes>
       </BrowserRouter>
     </AuthProvider>
