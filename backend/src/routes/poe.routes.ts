@@ -1,5 +1,6 @@
 // POE_ROUTES_V1
 // POE_NAV_PDF_V1
+// POE_ENTRY_PDF_V1
 import { Router } from 'express';
 import cloudinary from '../services/media.service';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -299,11 +300,17 @@ router.get('/admin/student/:studentId/pdf', requireAuth, requireRole(...VIEW_ROL
   });
   if (!student) return res.status(404).json({ error: 'Student not found' });
   const entries = await prisma.poeEntry.findMany({
-    where: { studentId: student.id, status: { not: 'DRAFT' } },
+    where: {
+      studentId: student.id,
+      status: { not: 'DRAFT' },
+      ...(typeof req.query.entryId === 'string' && req.query.entryId ? { id: req.query.entryId } : {}),
+    },
     orderBy: { performedOn: 'asc' },
     include: { media: true, unit: { select: { name: true } }, assessedBy: { select: { name: true } } },
   });
   const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const singleEntry = typeof req.query.entryId === 'string' && req.query.entryId.length > 0;
+  if (singleEntry && entries.length === 0) return res.status(404).json({ error: 'Entry not found' });
   const draftCount = await prisma.poeEntry.count({ where: { studentId: student.id, status: 'DRAFT' } });
   const skip = String(req.query.skip || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   const extOf = (m: { url: string; fileName?: string | null }) => ((m.fileName || m.url).split('?')[0].split('.').pop() || '').toLowerCase();
@@ -319,7 +326,7 @@ router.get('/admin/student/:studentId/pdf', requireAuth, requireRole(...VIEW_ROL
       return true;
     }),
   }));
-  const pdf = await buildPoePortfolioPdf(settings?.institutionName || 'Institution', student, shown as any, { draftCount });
+  const pdf = await buildPoePortfolioPdf(settings?.institutionName || 'Institution', student, shown as any, { draftCount: singleEntry ? undefined : draftCount, single: singleEntry });
   await logAudit({
     actorId: req.user!.userId,
     action: 'POE_PORTFOLIO_EXPORTED',
