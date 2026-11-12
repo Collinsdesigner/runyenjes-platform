@@ -1,4 +1,5 @@
 // POE_ADMIN_PAGE_V1
+// POE_NAV_PDF_V1
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
@@ -32,6 +33,10 @@ export default function PoeStudents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const [incPdf, setIncPdf] = useState(true);
+  const [incDocx, setIncDocx] = useState(true);
+  const [incVideo, setIncVideo] = useState(true);
 
   useEffect(() => {
     if (!token) return;
@@ -57,12 +62,16 @@ export default function PoeStudents() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [token, programId, unitId, status]);
+  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [token, programId, unitId, status, refresh]);
 
   async function downloadPdf(student: Entry['student']) {
     setPdfBusy(true); setError('');
     try {
-      const res = await fetch(`${API_URL}/poe/admin/student/${student.id}/pdf`, { headers: { Authorization: `Bearer ${token}` } });
+      const skip = [incPdf ? '' : 'pdf', incDocx ? '' : 'docx', incVideo ? '' : 'video'].filter(Boolean).join(',');
+      const res = await fetch(`${API_URL}/poe/admin/student/${student.id}/pdf?t=${Date.now()}${skip ? `&skip=${skip}` : ''}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      });
       if (!res.ok) throw new Error('Could not create the PDF');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -76,6 +85,18 @@ export default function PoeStudents() {
     } finally {
       setPdfBusy(false);
     }
+  }
+
+  function clearFilters() {
+    setProgramId(''); setUnitId(''); setStatus(''); setQ('');
+    setSelected(null);
+    setRefresh((n) => n + 1);
+  }
+  function viewAllFor(student: Entry['student']) {
+    setProgramId(''); setUnitId(''); setStatus('');
+    setQ(student.admissionNumber || student.name);
+    setSelected(null);
+    setRefresh((n) => n + 1);
   }
 
   const input = 'border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-600';
@@ -92,7 +113,7 @@ export default function PoeStudents() {
 
         {selected ? (
           <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3 dark:bg-gray-900 dark:border-gray-700">
-            <button className="text-xs text-gray-500" onClick={() => setSelected(null)}>Back to the list</button>
+            <button className="text-sm text-rgreen font-medium" onClick={() => setSelected(null)}>&larr; Back to Student POE</button>
             <div>
               <div className="font-semibold text-gray-900 dark:text-gray-100">{selected.title}</div>
               <div className="text-xs text-gray-500">{selected.student.name}{selected.student.admissionNumber ? ` (${selected.student.admissionNumber})` : ''} - {selected.unit.name} - performed {new Date(selected.performedOn).toLocaleDateString()}</div>
@@ -112,6 +133,15 @@ export default function PoeStudents() {
                 {selected.assessorFeedback && <p className="bg-yellow-50 border border-yellow-200 rounded p-2 mt-1 dark:bg-yellow-950 dark:border-yellow-800">Feedback: {selected.assessorFeedback}</p>}
               </div>
             )}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-xs text-gray-500">List these files in the PDF:</span>
+              <label className="flex items-center gap-1"><input type="checkbox" checked={incPdf} onChange={(e) => setIncPdf(e.target.checked)} /> PDF files</label>
+              <label className="flex items-center gap-1"><input type="checkbox" checked={incDocx} onChange={(e) => setIncDocx(e.target.checked)} /> Word files</label>
+              <label className="flex items-center gap-1"><input type="checkbox" checked={incVideo} onChange={(e) => setIncVideo(e.target.checked)} /> Videos</label>
+            </div>
+            <button onClick={() => viewAllFor(selected.student)} className="border border-gray-300 text-sm px-4 py-2 rounded-lg mr-2 dark:border-gray-600">
+              View all entries for this student
+            </button>
             <button disabled={pdfBusy} onClick={() => downloadPdf(selected.student)} className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50">
               {pdfBusy ? 'Preparing PDF...' : 'Download portfolio PDF'}
             </button>
@@ -134,6 +164,7 @@ export default function PoeStudents() {
               <form onSubmit={(e) => { e.preventDefault(); load(); }} className="flex gap-2">
                 <input className={input} placeholder="Student name or admission #" value={q} onChange={(e) => setQ(e.target.value)} />
                 <button type="submit" className="border border-gray-300 text-sm px-3 rounded-lg dark:border-gray-600">Search</button>
+                <button type="button" onClick={clearFilters} className="border border-gray-300 text-sm px-3 rounded-lg dark:border-gray-600">Clear filters</button>
               </form>
             </div>
             <div className="space-y-3">

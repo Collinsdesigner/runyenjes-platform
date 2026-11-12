@@ -1,4 +1,5 @@
 // POE_PDF_V1
+// POE_NAV_PDF_V1
 import PDFDocument from 'pdfkit';
 
 type Doc = InstanceType<typeof PDFDocument>;
@@ -48,7 +49,8 @@ async function thumb(url: string): Promise<Buffer | null> {
 export async function buildPoePortfolioPdf(
   institutionName: string,
   student: { name: string; admissionNumber?: string | null },
-  entries: PoePdfEntry[]
+  entries: PoePdfEntry[],
+  opts: { draftCount?: number } = {}
 ): Promise<Buffer> {
   const doc = new PDFDocument({ margin: MARGIN, size: 'A4' });
   const chunks: Buffer[] = [];
@@ -68,6 +70,11 @@ export async function buildPoePortfolioPdf(
   doc.moveDown(2);
   const competent = entries.filter((e) => e.status === 'COMPETENT').length;
   doc.fontSize(12).text(`Entries: ${entries.length}   Competent: ${competent}`, { align: 'center' });
+  if (opts.draftCount !== undefined) {
+    doc.moveDown(0.3);
+    doc.fontSize(10).fillColor('#666666').text(`Draft entries not included: ${opts.draftCount}`, { align: 'center' });
+    doc.fillColor('#000000');
+  }
   doc.moveDown(0.5);
   doc.fontSize(10).fillColor('#666666').text('Generated on ' + fmt(new Date()), { align: 'center' });
   doc.fillColor('#000000');
@@ -96,15 +103,22 @@ export async function buildPoePortfolioPdf(
         ensure(doc, 100);
         const y = doc.y + 4;
         let x = MARGIN;
+        let failed = 0;
         for (const m of images) {
           const buf = await thumb(m.url);
+          let ok = false;
           if (buf) {
-            try { doc.image(buf, x, y, { fit: [90, 90] }); } catch { /* skip unreadable image */ }
+            try { doc.image(buf, x, y, { fit: [90, 90] }); ok = true; } catch { /* skip unreadable image */ }
           }
+          if (!ok) failed++;
           x += 100;
         }
         doc.y = y + 96;
         doc.x = MARGIN;
+        if (failed) {
+          doc.fontSize(9).fillColor('#b00020').text(`Photo could not be loaded (${failed})`);
+          doc.fillColor('#000000');
+        }
       }
       for (const m of e.media.filter((x) => x.kind !== 'IMAGE')) {
         ensure(doc, 16);

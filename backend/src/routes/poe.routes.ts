@@ -1,4 +1,5 @@
 // POE_ROUTES_V1
+// POE_NAV_PDF_V1
 import { Router } from 'express';
 import cloudinary from '../services/media.service';
 import { requireAuth, requireRole } from '../middleware/auth';
@@ -303,7 +304,22 @@ router.get('/admin/student/:studentId/pdf', requireAuth, requireRole(...VIEW_ROL
     include: { media: true, unit: { select: { name: true } }, assessedBy: { select: { name: true } } },
   });
   const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-  const pdf = await buildPoePortfolioPdf(settings?.institutionName || 'Institution', student, entries as any);
+  const draftCount = await prisma.poeEntry.count({ where: { studentId: student.id, status: 'DRAFT' } });
+  const skip = String(req.query.skip || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const extOf = (m: { url: string; fileName?: string | null }) => ((m.fileName || m.url).split('?')[0].split('.').pop() || '').toLowerCase();
+  const shown = entries.map((e) => ({
+    ...e,
+    media: e.media.filter((m) => {
+      if (m.kind === 'VIDEO') return !skip.includes('video');
+      if (m.kind === 'DOCUMENT') {
+        const ext = extOf(m);
+        if (ext === 'pdf') return !skip.includes('pdf');
+        if (ext === 'doc' || ext === 'docx') return !skip.includes('docx');
+      }
+      return true;
+    }),
+  }));
+  const pdf = await buildPoePortfolioPdf(settings?.institutionName || 'Institution', student, shown as any, { draftCount });
   await logAudit({
     actorId: req.user!.userId,
     action: 'POE_PORTFOLIO_EXPORTED',
@@ -311,6 +327,8 @@ router.get('/admin/student/:studentId/pdf', requireAuth, requireRole(...VIEW_ROL
     entityId: student.id,
     after: { entries: entries.length },
   });
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="portfolio-${student.admissionNumber || student.id}.pdf"`);
   res.send(pdf);
