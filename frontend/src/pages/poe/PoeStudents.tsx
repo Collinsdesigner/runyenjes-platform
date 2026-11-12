@@ -1,5 +1,6 @@
 // POE_ADMIN_PAGE_V1
 // POE_NAV_PDF_V1
+// POE_ENTRY_PDF_V1
 import { useEffect, useState } from 'react';
 import PortalLayout from '../../components/portal/PortalLayout';
 import { api } from '../../api/client';
@@ -64,11 +65,11 @@ export default function PoeStudents() {
   }
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [token, programId, unitId, status, refresh]);
 
-  async function downloadPdf(student: Entry['student']) {
+  async function downloadPdf(student: Entry['student'], entryId?: string) {
     setPdfBusy(true); setError('');
     try {
       const skip = [incPdf ? '' : 'pdf', incDocx ? '' : 'docx', incVideo ? '' : 'video'].filter(Boolean).join(',');
-      const res = await fetch(`${API_URL}/poe/admin/student/${student.id}/pdf?t=${Date.now()}${skip ? `&skip=${skip}` : ''}`, {
+      const res = await fetch(`${API_URL}/poe/admin/student/${student.id}/pdf?t=${Date.now()}${skip ? `&skip=${skip}` : ''}${entryId ? `&entryId=${entryId}` : ''}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
@@ -77,7 +78,7 @@ export default function PoeStudents() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `portfolio-${student.admissionNumber || student.id}.pdf`;
+      a.download = `portfolio-${student.admissionNumber || student.id}${entryId ? '-entry' : ''}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -142,8 +143,11 @@ export default function PoeStudents() {
             <button onClick={() => viewAllFor(selected.student)} className="border border-gray-300 text-sm px-4 py-2 rounded-lg mr-2 dark:border-gray-600">
               View all entries for this student
             </button>
+            <button disabled={pdfBusy} onClick={() => downloadPdf(selected.student, selected.id)} className="border border-gray-300 text-sm px-4 py-2 rounded-lg mr-2 disabled:opacity-50 dark:border-gray-600">
+              Download this entry only
+            </button>
             <button disabled={pdfBusy} onClick={() => downloadPdf(selected.student)} className="bg-rgreen text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50">
-              {pdfBusy ? 'Preparing PDF...' : 'Download portfolio PDF'}
+              {pdfBusy ? 'Preparing PDF...' : 'Download full portfolio PDF (all entries)'}
             </button>
           </div>
         ) : (

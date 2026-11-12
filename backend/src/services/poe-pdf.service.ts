@@ -1,5 +1,6 @@
 // POE_PDF_V1
 // POE_NAV_PDF_V1
+// POE_ENTRY_PDF_V1
 import PDFDocument from 'pdfkit';
 
 type Doc = InstanceType<typeof PDFDocument>;
@@ -50,7 +51,7 @@ export async function buildPoePortfolioPdf(
   institutionName: string,
   student: { name: string; admissionNumber?: string | null },
   entries: PoePdfEntry[],
-  opts: { draftCount?: number } = {}
+  opts: { draftCount?: number; single?: boolean } = {}
 ): Promise<Buffer> {
   const doc = new PDFDocument({ margin: MARGIN, size: 'A4' });
   const chunks: Buffer[] = [];
@@ -70,6 +71,11 @@ export async function buildPoePortfolioPdf(
   doc.moveDown(2);
   const competent = entries.filter((e) => e.status === 'COMPETENT').length;
   doc.fontSize(12).text(`Entries: ${entries.length}   Competent: ${competent}`, { align: 'center' });
+  if (opts.single) {
+    doc.moveDown(0.3);
+    doc.fontSize(10).fillColor('#666666').text('This PDF contains one entry only', { align: 'center' });
+    doc.fillColor('#000000');
+  }
   if (opts.draftCount !== undefined) {
     doc.moveDown(0.3);
     doc.fontSize(10).fillColor('#666666').text(`Draft entries not included: ${opts.draftCount}`, { align: 'center' });
