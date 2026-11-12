@@ -189,7 +189,7 @@ app.use('/documents', documentsRoutes);
 app.use('/letters', lettersRoutes);
 app.use('/audit', auditRoutes);
 app.use('/requests', requestsRoutes);
-app.use('/poe', poeRoutes);
+app.use('/poe', requireModule('poe'), poeRoutes); // POE_MODULE_V1
 
 /**
  * =========================

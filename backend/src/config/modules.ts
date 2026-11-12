@@ -13,6 +13,7 @@ export const MODULES = [
   { key: 'stores', label: 'Stores / Inventory', description: 'Stores portal: items and stock movements' },
   { key: 'procurement', label: 'Procurement', description: 'Purchase requests (works with Stores)' },
   { key: 'alumni', label: 'Alumni and Job Board', description: 'Alumni portal, graduating students to alumni, and the job board' },
+  { key: 'poe', label: 'Portfolio of Evidence (POE)', description: 'Students upload photos, videos and documents as evidence; teachers mark it; registrar can export portfolios' }, // POE_MODULE_V1
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]['key'];
@@ -38,6 +39,7 @@ export const MODULE_AUDIENCE: Record<string, string[]> = {
   stores: ['STORES_OFFICER', 'ADMIN'],
   procurement: ['PROCUREMENT_OFFICER', 'ADMIN'],
   alumni: ['ALUMNI', 'ADMIN'],
+  poe: ['STUDENT', 'TEACHER', 'REGISTRAR', 'EXAM_OFFICER', 'ADMIN'],
 };
 
 // Procurement writes to Stores' tables, so it cannot run without Stores.

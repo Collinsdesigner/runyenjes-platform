@@ -5,6 +5,7 @@ import { Router } from 'express';
 import { Role } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
+import { isModuleEnabled } from '../middleware/modules';
 
 const router = Router();
 
@@ -97,9 +98,10 @@ router.get('/', requireAuth, async (req, res) => {
       }
     }
 
+    const poeOn = await isModuleEnabled('poe'); // POE_MODULE_NOTICES_V1
     // 3b. POE: evidence marked (student) and submissions waiting (teacher)
     if (role === 'STUDENT') {
-      const marked = await prisma.poeEntry.findMany({
+      const marked = !poeOn ? [] : await prisma.poeEntry.findMany({
         where: { studentId: userId, assessedAt: { gte: since }, status: { in: ['COMPETENT', 'NOT_YET_COMPETENT', 'RESUBMIT_REQUESTED'] } },
         orderBy: { assessedAt: 'desc' },
         take: 5,
@@ -117,7 +119,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
     if (role === 'TEACHER') {
       const mine = await prisma.unitLecturer.findMany({ where: { lecturerId: userId }, select: { unitId: true } });
-      const waitingPoe = await prisma.poeEntry.count({ where: { status: 'SUBMITTED', unitId: { in: mine.map((m) => m.unitId) } } });
+      const waitingPoe = !poeOn ? 0 : await prisma.poeEntry.count({ where: { status: 'SUBMITTED', unitId: { in: mine.map((m) => m.unitId) } } });
       if (waitingPoe > 0) {
         items.push({
           id: 'poe-pending',

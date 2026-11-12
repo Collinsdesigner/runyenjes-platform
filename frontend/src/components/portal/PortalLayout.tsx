@@ -305,6 +305,7 @@ const MODULE_PATHS: Record<string, string[]> = {
   stores: ['/stores'],
   procurement: ['/procurement'],
   alumni: ['/alumni', '/admin/alumni', '/jobs'],
+  poe: ['/student/poe', '/teacher/poe', '/poe'], // POE_MODULE_V1
 };
 
 function moduleForPath(path: string): string | null {
